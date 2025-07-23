@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "allow": ["Bash(find:*)", "Bash(pnpm build:*)"],
+    "deny": []
+  }
+}
