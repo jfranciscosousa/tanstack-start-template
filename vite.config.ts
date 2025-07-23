@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import checker from "vite-plugin-checker";
+import react from "@vitejs/plugin-react"
 
 export default defineConfig({
   server: {
@@ -15,7 +16,9 @@ export default defineConfig({
       projects: ["./tsconfig.json"],
     }),
 
-    tanstackStart(),
+    tanstackStart({ customViteReactPlugin: true }),
+
+    react(),
 
     tailwindcss(),
   ],

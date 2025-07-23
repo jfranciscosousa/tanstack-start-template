@@ -12,9 +12,9 @@
   "dependencies": {
     "@prisma/client": "6.12.0",
     "@tailwindcss/vite": "^4.1.11",
-    "@tanstack/react-router": "^1.129.3",
-    "@tanstack/react-router-devtools": "^1.129.3",
-    "@tanstack/react-start": "^1.129.3",
+    "@tanstack/react-router": "1.129.8",
+    "@tanstack/react-router-devtools": "1.129.8",
+    "@tanstack/react-start": "1.129.8",
     "bcrypt-ts": "^7.1.0",
     "csv-parse": "^6.1.0",
     "daisyui": "^5.0.46",

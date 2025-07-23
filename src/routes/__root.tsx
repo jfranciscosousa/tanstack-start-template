@@ -11,11 +11,11 @@ import { Toaster } from "sonner";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
 import { seo } from "~/server/seo.js";
-import { useAppSession } from "~/server/websession";
+import { useWebSession } from "~/server/websession";
 import appCss from "~/styles/app.css?url";
 
 const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async () => {
-  const session = await useAppSession();
+  const session = await useWebSession();
 
   return session.user;
 });

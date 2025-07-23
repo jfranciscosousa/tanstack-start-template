@@ -3,7 +3,7 @@ import { Home, CheckSquare, LogIn, LogOut, User, Menu, Settings } from "lucide-r
 import { Avatar } from "./Avatar";
 
 interface NavbarProps {
-  user: { email: string } | null;
+  user?: { email: string };
 }
 
 export function Navbar({ user }: NavbarProps) {

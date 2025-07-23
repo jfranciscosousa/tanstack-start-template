@@ -1,30 +1,30 @@
 import { useSession } from "@tanstack/react-start/server";
 import { prismaClient } from "./prisma";
-import { User } from "@prisma/client";
+import type { Session } from "@prisma/client";
 import { AppError } from "~/errors";
 
-async function getUserByUserId(userId?: string) {
-  if (!userId) return null;
+async function getUserBySession(sessionId?: string) {
+  if (!sessionId) return;
 
-  return prismaClient.user.findUnique({
+  const session = await prismaClient.session.findUnique({
     where: {
-      id: userId,
+      id: sessionId,
     },
-    select: {
-      email: true,
-      name: true,
-      id: true,
-      createdAt: true,
-      updatedAt: true,
+    include: {
+      user: {
+        omit: { password: true },
+      },
     },
   });
+
+  return session?.user;
 }
 
 type SessionUser = {
-  id: User["id"];
+  id: Session["id"];
 };
 
-export async function useAppSession() {
+export async function useWebSession() {
   if (!process.env.SECRET_KEY_BASE)
     throw new Error("SECRET_KEY_BASE is not set");
 
@@ -34,12 +34,12 @@ export async function useAppSession() {
 
   return {
     ...sessionProps,
-    user: await getUserByUserId(sessionProps.data.id),
+    user: await getUserBySession(sessionProps.data.id),
   };
 }
 
 export async function useLoggedInAppSession() {
-  const session = await useAppSession();
+  const session = await useWebSession();
   const user = session.user;
 
   if (!user) throw new AppError("NOT_FOUND");

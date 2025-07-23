@@ -5,7 +5,8 @@ import { zfd } from "zod-form-data";
 import { AppError } from "~/errors";
 import { hashPassword, verifyPassword } from "~/server/passwords";
 import { prismaClient } from "~/server/prisma";
-import { useAppSession, useLoggedInAppSession } from "~/server/websession";
+import { useLoggedInAppSession } from "~/server/websession";
+import { createAndUseSession, invalidateAllSessions } from "./sessions";
 
 const signUpSchema = zfd
   .formData({
@@ -31,8 +32,6 @@ export const signupFn = createServerFn({ method: "POST" })
 
     const password = await hashPassword(data.password);
 
-    const session = await useAppSession();
-
     if (found) {
       throw new AppError(
         "UNPROCESSABLE_ENTITY",
@@ -48,9 +47,7 @@ export const signupFn = createServerFn({ method: "POST" })
       },
     });
 
-    await session.update({
-      id: user.id,
-    });
+    await createAndUseSession(user.id);
 
     throw redirect({
       href: data.redirectUrl || "/",
@@ -102,10 +99,13 @@ export const updateUserFn = createServerFn({ method: "POST" })
     // Only update password if a new one is provided
     if (data.password) {
       updateData.password = await hashPassword(data.password);
+      await invalidateAllSessions(user.id);
     }
 
     await prismaClient.user.update({
       where: { id: user.id },
       data: updateData,
     });
+
+    await createAndUseSession(user.id);
   });
