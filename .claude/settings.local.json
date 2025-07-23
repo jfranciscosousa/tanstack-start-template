@@ -1,6 +1,10 @@
 {
   "permissions": {
-    "allow": ["Bash(find:*)", "Bash(pnpm build:*)"],
+    "allow": [
+      "Bash(find:*)",
+      "Bash(pnpm build:*)",
+      "WebFetch(domain:daisyui.com)"
+    ],
     "deny": []
   }
 }

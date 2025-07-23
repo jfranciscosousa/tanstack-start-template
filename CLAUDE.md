@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Expense Wizard** is a full-stack React application for expense management and CSV data processing. Users can upload CSV files, map columns to required fields, validate data, and manage financial transactions.
+A TanStack Start template with basic authentication functionality. This is a full-stack React application demonstrating session-based authentication with user registration and login capabilities.
 
 ## Technology Stack
 
@@ -34,81 +34,73 @@ npx prisma studio      # Open database browser
 
 ## Architecture
 
-### File-based Routing
+### File-based Routing Structure
 - Routes in `src/routes/` follow TanStack Router conventions
-- `__root.tsx`: Main layout with navigation
-- `_authed.tsx`: Protected route layout requiring authentication
-- `_authed/upload.tsx`: CSV upload page (protected)
+- `__root.tsx`: Root layout with user context, navigation, and global providers
+- `_authed.tsx`: Protected route layout requiring authentication (redirects to login if not authenticated)
+- `_authed/index.tsx`: Protected dashboard/home page
+- `login.tsx`: Login page with authentication form
+- `signup.tsx`: User registration page
+- `logout.tsx`: Logout functionality
 
 ### Authentication System
-- Session-based auth using custom session management
-- `server/session.server.ts`: Session utilities
-- `server/users.ts`: User operations with bcrypt password hashing
-- Protected routes use `_authed` layout pattern
+- **Session Management**: Uses TanStack Start's `useSession` with encrypted cookies
+- **Password Security**: bcrypt-ts for password hashing and verification
+- **Server Functions**: Type-safe server-side operations using `createServerFn`
+- **Route Protection**: `_authed` layout automatically redirects unauthenticated users to login
+- **Session Persistence**: Users stay logged in across browser sessions
+
+### Key Server Functions
+- `server/sessions.ts`: Login functionality with password verification
+- `server/users.ts`: User registration with email uniqueness validation
+- `server/websession.ts`: Session utilities and user context management
+- `server/passwords.ts`: Password hashing and verification utilities
+- `server/prisma.ts`: Database client configuration
 
 ### Database Schema
+Current schema includes:
 ```
-User (id, email, hashedPassword)
-├─ Category (id, name, userId) 
-└─ Transaction (id, date, description, value, categoryId, userId)
+User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   (hashed)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 ```
 
-### CSV Processing Architecture
-The upload system has sophisticated data processing capabilities:
-
-**Upload Flow**: `Upload.tsx` → CSV parsing → column mapping → `DataPreview.tsx` → validation → (TODO: database persistence)
-
-**Key Features**:
-- Dynamic column mapping to required fields (date, description, value, category)
-- Multiple date formats: YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY, YYYY/MM/DD
-- Multiple number formats with various decimal/thousands separators
-- localStorage persistence for mapping settings
-- Real-time validation with error reporting
-- Paginated preview interface
-
-**Data Transformation**: Raw CSV → parsed objects → mapped fields → validated data → preview with error highlighting
+### Error Handling
+- Custom `AppError` class in `src/errors.ts` with standardized error codes
+- Zod validation error formatting for form inputs
+- Consistent error messaging across authentication flows
 
 ## Component Structure
 
 ### Core Components
-- `components/Auth.tsx`: Authentication form wrapper
-- `components/Login.tsx` & `SignUp.tsx`: Authentication forms
-- `views/Upload/Upload.tsx`: Main CSV upload interface with column mapping
-- `views/Upload/DataPreview.tsx`: Data validation and preview with pagination
+- `components/Navbar.tsx`: Navigation bar with user context and logout
+- `components/SignUp.tsx`: Registration form with validation
+- `components/DefaultCatchBoundary.tsx`: Error boundary for route errors
+- `components/NotFound.tsx`: 404 page component
 
-### Server Functions
-Use `createServerFn` for type-safe server-side operations:
-- Authentication functions in `server/users.ts`
-- Session management in `server/session.server.ts`
+### Authentication Flow
+1. User visits protected route → redirected to `/login` with return URL
+2. Login form validates credentials → creates session → redirects back
+3. Registration creates new user → auto-login → redirects to dashboard
+4. Logout clears session → redirects to login
+
+## Configuration Files
+
+- **vite.config.ts**: TanStack Start plugin + TypeScript paths + Tailwind + type checking
+- **tsconfig.json**: Strict TypeScript with path mapping (`~/src/*`)
+- **prisma/schema.prisma**: SQLite database with User model
+
+## Environment Variables
+
+Required environment variables:
+- `DATABASE_URL`: SQLite database file path (defaults to `file:./dev.db`)
+- `SECRET_KEY_BASE`: Session encryption key (required for production)
 
 ## Styling Guidelines
 
-- Uses DaisyUI semantic color system for automatic light/dark mode support
-- Primary text: `text-base-content`
-- Muted text: `text-base-content/70`
-- Error text: `text-error`
-- Cards: `card bg-base-100 shadow-xl` with `card-body`
-- Buttons: `btn btn-primary`, `btn btn-success`, etc.
-- Forms: `select select-bordered`, `file-input file-input-bordered file-input-primary`
-
-## Database Development
-
-- Database file: `prisma/dev.db`
-- Schema: `prisma/schema.prisma`
-- Migrations: `prisma/migrations/`
-- Always run `pnpm prisma-generate` after schema changes
-
-## Configuration
-
-- **vite.config.ts**: TanStack Start + Tailwind + TypeScript paths
-- **tsconfig.json**: Strict TypeScript with path mapping (`~/`)
-- **.npmrc**: pnpm with `shamefully-hoist=true`
-- **.env**: Database URL configuration
-
-## Current Development Status
-
-**Completed**: Authentication system, CSV upload/parsing, column mapping, data validation, preview interface, database schema
-
-**In Progress**: CSV data persistence to database (currently shows placeholder in `Upload.tsx` handleSubmit function)
-
-**Architecture Note**: The CSV processing system is designed to handle complex data transformation and validation before database persistence. The `previewData` state contains validated, converted data ready for database insertion.
+Uses DaisyUI component library with Tailwind CSS. Check their docs here: https://daisyui.com/docs/v5/

@@ -14,6 +14,8 @@ import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedTodosRouteImport } from './routes/_authed/todos'
+import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -39,17 +41,31 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedTodosRoute = AuthedTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProfileRoute = AuthedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/profile': typeof AuthedProfileRoute
+  '/todos': typeof AuthedTodosRoute
   '/': typeof AuthedIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/profile': typeof AuthedProfileRoute
+  '/todos': typeof AuthedTodosRoute
   '/': typeof AuthedIndexRoute
 }
 export interface FileRoutesById {
@@ -58,14 +74,24 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/_authed/profile': typeof AuthedProfileRoute
+  '/_authed/todos': typeof AuthedTodosRoute
   '/_authed/': typeof AuthedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/logout' | '/signup' | '/'
+  fullPaths: '/login' | '/logout' | '/signup' | '/profile' | '/todos' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/logout' | '/signup' | '/'
-  id: '__root__' | '/_authed' | '/login' | '/logout' | '/signup' | '/_authed/'
+  to: '/login' | '/logout' | '/signup' | '/profile' | '/todos' | '/'
+  id:
+    | '__root__'
+    | '/_authed'
+    | '/login'
+    | '/logout'
+    | '/signup'
+    | '/_authed/profile'
+    | '/_authed/todos'
+    | '/_authed/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -112,14 +138,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/todos': {
+      id: '/_authed/todos'
+      path: '/todos'
+      fullPath: '/todos'
+      preLoaderRoute: typeof AuthedTodosRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/profile': {
+      id: '/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthedProfileRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
 interface AuthedRouteChildren {
+  AuthedProfileRoute: typeof AuthedProfileRoute
+  AuthedTodosRoute: typeof AuthedTodosRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedProfileRoute: AuthedProfileRoute,
+  AuthedTodosRoute: AuthedTodosRoute,
   AuthedIndexRoute: AuthedIndexRoute,
 }
 

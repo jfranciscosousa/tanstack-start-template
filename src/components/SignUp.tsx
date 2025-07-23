@@ -2,7 +2,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useMutation } from "~/hooks/useMutation";
 import { signupFn } from "~/server/users";
-import { User, Mail, Lock, Eye, Loader2, DollarSign } from "lucide-react";
+import { User, Mail, Lock, Eye, Loader2, DollarSign, LogIn } from "lucide-react";
+import { Avatar } from "./Avatar";
 
 export function SignUp() {
   const router = useRouter();
@@ -29,13 +30,15 @@ export function SignUp() {
       <div className="card w-full max-w-md bg-base-100 shadow-2xl">
         <div className="card-body">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl text-primary-content">💰</span>
+            <div className="mx-auto mb-4 flex justify-center">
+              <Avatar size="xl" className="w-16 h-16 p-4 rounded-xl">
+                <span className="text-2xl font-bold">TS</span>
+              </Avatar>
             </div>
-            <h1 className="card-title text-2xl justify-center">
-              Tanstack Start Sqlite
+            <h1 className="text-3xl font-bold">
+              Welcome to TanStack Start
             </h1>
-            <p className="text-base-content/70 mt-2">Create your account</p>
+            <p className="text-base-content/70 mt-2">Create your account to get started</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -111,16 +114,19 @@ export function SignUp() {
 
             <button
               type="submit"
-              className="btn btn-primary w-full mt-6"
+              className="btn btn-primary w-full mt-6 h-12"
               disabled={signupMutation.status === "pending"}
             >
               {signupMutation.status === "pending" ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   Creating account...
                 </>
               ) : (
-                "Create Account"
+                <>
+                  <User size={18} />
+                  Create Account
+                </>
               )}
             </button>
 
@@ -130,10 +136,11 @@ export function SignUp() {
               </div>
             )}
 
-            <div className="divider text-base-content/70">
+            <div className="divider text-base-content/70 text-sm">
               Already have an account?
             </div>
-            <Link to="/login" className="btn btn-outline btn-block">
+            <Link to="/login" className="btn btn-outline btn-block h-12 gap-2">
+              <LogIn size={18} />
               Sign In
             </Link>
           </form>

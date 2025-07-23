@@ -7,20 +7,18 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
+import { Toaster } from "sonner";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
 import { NotFound } from "~/components/NotFound.js";
-import { Navbar } from "~/components/Navbar";
 import { seo } from "~/server/seo.js";
 import { useAppSession } from "~/server/websession";
 import appCss from "~/styles/app.css?url";
 
-const getCurrentUserFn = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const session = await useAppSession();
+const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async () => {
+  const session = await useAppSession();
 
-    return session.user;
-  }
-);
+  return session.user;
+});
 
 export const Route = createRootRoute({
   beforeLoad: async () => ({
@@ -98,8 +96,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-screen bg-base-200">
-        <Navbar user={user} />
-        <main className="container mx-auto px-4 py-8">{children}</main>
+        <Toaster />
+
+        {children}
+
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>

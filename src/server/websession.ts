@@ -1,6 +1,7 @@
 import { useSession } from "@tanstack/react-start/server";
 import { prismaClient } from "./prisma";
 import { User } from "@prisma/client";
+import { AppError } from "~/errors";
 
 async function getUserByUserId(userId?: string) {
   if (!userId) return null;
@@ -8,6 +9,13 @@ async function getUserByUserId(userId?: string) {
   return prismaClient.user.findUnique({
     where: {
       id: userId,
+    },
+    select: {
+      email: true,
+      name: true,
+      id: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 }
@@ -28,4 +36,13 @@ export async function useAppSession() {
     ...sessionProps,
     user: await getUserByUserId(sessionProps.data.id),
   };
+}
+
+export async function useLoggedInAppSession() {
+  const session = await useAppSession();
+  const user = session.user;
+
+  if (!user) throw new AppError("NOT_FOUND");
+
+  return { ...session, user };
 }

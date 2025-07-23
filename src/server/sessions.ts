@@ -4,6 +4,7 @@ import { prismaClient } from "./prisma";
 import { useAppSession } from "./websession";
 import { zfd } from "zod-form-data";
 import z from "zod";
+import { AppError } from "~/errors";
 
 const loginSchema = zfd.formData({
   email: zfd.text(z.email()),
@@ -21,7 +22,7 @@ export const loginFn = createServerFn({ method: "POST" })
     });
 
     if (!user || !(await verifyPassword(data.password, user.password))) {
-      throw new Error("not_found");
+      throw new AppError("NOT_FOUND", "The combination of email and password is incorrect.");
     }
 
     const session = await useAppSession();

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Upload, LogIn, LogOut, User } from "lucide-react";
+import { Home, CheckSquare, LogIn, LogOut, User, Menu, Settings } from "lucide-react";
+import { Avatar } from "./Avatar";
 
 interface NavbarProps {
   user: { email: string } | null;
@@ -7,69 +8,76 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
   return (
-    <div className="navbar bg-base-100 shadow-lg">
+    <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h8m-8 6h16"
-              />
-            </svg>
+            <Menu size={20} />
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-56 p-2 shadow-lg border border-base-300"
           >
             <li>
               <Link
                 to="/"
                 activeProps={{
-                  className: "active",
+                  className: "active bg-primary/20 text-primary",
                 }}
                 activeOptions={{ exact: true }}
-                className="flex items-center gap-2"
+                className="flex items-center gap-3 py-3"
               >
-                <Home size={16} />
-                Home
+                <Home size={18} />
+                Dashboard
               </Link>
             </li>
+            {user && (
+              <li>
+                <div className="flex items-center gap-3 py-3 text-base-content/50 cursor-not-allowed">
+                  <CheckSquare size={18} />
+                  Todos (Coming Soon)
+                </div>
+              </li>
+            )}
           </ul>
         </div>
-        <Link to="/" className="btn btn-ghost text-xl font-bold">
-          <span className="text-primary">=�</span>
-          Tanstack Start Sqlite
+        <Link to="/" className="btn btn-ghost text-lg font-bold px-2">
+          <div className="flex items-center gap-2">
+            <Avatar size="sm">
+              <span className="text-sm font-bold">TS</span>
+            </Avatar>
+            <span className="hidden sm:inline">TanStack Start</span>
+          </div>
         </Link>
       </div>
 
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
+        <ul className="menu menu-horizontal px-1 gap-1">
           <li>
             <Link
               to="/"
               activeProps={{
-                className: "active",
+                className: "active bg-primary/20 text-primary",
               }}
               activeOptions={{ exact: true }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-base-200"
             >
-              <Home size={16} />
-              Home
+              <Home size={18} />
+              Dashboard
             </Link>
           </li>
+          {user && (
+            <li>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-base-content/50 cursor-not-allowed">
+                <CheckSquare size={18} />
+                Todos (Coming Soon)
+              </div>
+            </li>
+          )}
         </ul>
       </div>
 
-      <div className="navbar-end">
+      <div className="navbar-end gap-2">
         {user ? (
           <div className="dropdown dropdown-end">
             <div
@@ -77,34 +85,47 @@ export function Navbar({ user }: NavbarProps) {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-8 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                <User size={16} />
-              </div>
+              <Avatar size="md" className="rounded-full">
+                <User size={18} />
+              </Avatar>
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300"
             >
+              <li className="menu-title">
+                <span className="text-xs uppercase tracking-wider">Account</span>
+              </li>
               <li>
-                <div className="justify-between">
-                  <span className="text-base-content/70">{user.email}</span>
+                <div className="flex flex-col px-4 py-3 bg-base-200 rounded-lg mb-2">
+                  <span className="text-sm font-medium">{user.email}</span>
+                  <span className="text-xs text-base-content/60">Signed in</span>
                 </div>
               </li>
               <li>
                 <Link
-                  to="/logout"
-                  className="flex items-center gap-2 text-error"
+                  to="/profile"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-base-200 rounded-lg"
                 >
-                  <LogOut size={16} />
-                  Logout
+                  <Settings size={18} />
+                  Edit Profile
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/logout"
+                  className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/10 rounded-lg"
+                >
+                  <LogOut size={18} />
+                  Sign out
                 </Link>
               </li>
             </ul>
           </div>
         ) : (
-          <Link to="/login" className="btn btn-primary flex items-center gap-2">
+          <Link to="/login" className="btn btn-primary btn-sm gap-2">
             <LogIn size={16} />
-            Login
+            <span className="hidden sm:inline">Sign in</span>
           </Link>
         )}
       </div>
