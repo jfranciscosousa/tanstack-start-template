@@ -16,7 +16,7 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
-export default function Login() {
+function Login() {
   const { redirectUrl } = Route.useSearch();
   const router = useRouter();
   const fn = useServerFn(loginFn);

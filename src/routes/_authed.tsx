@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_authed")({
     let redirectUrl = `${location.pathname}`;
 
     if (location.searchStr) redirectUrl += `${location.searchStr}`;
-
+console.log(context)
     if (!context.user) {
       throw redirect({
         to: "/login",

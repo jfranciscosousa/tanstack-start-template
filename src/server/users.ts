@@ -14,7 +14,7 @@ const signUpSchema = zfd
     email: zfd.text(z.email()),
     password: zfd.text(),
     passwordConfirmation: zfd.text(),
-    redirectUrl: zfd.text().optional(),
+    redirectUrl: zfd.text(z.string().optional()),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
     message: "Passwords must match",
@@ -22,7 +22,7 @@ const signUpSchema = zfd
   });
 
 export const signupFn = createServerFn({ method: "POST" })
-  .validator((formData: FormData) => signUpSchema.parse(formData))
+  .inputValidator((formData: FormData) => signUpSchema.parse(formData))
   .handler(async ({ data }) => {
     const found = await prismaClient.user.findUnique({
       where: {
@@ -75,7 +75,7 @@ const updateUserSchema = zfd
   );
 
 export const updateUserFn = createServerFn({ method: "POST" })
-  .validator((formData: FormData) => updateUserSchema.parse(formData))
+  .inputValidator((formData: FormData) => updateUserSchema.parse(formData))
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
 
