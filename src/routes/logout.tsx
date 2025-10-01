@@ -1,11 +1,9 @@
 import { redirect, createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useWebSession } from "~/server/websession";
+import { invalidateCurrentSession } from "~/server/sessions";
 
 const logoutFn = createServerFn().handler(async () => {
-  const session = await useWebSession();
-
-  session.clear();
+  await invalidateCurrentSession();
 
   throw redirect({
     href: "/",

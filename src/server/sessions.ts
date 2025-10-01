@@ -52,6 +52,71 @@ export const createAndUseSession = createServerOnlyFn(
   }
 );
 
+export const invalidateCurrentSession = createServerOnlyFn(async () => {
+  const webSession = await useWebSession();
+
+  await prismaClient.session.delete({ where: { id: webSession.data.id } });
+  webSession.clear();
+});
+
 export const invalidateAllSessions = createServerOnlyFn((userId: string) =>
   prismaClient.session.deleteMany({ where: { userId } })
 );
+
+/**
+ * Fetches all sessions for the current user
+ */
+
+export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const webSession = await useWebSession();
+
+    if (!webSession.user) {
+      throw new AppError(
+        "UNAUTHORIZED",
+        "You must be logged in to view sessions"
+      );
+    }
+
+    const sessions = await prismaClient.session.findMany({
+      where: { userId: webSession.user.id },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return {
+      sessions,
+      currentSessionId: webSession.data.id,
+    };
+  }
+);
+
+/**
+ * Revokes a specific session
+ */
+export const revokeSession = createServerFn({ method: "POST" })
+  .inputValidator((sessionId: string) => z.string().uuid().parse(sessionId))
+  .handler(async ({ data: sessionId }) => {
+    const webSession = await useWebSession();
+
+    if (!webSession.user) {
+      throw new AppError("UNAUTHORIZED", "You must be logged in");
+    }
+
+    // Verify the session belongs to the user
+    const session = await prismaClient.session.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session || session.userId !== webSession.user.id) {
+      throw new AppError("NOT_FOUND", "Session not found");
+    }
+
+    // Don't allow revoking the current session
+    if (sessionId === webSession.data.id) {
+      throw new AppError("BAD_REQUEST", "Cannot revoke your current session");
+    }
+
+    await prismaClient.session.delete({
+      where: { id: sessionId },
+    });
+  });

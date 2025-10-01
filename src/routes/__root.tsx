@@ -69,7 +69,7 @@ export const Route = createRootRoute({
 });
 
 export function useCurrentUser() {
-  return Route.useLoaderData().user!;
+  return Route.useLoaderData()?.user!;
 }
 
 function RootComponent() {
