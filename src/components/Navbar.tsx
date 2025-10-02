@@ -33,10 +33,16 @@ export function Navbar({ user }: NavbarProps) {
             </li>
             {user && (
               <li>
-                <div className="flex items-center gap-3 py-3 text-base-content/50 cursor-not-allowed">
+                <Link
+                  to="/todos"
+                  activeProps={{
+                    className: "active bg-primary/20 text-primary",
+                  }}
+                  className="flex items-center gap-3 py-3"
+                >
                   <CheckSquare size={18} />
-                  Todos (Coming Soon)
-                </div>
+                  Todos
+                </Link>
               </li>
             )}
           </ul>
@@ -68,10 +74,16 @@ export function Navbar({ user }: NavbarProps) {
           </li>
           {user && (
             <li>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-base-content/50 cursor-not-allowed">
+              <Link
+                to="/todos"
+                activeProps={{
+                  className: "active bg-primary/20 text-primary",
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-base-200"
+              >
                 <CheckSquare size={18} />
-                Todos (Coming Soon)
-              </div>
+                Todos
+              </Link>
             </li>
           )}
         </ul>
