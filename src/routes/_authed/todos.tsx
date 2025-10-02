@@ -6,40 +6,43 @@ import {
 } from "~/server/todos";
 import { useState, useRef, useLayoutEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { flushSync } from "react-dom";
 
 export const Route = createFileRoute("/_authed/todos")({
   component: RouteComponent,
-  loader: async () => {
-    const todos = await getTodos();
-    return { todos };
-  },
+  loader: () => getTodos(),
 });
 
 function RouteComponent() {
   const router = useRouter();
-  const { todos } = Route.useLoaderData();
-  const [newTodoContent, setNewTodoContent] = useState("");
+  const todos = Route.useLoaderData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const createTodo = useServerFn(createTodoFn);
 
-  useLayoutEffect(() => {
-    inputRef.current?.focus();
-  }, [todos]);
-
-  const handleCreateTodo = async (e: React.FormEvent) => {
+  const handleCreateTodo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!newTodoContent.trim()) return;
+
+    const formData = new FormData(e.currentTarget);
+    const content = formData.get("content") as string;
+
+    if (!content.trim()) return;
 
     setIsSubmitting(true);
     try {
-      await createTodo({ data: { content: newTodoContent } });
-      await router.invalidate();
-      setNewTodoContent("");
+      await createTodo({ data: { content } });
+      await router.invalidate({ sync: true });
     } catch (error) {
       console.error("Failed to create todo:", error);
     } finally {
-      setIsSubmitting(false);
+      // Otherwise, programatic focus doesn't work
+      flushSync(() => {
+        setIsSubmitting(false);
+      });
+      if (inputRef.current) {
+        inputRef.current.value = "";
+        inputRef.current.focus();
+      }
     }
   };
 
@@ -59,18 +62,18 @@ function RouteComponent() {
       <form onSubmit={handleCreateTodo} className="mb-8 max-w-2xl">
         <div className="flex gap-2">
           <input
+            name="content"
             ref={inputRef}
             type="text"
             className="input input-bordered flex-1"
             placeholder="What needs to be done?"
-            value={newTodoContent}
-            onChange={(e) => setNewTodoContent(e.target.value)}
             disabled={isSubmitting}
+            required
           />
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={isSubmitting || !newTodoContent.trim()}
+            disabled={isSubmitting}
           >
             Add
           </button>
