@@ -1,5 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Home, CheckSquare, LogIn, LogOut, User, Menu, Settings } from "lucide-react";
+import {
+  Home,
+  CheckSquare,
+  LogIn,
+  LogOut,
+  User,
+  Menu,
+  Settings,
+} from "lucide-react";
 import { Avatar } from "./Avatar";
 
 interface NavbarProps {
@@ -31,20 +39,6 @@ export function Navbar({ user }: NavbarProps) {
                 Dashboard
               </Link>
             </li>
-            {user && (
-              <li>
-                <Link
-                  to="/todos"
-                  activeProps={{
-                    className: "active bg-primary/20 text-primary",
-                  }}
-                  className="flex items-center gap-3 py-3"
-                >
-                  <CheckSquare size={18} />
-                  Todos
-                </Link>
-              </li>
-            )}
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost text-lg font-bold px-2">
@@ -72,20 +66,6 @@ export function Navbar({ user }: NavbarProps) {
               Dashboard
             </Link>
           </li>
-          {user && (
-            <li>
-              <Link
-                to="/todos"
-                activeProps={{
-                  className: "active bg-primary/20 text-primary",
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-base-200"
-              >
-                <CheckSquare size={18} />
-                Todos
-              </Link>
-            </li>
-          )}
         </ul>
       </div>
 
@@ -106,12 +86,16 @@ export function Navbar({ user }: NavbarProps) {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300"
             >
               <li className="menu-title">
-                <span className="text-xs uppercase tracking-wider">Account</span>
+                <span className="text-xs uppercase tracking-wider">
+                  Account
+                </span>
               </li>
               <li>
                 <div className="flex flex-col px-4 py-3 bg-base-200 rounded-lg mb-2">
                   <span className="text-sm font-medium">{user.email}</span>
-                  <span className="text-xs text-base-content/60">Signed in</span>
+                  <span className="text-xs text-base-content/60">
+                    Signed in
+                  </span>
                 </div>
               </li>
               <li>
