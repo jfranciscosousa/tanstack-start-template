@@ -4,7 +4,7 @@ import {
   createTodo as createTodoFn,
   deleteTodo,
 } from "~/server/todos";
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { flushSync } from "react-dom";
 

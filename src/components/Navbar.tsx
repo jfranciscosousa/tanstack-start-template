@@ -95,9 +95,9 @@ export function Navbar({ user }: NavbarProps) {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle avatar"
+              className="btn btn-ghost btn-circle"
             >
-              <Avatar size="md" className="rounded-full">
+              <Avatar size="md">
                 <User size={18} />
               </Avatar>
             </div>
