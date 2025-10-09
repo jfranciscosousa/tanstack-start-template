@@ -8,18 +8,16 @@ const createTodoSchema = z.object({
   content: z.string().min(1, "Content is required"),
 });
 
-export const getTodos = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const { user } = await useLoggedInAppSession();
+export const getTodos = createServerFn({ method: "GET" }).handler(async () => {
+  const { user } = await useLoggedInAppSession();
 
-    const todos = await prismaClient.todo.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-    });
+  const todos = await prismaClient.todo.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+  });
 
-    return todos;
-  },
-);
+  return todos;
+});
 
 export const createTodo = createServerFn({ method: "POST" })
   .inputValidator(createTodoSchema)
@@ -42,15 +40,11 @@ export const deleteTodo = createServerFn({ method: "POST" })
     const { user } = await useLoggedInAppSession();
 
     const todo = await prismaClient.todo.findUnique({
-      where: { id: data.id },
+      where: { id: data.id, userId: user.id },
     });
 
     if (!todo) {
       throw new AppError("NOT_FOUND");
-    }
-
-    if (todo.userId !== user.id) {
-      throw new AppError("UNAUTHORIZED");
     }
 
     await prismaClient.todo.delete({
@@ -59,3 +53,13 @@ export const deleteTodo = createServerFn({ method: "POST" })
 
     return { success: true };
   });
+
+export const deleteAllTodos = createServerFn({
+  method: "POST",
+}).handler(async () => {
+  const { user } = await useLoggedInAppSession();
+
+  await prismaClient.todo.deleteMany({ where: { userId: user.id } });
+
+  return { success: true };
+});
