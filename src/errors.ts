@@ -1,5 +1,3 @@
-import z, { ZodError } from "zod";
-
 const ERROR_CODES = {
   NOT_FOUND: "NOT_FOUND",
   UNPROCESSEABLE_ENTITY: "UNPROCESSABLE_ENTITY",
@@ -15,7 +13,8 @@ const DEFAULT_MESSAGES = {
   [ERROR_CODES.UNPROCESSEABLE_ENTITY]:
     "The request was well-formed but was unable to be followed due to semantic errors.",
   [ERROR_CODES.UNAUTHORIZED]: "You are not authorized to access this resource.",
-  [ERROR_CODES.UNAUTHENTICATED]: "You must be authenticated to access this resource.",
+  [ERROR_CODES.UNAUTHENTICATED]:
+    "You must be authenticated to access this resource.",
   [ERROR_CODES.FORBIDDEN]:
     "You do not have permission to access this resource.",
   [ERROR_CODES.BAD_REQUEST]:
@@ -35,30 +34,23 @@ export class AppError extends Error {
   }
 }
 
-function prettifyZodErrors(errors: z.core.$ZodIssue[]): string {
-  return errors
-    .map((error) => {
-      const path = error.path.length ? ` at ${error.path.join(".")}` : "";
-      return `${error.message}${path}`;
-    })
-    .join(", ");
+function isZodIssues(error: any) {
+  if (typeof error.message !== "string") return;
+
+  try {
+    return JSON.parse(error.message);
+  } catch (_) {
+    return false;
+  }
 }
 
-export function renderError(
-  error: { name: string; message: string } | AppError | ZodError
-): string {
-  if (error instanceof AppError || error.name === "AppError") {
-    return error.message;
+export function renderError(error: unknown): string {
+  if (isZodIssues(error)) {
+    return DEFAULT_MESSAGES[ERROR_CODES.UNPROCESSEABLE_ENTITY];
   }
 
-  if (error instanceof ZodError) {
-    return prettifyZodErrors(error._zod.def);
-  }
-
-  if (error.name === "ZodError") {
-    const zodErrors: z.core.$ZodIssue[] = JSON.parse(error.message);
-
-    return prettifyZodErrors(zodErrors);
+  if (error && typeof error === "object" && (error as any)?.message) {
+    return (error as any).message;
   }
 
   return DEFAULT_MESSAGES[ERROR_CODES.INTERNAL_SERVER_ERROR];

@@ -4,8 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Lock, Mail, LogIn, UserPlus } from "lucide-react";
 import z from "zod";
 import { Avatar } from "~/components/Avatar";
+import { PasswordInput } from "~/components/PasswordInput";
+import { TextInput } from "~/components/TextInput";
+import { renderError } from "~/errors";
+import { useFormDataValidator } from "~/hooks/useFormDataValidator";
 import { useMutation } from "~/hooks/useMutation";
-import { loginFn } from "~/server/sessions";
+import { loginFn, loginSchema } from "~/server/sessions";
 
 const searchSchema = z.object({
   redirectUrl: z.string().optional(),
@@ -27,13 +31,18 @@ function Login() {
       router.navigate({ to: "/" });
     },
   });
+  const validator = useFormDataValidator(loginSchema);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    loginMutation.mutate({
-      data: new FormData(e.target as HTMLFormElement),
-    });
+    const formData = new FormData(e.currentTarget);
+
+    if (validator.validate(formData)) {
+      loginMutation.mutate({
+        data: formData,
+      });
+    }
   }
 
   return (
@@ -46,47 +55,32 @@ function Login() {
                 <span className="text-2xl font-bold">TS</span>
               </Avatar>
             </div>
-            <h1 className="text-3xl font-bold">
-              Welcome Back
-            </h1>
+            <h1 className="text-3xl font-bold">Welcome Back</h1>
             <p className="text-base-content/70 mt-2">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <Mail size={16} />
-                  Email
-                </span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Enter your email"
-                className="input input-bordered w-full"
-                required
-              />
-            </div>
+            <TextInput
+              type="email"
+              name="email"
+              id="email"
+              label="Email"
+              icon={Mail}
+              placeholder="Enter your email"
+              error={validator.errors?.properties?.email?.errors}
+              required
+            />
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <Lock size={16} />
-                  Password
-                </span>
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Create a password"
-                className="input input-bordered w-full"
-                required
-                minLength={6}
-              />
-            </div>
+            <PasswordInput
+              name="password"
+              id="password"
+              label="Password"
+              icon={Lock}
+              placeholder="Create a password"
+              error={validator.errors?.properties?.password?.errors}
+              required
+              minLength={6}
+            />
 
             <input
               type="hidden"
@@ -112,9 +106,9 @@ function Login() {
               )}
             </button>
 
-            {loginMutation.error && (
+            {!!loginMutation.error && (
               <div className="alert alert-error mt-4">
-                <span>{loginMutation.error.message}</span>
+                {renderError(loginMutation.error)}
               </div>
             )}
 

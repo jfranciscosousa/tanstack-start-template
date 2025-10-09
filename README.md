@@ -69,7 +69,7 @@ npx prisma studio      # Open database browser
 ```
 src/
 ├── routes/                 # File-based routing
-│   ├── __root.tsx         # Root layout with navigation
+│   ├── __root.tsx         # Root layout with navigation. Server rendered and injected with auth info. All other routes are CSR.
 │   ├── _authed.tsx        # Protected route layout
 │   ├── _authed/           # Protected pages
 │   ├── login.tsx          # Login page

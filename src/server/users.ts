@@ -8,7 +8,7 @@ import { prismaClient } from "~/server/prisma";
 import { useLoggedInAppSession } from "~/server/websession";
 import { createAndUseSession, invalidateAllSessions } from "./sessions";
 
-const signUpSchema = zfd
+export const signUpSchema = zfd
   .formData({
     name: zfd.text(),
     email: zfd.text(z.email()),
@@ -21,8 +21,10 @@ const signUpSchema = zfd
     path: ["passwordConfirmation"],
   });
 
+export type SignUpSchemaType = z.infer<typeof signUpSchema>;
+
 export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator((formData: FormData) => signUpSchema.parse(formData))
+  .inputValidator(signUpSchema)
   .handler(async ({ data }) => {
     const found = await prismaClient.user.findUnique({
       where: {
@@ -54,7 +56,7 @@ export const signupFn = createServerFn({ method: "POST" })
     });
   });
 
-const updateUserSchema = zfd
+export const updateUserSchema = zfd
   .formData({
     name: zfd.text(),
     email: zfd.text(z.email()),
@@ -75,7 +77,7 @@ const updateUserSchema = zfd
   );
 
 export const updateUserFn = createServerFn({ method: "POST" })
-  .inputValidator((formData: FormData) => updateUserSchema.parse(formData))
+  .inputValidator(updateUserSchema)
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
 

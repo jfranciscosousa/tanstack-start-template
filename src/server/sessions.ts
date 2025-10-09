@@ -8,7 +8,7 @@ import { AppError } from "~/errors";
 import { getRequestInfo } from "./request-info";
 import { getRequest } from "@tanstack/react-start/server";
 
-const loginSchema = zfd.formData({
+export const loginSchema = zfd.formData({
   email: zfd.text(z.email()),
   password: zfd.text(),
   redirectUrl: zfd.text().optional(),

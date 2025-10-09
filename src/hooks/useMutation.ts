@@ -1,7 +1,7 @@
 import * as React from "react";
 import { flushSync } from "react-dom";
 
-export function useMutation<TVariables, TData, TError = Error>(opts: {
+export function useMutation<TVariables, TData, TError = unknown>(opts: {
   fn: (variables: TVariables) => Promise<TData>;
   onSuccess?: (ctx: { data: TData }) => void | Promise<void>;
   onError?: (ctx: { error: TError }) => void | Promise<void>;

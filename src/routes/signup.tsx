@@ -2,9 +2,12 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Eye, Loader2, Lock, Mail, User } from "lucide-react";
 import z from "zod";
+import { PasswordInput } from "~/components/PasswordInput";
+import { TextInput } from "~/components/TextInput";
 import { renderError } from "~/errors";
+import { useFormDataValidator } from "~/hooks/useFormDataValidator";
 import { useMutation } from "~/hooks/useMutation";
-import { signupFn } from "~/server/users";
+import { signupFn, signUpSchema } from "~/server/users";
 
 const searchSchema = z.object({
   redirectUrl: z.string().optional(),
@@ -18,21 +21,25 @@ export const Route = createFileRoute("/signup")({
 function SignUp() {
   const { redirectUrl } = Route.useSearch();
   const router = useRouter();
-  const fn = useServerFn(signupFn);
   const signupMutation = useMutation({
-    fn,
+    fn: useServerFn(signupFn),
     onSuccess: async () => {
       await router.invalidate();
       router.navigate({ to: "/" });
     },
   });
+  const validator = useFormDataValidator(signUpSchema);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    signupMutation.mutate({
-      data: new FormData(e.target as HTMLFormElement),
-    });
+    const formData = new FormData(e.currentTarget);
+
+    if (validator.validate(formData)) {
+      signupMutation.mutate({
+        data: formData,
+      });
+    }
   }
 
   return (
@@ -50,75 +57,49 @@ function SignUp() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <User size={16} />
-                  Name
-                </span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Enter your full name"
-                className="input input-bordered w-full"
-                required
-              />
-            </div>
+            <TextInput
+              type="text"
+              name="name"
+              id="name"
+              label="Name"
+              icon={User}
+              placeholder="Enter your full name"
+              error={validator.errors?.properties?.name?.errors}
+              required
+            />
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <Mail size={16} />
-                  Email
-                </span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Enter your email"
-                className="input input-bordered w-full"
-                required
-              />
-            </div>
+            <TextInput
+              type="email"
+              name="email"
+              id="email"
+              label="Email"
+              icon={Mail}
+              placeholder="Enter your email"
+              error={validator.errors?.properties?.email?.errors}
+              required
+            />
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <Lock size={16} />
-                  Password
-                </span>
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Create a password"
-                className="input input-bordered w-full"
-                required
-                minLength={6}
-              />
-            </div>
+            <PasswordInput
+              name="password"
+              id="password"
+              label="Password"
+              icon={Lock}
+              placeholder="Create a password"
+              error={validator.errors?.properties?.password?.errors}
+              required
+              minLength={6}
+            />
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text flex items-center gap-2">
-                  <Eye size={16} />
-                  Confirm Password
-                </span>
-              </label>
-              <input
-                type="password"
-                name="passwordConfirmation"
-                id="passwordConfirmation"
-                placeholder="Confirm your password"
-                className="input input-bordered w-full"
-                required
-                minLength={6}
-              />
-            </div>
+            <PasswordInput
+              name="passwordConfirmation"
+              id="passwordConfirmation"
+              label="Confirm Password"
+              icon={Eye}
+              placeholder="Confirm your password"
+              error={validator.errors?.properties?.passwordConfirmation?.errors}
+              required
+              minLength={6}
+            />
 
             <input
               type="hidden"
@@ -141,7 +122,7 @@ function SignUp() {
               )}
             </button>
 
-            {signupMutation.error && (
+            {!!signupMutation.error && (
               <div className="alert alert-error mt-4">
                 {renderError(signupMutation.error)}
               </div>
