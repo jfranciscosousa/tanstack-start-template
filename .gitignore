@@ -19,5 +19,6 @@ yarn.lock
 /playwright/.cache/
 .tanstack/
 dist/
+.nitro/*
 
 prisma/dev.db
