@@ -106,6 +106,7 @@ function RouteComponent() {
           className="btn btn-error"
           type="button"
           onClick={handleDeleteAllTodos}
+          disabled={isSubmitting}
         >
           Delete all
         </button>

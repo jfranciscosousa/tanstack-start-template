@@ -66,6 +66,7 @@ export const Route = createRootRoute({
   },
   notFoundComponent: () => <NotFound />,
   component: RootComponent,
+  ssr: true,
 });
 
 export function useCurrentUser() {

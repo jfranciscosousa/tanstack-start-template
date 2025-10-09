@@ -6,12 +6,17 @@ import { NotFound } from "./components/NotFound";
 export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
-    defaultPreload: "intent",
+    defaultPreload: "viewport",
     defaultErrorComponent: DefaultCatchBoundary,
     defaultNotFoundComponent: () => <NotFound />,
     scrollRestoration: true,
-    defaultPendingMs: 0,
-
+    defaultPendingComponent: () => (
+      <div className="h-screen w-screen">
+        <span className="absolute top-1/2 left-1/2 translate-x-1/2 -translate-y-1/2 loading loading-spinner w-[64px]"></span>
+      </div>
+    ),
+    defaultPendingMinMs: 750,
+    defaultPendingMs: 500,
   });
 
   return router;
