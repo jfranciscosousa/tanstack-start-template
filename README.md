@@ -1,72 +1,134 @@
-# Welcome to TanStack.com!
+# TanStack Start Template
 
-This site is built with TanStack Router!
+A modern full-stack React application built with TanStack Start, featuring complete authentication functionality and a clean, responsive design.
 
-- [TanStack Router Docs](https://tanstack.com/router)
+## Features
 
-It's deployed automagically with Netlify!
+- 🔐 **Complete Authentication System** - User registration, login, logout with session management
+- 🛡️ **Route Protection** - Automatic redirects for protected routes
+- 🎨 **Modern UI** - Tailwind CSS + DaisyUI component library
+- 📱 **Responsive Design** - Mobile-first approach with clean navigation
+- 🗄️ **Database Integration** - Prisma ORM with SQLite
+- 🔒 **Secure Password Handling** - bcrypt encryption for password security
+- 🧩 **Type Safety** - Full TypeScript support throughout the stack
 
-- [Netlify](https://netlify.com/)
+## Technology Stack
 
-## Development
+- **Frontend**: React 19.1.0 + TypeScript + TanStack Router
+- **Backend**: TanStack Start server functions
+- **Database**: Prisma 6.12.0 + SQLite
+- **Styling**: Tailwind CSS 4.1.11 + DaisyUI 5.0.46
+- **Build Tool**: Vite 7.0.5
+- **Package Manager**: pnpm
 
-From your terminal:
+## Quick Start
 
-```sh
+### Prerequisites
+
+- Node.js (18+ recommended)
+- pnpm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd tanstack-start-template
+
+# Install dependencies
 pnpm install
+
+# Set up the database
+pnpm prisma-generate
+npx prisma migrate dev
+
+# Start development server
 pnpm dev
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+Visit [http://localhost:3000](http://localhost:3000) to see your application.
 
-## Editing and previewing the docs of TanStack projects locally
+## Available Scripts
 
-The documentations for all TanStack projects except for `React Charts` are hosted on [https://tanstack.com](https://tanstack.com), powered by this TanStack Router app.
-In production, the markdown doc pages are fetched from the GitHub repos of the projects, but in development they are read from the local file system.
-
-Follow these steps if you want to edit the doc pages of a project (in these steps we'll assume it's [`TanStack/form`](https://github.com/tanstack/form)) and preview them locally :
-
-1. Create a new directory called `tanstack`.
-
-```sh
-mkdir tanstack
+### Development
+```bash
+pnpm dev           # Start development server
+pnpm build         # Build for production
+pnpm start         # Start production server
 ```
 
-2. Enter the directory and clone this repo and the repo of the project there.
-
-```sh
-cd tanstack
-git clone git@github.com:TanStack/tanstack.com.git
-git clone git@github.com:TanStack/form.git
+### Database
+```bash
+pnpm prisma-generate    # Generate Prisma client
+npx prisma migrate dev  # Run database migrations
+npx prisma studio      # Open database browser
 ```
 
-> [!NOTE]
-> Your `tanstack` directory should look like this:
->
-> ```
-> tanstack/
->    |
->    +-- form/
->    |
->    +-- tanstack.com/
-> ```
+## Project Structure
 
-> [!WARNING]
-> Make sure the name of the directory in your local file system matches the name of the project's repo. For example, `tanstack/form` must be cloned into `form` (this is the default) instead of `some-other-name`, because that way, the doc pages won't be found.
-
-3. Enter the `tanstack/tanstack.com` directory, install the dependencies and run the app in dev mode:
-
-```sh
-cd tanstack.com
-pnpm i
-# The app will run on https://localhost:3000 by default
-pnpm dev
+```
+src/
+├── routes/                 # File-based routing
+│   ├── __root.tsx         # Root layout with navigation
+│   ├── _authed.tsx        # Protected route layout
+│   ├── _authed/           # Protected pages
+│   ├── login.tsx          # Login page
+│   ├── signup.tsx         # Registration page
+│   └── logout.tsx         # Logout functionality
+├── components/            # Reusable components
+├── server/               # Server-side functions
+│   ├── sessions.ts       # Authentication logic
+│   ├── users.ts          # User management
+│   └── prisma.ts         # Database client
+└── errors.ts             # Custom error handling
 ```
 
-4. Now you can visit http://localhost:3000/form/latest/docs/overview in the browser and see the changes you make in `tanstack/form/docs`.
+## Authentication Flow
 
-> [!NOTE]
-> The updated pages need to be manually reloaded in the browser.
+1. **Registration**: Users can create accounts with email/password
+2. **Login**: Session-based authentication with encrypted cookies
+3. **Protection**: Unauthenticated users are redirected to login
+4. **Persistence**: Sessions survive browser restarts
 
-> [!WARNING]
-> You will need to update the `docs/config.json` file (in the project's repo) if you add a new doc page!
+## Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+DATABASE_URL="file:./dev.db"
+SECRET_KEY_BASE="your-secret-key-for-session-encryption"
+```
+
+## Database Schema
+
+The application includes a User model with the following structure:
+
+```prisma
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Documentation
+
+- [TanStack Start](https://tanstack.com/start)
+- [TanStack Router](https://tanstack.com/router)
+- [DaisyUI Components](https://daisyui.com/docs/v5/)
+- [Prisma Documentation](https://www.prisma.io/docs)
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
