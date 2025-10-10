@@ -15,7 +15,7 @@ echo "📦 Generating Prisma client..."
 pnpm prisma generate
 
 # Build the TanStack Start application
-pnpm build
+pnpm vite build
 
 echo "Pushing db changes"
 pnpm prisma db push

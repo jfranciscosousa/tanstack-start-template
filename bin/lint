@@ -10,6 +10,6 @@ ENV_FILE=.env . bin/load-env
 
 echo "🔍 Running ESLint..."
 
-pnpm eslint src
+pnpm eslint ./src
 
 echo "✅ Linting completed successfully!"

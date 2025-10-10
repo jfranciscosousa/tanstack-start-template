@@ -73,6 +73,8 @@ export default defineConfig([
       "package-lock.json",
       "pnpm-lock.yaml",
       "yarn.lock",
+      ".nitro/**",
+      ".vercel/**",
     ],
   },
 ]);
