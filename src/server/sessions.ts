@@ -56,7 +56,7 @@ export const invalidateCurrentSession = createServerOnlyFn(async () => {
   const webSession = await useWebSession();
 
   await prismaClient.session.delete({ where: { id: webSession.data.id } });
-  webSession.clear();
+  await webSession.clear();
 });
 
 export const invalidateAllSessions = createServerOnlyFn((userId: string) =>

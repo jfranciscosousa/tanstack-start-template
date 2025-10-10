@@ -1,3 +1,5 @@
+import z from "zod";
+
 export interface RequestInfo {
   ipAddress: string;
   userAgent: string;
@@ -66,11 +68,20 @@ async function getLocationFromIP(ip: string): Promise<string | null> {
 
   try {
     const response = await fetch(`https://ipapi.co/${ip}/json/`);
-    const data = await response.json();
+
+    const schema = z.object({
+      city: z.string(),
+      region: z.string(),
+      country_name: z.string(),
+      error: z.string().optional(),
+    });
+
+    const data = schema.parse(await response.json());
 
     if (data.error) return null;
 
     const parts = [data.city, data.region, data.country_name].filter(Boolean);
+
     return parts.length > 0 ? parts.join(", ") : null;
   } catch {
     return null;

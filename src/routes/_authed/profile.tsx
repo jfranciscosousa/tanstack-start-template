@@ -38,7 +38,6 @@ function ProfileComponent() {
           </p>
         </div>
 
-
         <div role="tablist" className="tabs tabs-boxed bg-base-100 shadow">
           <button
             role="tab"

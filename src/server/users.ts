@@ -7,6 +7,7 @@ import { hashPassword, verifyPassword } from "~/server/passwords";
 import { prismaClient } from "~/server/prisma";
 import { useLoggedInAppSession } from "~/server/websession";
 import { createAndUseSession, invalidateAllSessions } from "./sessions";
+import type { User } from "@prisma/client";
 
 export const signUpSchema = zfd
   .formData({
@@ -16,7 +17,7 @@ export const signUpSchema = zfd
     passwordConfirmation: zfd.text(),
     redirectUrl: zfd.text(z.string().optional()),
   })
-  .refine((data) => data.password === data.passwordConfirmation, {
+  .refine(data => data.password === data.passwordConfirmation, {
     message: "Passwords must match",
     path: ["passwordConfirmation"],
   });
@@ -65,7 +66,7 @@ export const updateUserSchema = zfd
     passwordConfirmation: zfd.text(z.string().optional()),
   })
   .refine(
-    (data) => {
+    data => {
       if (!data.password) return true;
 
       return data.password === data.passwordConfirmation;
@@ -93,7 +94,7 @@ export const updateUserFn = createServerFn({ method: "POST" })
       );
     }
 
-    const updateData: any = {
+    const updateData: Partial<User> = {
       name: data.name,
       email: data.email,
     };

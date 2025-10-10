@@ -14,7 +14,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/signup")({
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: search => searchSchema.parse(search),
   component: SignUp,
 });
 
@@ -25,7 +25,7 @@ function SignUp() {
     fn: useServerFn(signupFn),
     onSuccess: async () => {
       await router.invalidate();
-      router.navigate({ to: "/" });
+      await router.navigate({ to: "/" });
     },
   });
   const validator = useFormDataValidator(signUpSchema);

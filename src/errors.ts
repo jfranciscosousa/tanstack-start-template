@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 const ERROR_CODES = {
   NOT_FOUND: "NOT_FOUND",
   UNPROCESSEABLE_ENTITY: "UNPROCESSABLE_ENTITY",
@@ -39,7 +43,7 @@ function isZodIssues(error: any) {
 
   try {
     return JSON.parse(error.message);
-  } catch (_) {
+  } catch (_err) {
     return false;
   }
 }

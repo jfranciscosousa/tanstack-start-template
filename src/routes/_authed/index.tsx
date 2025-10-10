@@ -51,7 +51,7 @@ function RouteComponent() {
     createTodoMutation.status === "pending" ||
     deleteAllTodosMutation.status === "pending";
 
-  async function handleCreateTodo(e: React.FormEvent<HTMLFormElement>) {
+  function handleCreateTodo(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -59,12 +59,12 @@ function RouteComponent() {
 
     if (!content.trim()) return;
 
-    await createTodoMutation.mutate({ data: { content } });
-
-    if (inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.value = "";
-    }
+    createTodoMutation.mutateAsync({ data: { content } }).catch(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.value = "";
+      }
+    });
   }
 
   function handleDeleteTodo(id: string) {
@@ -113,7 +113,7 @@ function RouteComponent() {
       </div>
 
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-        {todos.map((todo) => (
+        {todos.map(todo => (
           <div key={todo.id} className="break-inside-avoid">
             <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
               <div className="card-body p-4">

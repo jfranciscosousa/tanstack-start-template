@@ -1,4 +1,4 @@
-import { Session } from "@prisma/client";
+import type { Session } from "@prisma/client";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -73,7 +73,7 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            {sessions.map((session) => {
+            {sessions.map(session => {
               const DeviceIcon = getDeviceIcon(session.userAgent);
               const isCurrentSession = session.id === currentSessionId;
 

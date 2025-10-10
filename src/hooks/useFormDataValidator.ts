@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { z, ZodError, ZodSchema } from "zod";
+import type { ZodError, ZodSchema } from "zod";
+import { z } from "zod";
 
 export function useFormDataValidator<T extends ZodSchema>(schema: T) {
   const [zodErrors, setZodErrors] = useState<ZodError<z.infer<T>>>();

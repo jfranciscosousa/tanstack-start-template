@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Navbar } from "~/components/Navbar";
 
 export const Route = createFileRoute("/_authed")({
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: ({ context, location }) => {
     let redirectUrl = `${location.pathname}`;
 
     if (location.searchStr) redirectUrl += `${location.searchStr}`;

@@ -149,7 +149,7 @@ export function ProfileTab() {
               <button
                 type="button"
                 className="btn btn-outline"
-                onClick={() => router.navigate({ to: "/" })}
+                onClick={() => void router.navigate({ to: "/" })}
               >
                 Cancel
               </button>

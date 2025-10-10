@@ -3,7 +3,14 @@ import type { ReactNode } from "react";
 interface AvatarProps {
   children: ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
-  variant?: "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "accent"
+    | "info"
+    | "success"
+    | "warning"
+    | "error";
   className?: string;
 }
 
@@ -28,13 +35,15 @@ export function Avatar({
   children,
   size = "md",
   variant = "primary",
-  className = ""
+  className = "",
 }: AvatarProps) {
   const sizeClass = sizeClasses[size];
   const variantClass = variantClasses[variant];
 
   return (
-    <div className={`avatar ${variantClass} ${sizeClass} rounded-xl flex items-center justify-center ${className}`}>
+    <div
+      className={`avatar ${variantClass} ${sizeClass} rounded-xl flex items-center justify-center ${className}`}
+    >
       {children}
     </div>
   );

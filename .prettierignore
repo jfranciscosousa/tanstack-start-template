@@ -1,4 +1,13 @@
-**/build
-**/public
+dist/
+build/
+.vinxi/
+.output/
+node_modules/
+coverage/
+*.min.js
+*.min.css
+package-lock.json
 pnpm-lock.yaml
+yarn.lock
 routeTree.gen.ts
+**/public

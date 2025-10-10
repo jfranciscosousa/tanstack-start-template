@@ -16,7 +16,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: search => searchSchema.parse(search),
   component: Login,
 });
 
@@ -28,7 +28,7 @@ function Login() {
     fn,
     onSuccess: async () => {
       await router.invalidate();
-      router.navigate({ to: "/" });
+      await router.navigate({ to: "/" });
     },
   });
   const validator = useFormDataValidator(loginSchema);
@@ -113,7 +113,7 @@ function Login() {
             )}
 
             <div className="divider text-base-content/70 text-sm">
-              Don't have an account?
+              Don&apos;t have an account?
             </div>
             <Link
               to="/signup"

@@ -14,7 +14,7 @@ export function useMutation<TVariables, TData, TError = unknown>(opts: {
     "idle" | "pending" | "success" | "error"
   >("idle");
 
-  const mutate = React.useCallback(
+  const mutateAsync = React.useCallback(
     async (variables: TVariables): Promise<TData | undefined> => {
       flushSync(() => {
         setStatus("pending");
@@ -32,7 +32,8 @@ export function useMutation<TVariables, TData, TError = unknown>(opts: {
         });
 
         return data;
-      } catch (error: any) {
+      } catch (uerror: unknown) {
+        const error = uerror as TError;
         await opts.onError?.({ error });
         flushSync(() => {
           setStatus("error");
@@ -40,7 +41,14 @@ export function useMutation<TVariables, TData, TError = unknown>(opts: {
         });
       }
     },
-    [opts.fn]
+    [opts]
+  );
+
+  const mutate = React.useCallback(
+    (variables: TVariables): void => {
+      void mutateAsync(variables);
+    },
+    [mutateAsync]
   );
 
   return {
@@ -48,6 +56,7 @@ export function useMutation<TVariables, TData, TError = unknown>(opts: {
     variables,
     submittedAt,
     mutate,
+    mutateAsync,
     error,
     data,
   };

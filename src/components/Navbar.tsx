@@ -1,13 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import {
-  Home,
-  CheckSquare,
-  LogIn,
-  LogOut,
-  User,
-  Menu,
-  Settings,
-} from "lucide-react";
+import { Home, LogIn, LogOut, User, Menu, Settings } from "lucide-react";
 import { Avatar } from "./Avatar";
 
 interface NavbarProps {
@@ -22,10 +14,7 @@ export function Navbar({ user }: NavbarProps) {
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
             <Menu size={20} />
           </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-56 p-2 shadow-lg border border-base-300"
-          >
+          <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-56 p-2 shadow-lg border border-base-300">
             <li>
               <Link
                 to="/"
@@ -81,10 +70,7 @@ export function Navbar({ user }: NavbarProps) {
                 <User size={18} />
               </Avatar>
             </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300"
-            >
+            <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300">
               <li className="menu-title">
                 <span className="text-xs uppercase tracking-wider">
                   Account

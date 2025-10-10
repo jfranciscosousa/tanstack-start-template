@@ -3,7 +3,9 @@
     "allow": [
       "Bash(find:*)",
       "Bash(pnpm build:*)",
-      "WebFetch(domain:daisyui.com)"
+      "WebFetch(domain:daisyui.com)",
+      "Bash(pnpm add:*)",
+      "Bash(npm install:*)"
     ],
     "deny": []
   }
