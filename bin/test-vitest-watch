@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Vitest watch mode script
+# This script runs unit tests in watch mode
+
+set -e  # Exit on error
+
+# Load environment variables
+ENV_FILE=.env . bin/load-env
+
+echo "👀 Running unit tests in watch mode..."
+
+# Generate Prisma client for tests
+echo "📦 Generating Prisma client..."
+pnpm prisma generate
+
+# Run Vitest in watch mode
+NODE_ENV=test pnpm vitest
+
+echo "✅ Vitest watch mode ended"

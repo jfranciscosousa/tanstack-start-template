@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Start production server script
+# This script starts the built application server
+
+set -e  # Exit on error
+
+# Load environment variables
+ENV_FILE=.env . bin/load-env
+
+OUTPUT_DIR=".output"
+
+if [ ! -d "$OUTPUT_DIR" ]; then
+    echo "❌ Build output not found: $OUTPUT_DIR"
+    echo "💡 Run './bin/build' first to build the application"
+    exit 1
+fi
+
+echo "🚀 Starting TanStack Start production server..."
+
+# Start the production server
+pnpm start

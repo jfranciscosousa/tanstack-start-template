@@ -1,5 +1,5 @@
 import { type LucideIcon } from "lucide-react";
-import { type ComponentPropsWithoutRef } from "react";
+import { useId, type ComponentPropsWithoutRef } from "react";
 
 export interface TextInputProps extends ComponentPropsWithoutRef<"input"> {
   label: string;
@@ -14,11 +14,13 @@ export function TextInput({
   className = "",
   ...inputProps
 }: TextInputProps) {
+  const defaultId = useId();
+  const id = inputProps.id || defaultId;
   const errorMessage = Array.isArray(error) ? error.join(", ") : error;
 
   return (
     <div className="form-control">
-      <label className="label" htmlFor={inputProps.id}>
+      <label className="label" htmlFor={id}>
         <span className="label-text flex items-center gap-2">
           {Icon && <Icon size={16} />}
           {label}
@@ -26,6 +28,7 @@ export function TextInput({
       </label>
       <input
         {...inputProps}
+        id={id}
         className={`input input-bordered w-full ${errorMessage ? "input-error" : ""} ${className}`}
       />
       {errorMessage && (

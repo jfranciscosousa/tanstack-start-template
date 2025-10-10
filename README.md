@@ -14,11 +14,12 @@ A modern full-stack React application built with TanStack Start, featuring compl
 
 ## Technology Stack
 
-- **Frontend**: React 19.1.0 + TypeScript + TanStack Router
+- **Frontend**: React 19.2.0 + TypeScript + TanStack Router
 - **Backend**: TanStack Start server functions
-- **Database**: Prisma 6.12.0 + SQLite
-- **Styling**: Tailwind CSS 4.1.11 + DaisyUI 5.0.46
-- **Build Tool**: Vite 7.0.5
+- **Database**: Prisma 6.17.0 + SQLite
+- **Styling**: Tailwind CSS 4.1.14 + DaisyUI 5.1.31
+- **Testing**: Vitest 3.2.4 + React Testing Library
+- **Build Tool**: Vite 7.1.9
 - **Package Manager**: pnpm
 
 ## Quick Start
@@ -35,15 +36,11 @@ A modern full-stack React application built with TanStack Start, featuring compl
 git clone <your-repo-url>
 cd tanstack-start-template
 
-# Install dependencies
-pnpm install
-
-# Set up the database
-pnpm prisma-generate
-npx prisma migrate dev
+# Run setup script (installs dependencies, sets up database)
+bin/setup
 
 # Start development server
-pnpm dev
+bin/dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see your application.
@@ -52,9 +49,23 @@ Visit [http://localhost:3000](http://localhost:3000) to see your application.
 
 ### Development
 ```bash
-pnpm dev           # Start development server
-pnpm build         # Build for production
-pnpm start         # Start production server
+bin/dev            # Start development server
+bin/build          # Build for production
+bin/start          # Start production server
+bin/setup          # Initial project setup
+```
+
+### Testing
+```bash
+bin/test           # Run all tests (unit + e2e)
+bin/test-vitest    # Run unit tests with Vitest
+bin/test-vitest-watch  # Run unit tests in watch mode
+```
+
+### Code Quality
+```bash
+bin/lint           # Run ESLint
+bin/ts-check       # Run TypeScript compiler check
 ```
 
 ### Database
@@ -69,18 +80,29 @@ npx prisma studio      # Open database browser
 ```
 src/
 ├── routes/                 # File-based routing
-│   ├── __root.tsx         # Root layout with navigation. Server rendered and injected with auth info. All other routes are CSR.
+│   ├── __root.tsx         # Root layout with navigation
 │   ├── _authed.tsx        # Protected route layout
 │   ├── _authed/           # Protected pages
 │   ├── login.tsx          # Login page
 │   ├── signup.tsx         # Registration page
 │   └── logout.tsx         # Logout functionality
 ├── components/            # Reusable components
+│   └── __tests__/         # Component tests
 ├── server/               # Server-side functions
 │   ├── sessions.ts       # Authentication logic
 │   ├── users.ts          # User management
-│   └── prisma.ts         # Database client
+│   ├── prisma.ts         # Database client
+│   └── __tests__/        # Server function tests
+├── test/                 # Test utilities and setup
+│   ├── setup.ts          # Test configuration
+│   └── utils.tsx         # Testing utilities
 └── errors.ts             # Custom error handling
+bin/                      # Development scripts
+├── dev                   # Start development server
+├── build                 # Build for production
+├── test                  # Run all tests
+├── test-vitest          # Run unit tests
+└── ...                  # Other utility scripts
 ```
 
 ## Authentication Flow

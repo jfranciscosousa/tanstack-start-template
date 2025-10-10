@@ -1,0 +1,86 @@
+#!/bin/bash
+
+set -e
+
+echo "🚀 Setting up TanStack Start project..."
+
+# Copy environment files
+echo "📄 Copying environment files..."
+cp .env.sample .env
+cp .env.test.sample .env.test
+
+# Prompt for database configuration
+echo ""
+echo "📦 Database Configuration"
+echo "Two databases will be created: <database-name>_dev and <database-name>_test"
+echo ""
+
+read -p "PostgreSQL username: " db_user
+read -s -p "PostgreSQL password: " db_password
+echo ""
+read -p "PostgreSQL host [localhost]: " db_host
+db_host=${db_host:-localhost}
+read -p "PostgreSQL port [5432]: " db_port
+db_port=${db_port:-5432}
+read -p "Database name (without _dev/_test suffix): " db_name
+
+if [ -z "$db_user" ] || [ -z "$db_name" ]; then
+  echo "❌ Username and database name are required"
+  exit 1
+fi
+
+# Construct database URLs
+dev_db_name="${db_name}_dev"
+test_db_name="${db_name}_test"
+
+if [ -n "$db_password" ]; then
+    dev_db_url="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${dev_db_name}"
+    test_db_url="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${test_db_name}"
+else
+    dev_db_url="postgresql://${db_user}@${db_host}:${db_port}/${dev_db_name}"
+    test_db_url="postgresql://${db_user}@${db_host}:${db_port}/${test_db_name}"
+fi
+
+# Update .env files with database URLs
+sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"${dev_db_url}\"|g" .env
+sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"${test_db_url}\"|g" .env.test
+
+echo "✅ Environment files configured with database URLs"
+
+# Install dependencies
+echo ""
+echo "📦 Installing dependencies..."
+pnpm install
+
+# Generate Prisma client
+echo ""
+echo "🔧 Generating Prisma client..."
+pnpm prisma generate
+
+# Apply database schema
+echo ""
+echo "🗄️  Setting up databases..."
+echo "Creating development database: ${dev_db_name}"
+createdb "${dev_db_name}" 2>/dev/null || echo "   Database ${dev_db_name} already exists (or createdb failed)"
+
+echo "Creating test database: ${test_db_name}"
+createdb "${test_db_name}" 2>/dev/null || echo "   Database ${test_db_name} already exists (or createdb failed)"
+
+echo "Applying schema to development database..."
+npx prisma db push
+
+echo "Applying schema to test database..."
+DATABASE_URL="${test_db_url}" npx prisma db push
+
+echo ""
+echo "🎉 Setup complete! Your TanStack Start project is ready to go:"
+echo "   ✅ Dependencies installed"
+echo "   ✅ Environment files configured"
+echo "   ✅ Development database created: ${dev_db_name}"
+echo "   ✅ Test database created: ${test_db_name}"
+echo "   ✅ Database schemas applied"
+echo "   ✅ Prisma client generated"
+echo ""
+echo "Next steps:"
+echo "   - Run 'bin/dev' to start the development server"
+echo "   - Run 'bin/test' to run tests"

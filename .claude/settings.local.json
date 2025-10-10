@@ -5,7 +5,8 @@
       "Bash(pnpm build:*)",
       "WebFetch(domain:daisyui.com)",
       "Bash(pnpm add:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:testing-library.com)"
     ],
     "deny": []
   }

@@ -3,6 +3,7 @@ package-lock.json
 yarn.lock
 
 !.env.sample
+!.env.test.sample
 .env
 .DS_Store
 .cache

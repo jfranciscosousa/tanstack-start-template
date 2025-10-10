@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Deployment script
+# This script validates configuration, pushes database schema with Drizzle, and builds
+
+set -e  # Exit on error
+
+# Load environment variables
+ENV_FILE=.env . bin/load-env
+
+echo "🚀 Starting deployment process..."
+
+echo "✅ Validating configuration..."
+pnpm tsx tasks/validateConfig.ts
+
+echo "📊 Setting up database schema with Drizzle..."
+pnpm drizzle-kit migrate
+
+echo "🔨 Building application..."
+bin/build
+
+echo "✅ Deployment process completed successfully!"
+echo "📁 Build files are ready in: build/"

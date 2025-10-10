@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Environment loading utility - prevents duplicate loading
+# Usage: . bin/load-env <env-file>
+# Example: . bin/load-env .env
+# Example: . bin/load-env .env.test
+
+# Check if environment is already loaded to prevent conflicts
+if [ -n "${ENV_LOADED:-}" ]; then
+    echo "Already loaded env file previously"
+    return 0 2>/dev/null || exit 0
+fi
+
+ENV_FILE="${ENV_FILE:-$1}"
+
+# Load environment if file exists
+if [ -f "$ENV_FILE" ]; then
+    echo "📝 Loading environment from: $ENV_FILE"
+
+    # Export all variables from the env file
+    eval "$(bin/dotenv -f "$ENV_FILE" export)"
+
+    # Mark environment as loaded
+    export ENV_LOADED="$ENV_FILE"
+else
+    echo "⚠️  Environment file not found: $ENV_FILE"
+    # Still mark as loaded to prevent repeated attempts
+    export ENV_LOADED="none"
+fi

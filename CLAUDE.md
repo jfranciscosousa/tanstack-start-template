@@ -10,10 +10,11 @@ A production-ready TanStack Start template featuring complete authentication fun
 
 - **TanStack Start**: Full-stack React framework with file-based routing and server functions
 - **TanStack Router**: Type-safe routing with nested layouts and automatic code splitting
-- **React 19.1.0** with **TypeScript 5.x**: Latest React with concurrent features
-- **Prisma 6.12.0** with SQLite database for development (PostgreSQL ready)
-- **Tailwind CSS 4.1.11** + **DaisyUI 5.0.46**: Utility-first CSS with component library
-- **Vite 7.0.5**: Fast build tooling with HMR and optimized bundling
+- **React 19.2.0** with **TypeScript 5.x**: Latest React with concurrent features
+- **Prisma 6.17.0** with SQLite database for development (PostgreSQL ready)
+- **Tailwind CSS 4.1.14** + **DaisyUI 5.1.31**: Utility-first CSS with component library
+- **Vite 7.1.9**: Fast build tooling with HMR and optimized bundling
+- **Vitest 3.2.4**: Fast unit testing with React Testing Library
 - **pnpm**: Fast, disk space efficient package manager
 - **bcrypt-ts**: Secure password hashing
 - **Zod**: Schema validation for forms and API inputs
@@ -22,10 +23,10 @@ A production-ready TanStack Start template featuring complete authentication fun
 
 ### Core Development
 ```bash
-pnpm dev           # Start development server (http://localhost:3000)
-pnpm build         # Build for production
-pnpm start         # Start production server
-pnpm preview       # Preview production build locally
+bin/dev            # Start development server (http://localhost:3000)
+bin/build          # Build for production
+bin/start          # Start production server
+bin/setup          # Initial project setup
 ```
 
 ### Database Management
@@ -37,11 +38,18 @@ npx prisma studio      # Open database browser UI
 npx prisma db seed     # Run database seed script (if configured)
 ```
 
+### Testing
+```bash
+bin/test           # Run all tests (unit + e2e)
+bin/test-vitest    # Run unit tests with Vitest
+bin/test-vitest-watch  # Run unit tests in watch mode
+```
+
 ### Code Quality
 ```bash
-pnpm lint          # Run ESLint (if configured)
-pnpm type-check    # Run TypeScript compiler check
-pnpm format        # Format code with Prettier (if configured)
+bin/lint           # Run ESLint
+bin/ts-check       # Run TypeScript compiler check
+pnpm format        # Format code with Prettier
 ```
 
 ## Architecture

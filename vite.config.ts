@@ -5,13 +5,20 @@ import tailwindcss from "@tailwindcss/vite";
 import checker from "vite-plugin-checker";
 import react from "@vitejs/plugin-react";
 import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
+import path from "path";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  resolve: {
+    alias: {
+      "~": path.resolve(__dirname, "./src"),
+    },
+  },
   server: {
     port: 3000,
   },
   plugins: [
-    checker({ typescript: true /** or an object config */ }),
+    mode === "serve" &&
+      checker({ typescript: true /** or an object config */ }),
 
     tsConfigPaths({
       projects: ["./tsconfig.json"],
@@ -27,4 +34,4 @@ export default defineConfig({
 
     tailwindcss(),
   ],
-});
+}));

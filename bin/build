@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Build script for the TanStack Start application
+# This script builds the application for production
+
+set -e  # Exit on error
+
+# Load environment variables
+ENV_FILE=.env . bin/load-env
+
+echo "🔨 Building TanStack Start application..."
+
+# Generate Prisma client before building
+echo "📦 Generating Prisma client..."
+pnpm prisma generate
+
+# Build the TanStack Start application
+pnpm build
+
+echo "✅ Build completed successfully!"
+echo "📁 Build files are in: .output/"

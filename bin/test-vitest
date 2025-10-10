@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Vitest unit test script
+# This script runs unit tests with Vitest
+
+set -e  # Exit on error
+
+# Load environment variables (test script - uses .env.test if it exists, otherwise .env)
+if [ -f ".env.test" ]; then
+    ENV_FILE=.env.test . bin/load-env
+else
+    ENV_FILE=.env . bin/load-env
+fi
+
+echo "🧪 Running unit tests with Vitest..."
+
+# Generate Prisma client for tests
+echo "📦 Generating Prisma client..."
+pnpm prisma generate
+
+# Run Vitest in run mode (non-watch)
+NODE_ENV=test pnpm vitest run
+
+echo "✅ Unit tests completed successfully!"

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Development server script
+# This script starts the development server with hot reloading
+
+set -e  # Exit on error
+
+# Load environment variables
+ENV_FILE=.env . bin/load-env
+
+echo "🚀 Starting TanStack Start development server..."
+
+# Generate Prisma client if needed
+echo "📦 Generating Prisma client..."
+pnpm prisma generate
+
+# Start the development server
+pnpm vite dev

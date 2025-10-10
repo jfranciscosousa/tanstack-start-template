@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Test script
+# This script runs all tests (unit tests and e2e tests)
+
+set -e  # Exit on error
+
+# Load environment variables (test script - uses .env.test if it exists, otherwise .env)
+if [ -f ".env.test" ]; then
+    ENV_FILE=.env.test . bin/load-env
+else
+    ENV_FILE=.env . bin/load-env
+fi
+
+echo "🧪 Running all tests..."
+
+echo "📋 Running unit tests with Vitest..."
+./bin/test-vitest
+
+# Only run e2e tests if they're implemented
+if [ -f "./bin/test-e2e" ] && grep -q "playwright\|cypress" ./bin/test-e2e 2>/dev/null; then
+    echo "🎭 Running end-to-end tests..."
+    ./bin/test-e2e
+else
+    echo "⚠️  End-to-end tests not yet implemented (skipping)"
+fi
+
+echo "✅ All tests completed successfully!"
