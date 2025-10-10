@@ -67,7 +67,9 @@ jobs:
           bin/ts-check
 
       - name: Vitest
-        run: bin/test-vitest
+        run: |
+          pnpm prisma db push
+          bin/test-vitest
         env:
           SECRET_KEY_BASE: supersecret42069
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/react-router-starter-test
