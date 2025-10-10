@@ -5,8 +5,12 @@
 
 set -e  # Exit on error
 
-# Load environment variables
-ENV_FILE=.env . bin/load-env
+# Load environment variables (test script - uses .env.test if it exists, otherwise .env)
+if [ -f ".env.test" ]; then
+    ENV_FILE=.env.test . bin/load-env
+else
+    ENV_FILE=.env . bin/load-env
+fi
 
 echo "👀 Running unit tests in watch mode..."
 

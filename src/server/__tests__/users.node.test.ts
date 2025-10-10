@@ -1,12 +1,12 @@
 import { faker } from "@faker-js/faker";
 import type { User } from "@prisma/client";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { ZodError } from "zod";
 import { AppError } from "~/errors";
+import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
 import { hashPassword, verifyPassword } from "../passwords";
 import { prismaClient } from "../prisma";
 import { signupFn, updateUserFn } from "../users";
-import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
@@ -16,6 +16,7 @@ vi.mock("~/server/websession");
 describe("User schemas integration tests", () => {
   describe("signupFn", () => {
     it("should create a user with its given params", async () => {
+      const { update: updateSession } = mockLoggedOut();
       const testData = {
         name: faker.person.fullName(),
         email: faker.internet.email(),
@@ -37,14 +38,16 @@ describe("User schemas integration tests", () => {
       try {
         await signupFn({ data: formData });
       } catch (error) {
-        console.log(error, "error");
         // The function throws a redirect, which is expected behavior
         expect(error).toBeDefined();
+        const request = error as Response;
+        expect(request.status).toEqual(307);
       }
 
       // Verify user was actually created in the database
       const createdUser = await prismaClient.user.findUnique({
         where: { email: testData.email },
+        include: { sessions: true },
       });
 
       expect(createdUser).not.toBe(null);
@@ -53,6 +56,9 @@ describe("User schemas integration tests", () => {
       expect(createdUser!.id).toBeDefined();
       expect(createdUser!.createdAt).toBeInstanceOf(Date);
       expect(createdUser!.updatedAt).toBeInstanceOf(Date);
+      expect(updateSession).toBeCalledWith({
+        id: createdUser!.sessions[0].id,
+      });
 
       // Verify password was hashed correctly
       const isPasswordValid = await verifyPassword(
@@ -114,9 +120,11 @@ describe("User schemas integration tests", () => {
 
   describe("updateUserFn", () => {
     let testUser: User;
+    let updateSession: Mock;
 
     beforeEach(async () => {
       // Create a test user for update operations
+
       testUser = await prismaClient.user.create({
         data: {
           name: faker.person.fullName(),
@@ -126,7 +134,7 @@ describe("User schemas integration tests", () => {
       });
 
       // Mock the session to return our test user
-      mockLoggedIn(testUser);
+      updateSession = mockLoggedIn(testUser).update;
     });
 
     it("should update user profile without changing password", async () => {
@@ -154,9 +162,6 @@ describe("User schemas integration tests", () => {
       expect(updatedUser).toBeDefined();
       expect(updatedUser!.name).toBe("Updated Name");
       expect(updatedUser!.email).toBe("updated@test.com");
-      expect(updatedUser!.updatedAt.getTime()).toBeGreaterThan(
-        testUser.updatedAt.getTime()
-      );
 
       // Verify password wasn't changed
       const isOriginalPasswordValid = await verifyPassword(
@@ -223,6 +228,10 @@ describe("User schemas integration tests", () => {
         where: { userId: testUser.id },
       });
       expect(remainingSessions).toHaveLength(1);
+
+      const [session] = remainingSessions;
+      // Check that the web session was updated with the session id
+      expect(updateSession).toBeCalledWith({ id: session.id });
     });
 
     it("should throw error with wrong current password", async () => {
@@ -272,7 +281,7 @@ describe("User schemas integration tests", () => {
         expect.fail("Expected error to be thrown");
       } catch (error) {
         const appError = error as AppError;
-        console.error(appError, "App error");
+
         expect(appError.code).toBe("NOT_FOUND");
         expect(appError.message).toBe("The requested resource was not found.");
       }

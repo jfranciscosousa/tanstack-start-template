@@ -23,3 +23,4 @@ dist/
 .nitro/*
 
 prisma/dev.db
+.claude/

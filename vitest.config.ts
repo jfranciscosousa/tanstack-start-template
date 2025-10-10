@@ -9,7 +9,6 @@ export default defineConfig({
   ],
   test: {
     clearMocks: true,
-
     projects: [
       {
         // add "extends: true" to inherit the options from the root config
@@ -29,7 +28,6 @@ export default defineConfig({
           include: ["**/*.node.test.{ts,js}"],
           // color of the name label can be changed
           name: { label: "node", color: "green" },
-          environment: "node",
           setupFiles: "./src/test/setup-node.ts",
         },
       },

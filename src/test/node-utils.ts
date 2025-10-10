@@ -29,5 +29,16 @@ export const mockLoggedIn = (user: User) => {
 };
 
 export const mockLoggedOut = () => {
+  const mock = {
+    sessionId: "test-session-id",
+    user: null,
+    update: vi.fn(),
+    clear: vi.fn(),
+  };
+
+  vi.mocked(useWebSession).mockResolvedValue(mock as any);
+  vi.mocked(useLoggedInAppSession).mockResolvedValue(mock as any);
   vi.mocked(useLoggedInAppSession).mockRejectedValue(new AppError("NOT_FOUND"));
+
+  return mock;
 };
