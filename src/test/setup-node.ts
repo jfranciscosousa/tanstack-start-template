@@ -1,5 +1,11 @@
-import { afterEach } from "vitest";
+import { beforeEach } from "node:test";
+import { afterAll } from "vitest";
+import { prismaClient } from "~/server/prisma";
 
-afterEach(() => {
-  // do something for node tests
-});
+async function cleanup() {
+  await prismaClient.session.deleteMany({});
+  await prismaClient.user.deleteMany({});
+}
+
+beforeEach(cleanup);
+afterAll(cleanup);

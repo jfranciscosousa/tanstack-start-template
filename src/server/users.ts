@@ -25,8 +25,9 @@ export const signUpSchema = zfd
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;
 
 export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator(signUpSchema)
-  .handler(async ({ data }) => {
+  .inputValidator(data => data)
+  .handler(async ctx => {
+    const data = signUpSchema.parse(ctx.data);
     const found = await prismaClient.user.findUnique({
       where: {
         email: data.email,
@@ -78,8 +79,9 @@ export const updateUserSchema = zfd
   );
 
 export const updateUserFn = createServerFn({ method: "POST" })
-  .inputValidator(updateUserSchema)
-  .handler(async ({ data }) => {
+  .inputValidator(data => data)
+  .handler(async ctx => {
+    const data = updateUserSchema.parse(ctx.data);
     const { user } = await useLoggedInAppSession();
 
     const userPassword = await prismaClient.user.findUnique({
@@ -110,5 +112,7 @@ export const updateUserFn = createServerFn({ method: "POST" })
       data: updateData,
     });
 
-    await createAndUseSession(user.id);
+    if (data.password) {
+      await createAndUseSession(user.id);
+    }
   });
