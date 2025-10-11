@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => ({
     tanstackStart(),
 
     nitroV2Plugin({
-      preset: "vercel",
+      preset: process.env.NITRO_PRESET || "vercel",
     }),
 
     react(),

@@ -12,6 +12,6 @@ echo "🎭 Building end-to-end test dependencies"
 
 pnpm prisma db push --force-reset
 
-pnpm vite build
+NITRO_PRESET=node_server pnpm vite build
 
 echo "✅ End-to-end dependencies built successfully!"

@@ -7,6 +7,7 @@ set -e  # Exit on error
 
 # Load environment variables
 ENV_FILE=.env . bin/load-env
+PORT="${PORT:-3000}"
 
 echo "🚀 Starting TanStack Start development server..."
 
@@ -15,4 +16,4 @@ echo "📦 Generating Prisma client..."
 pnpm prisma generate
 
 # Start the development server
-pnpm vite dev
+pnpm vite dev --port $PORT

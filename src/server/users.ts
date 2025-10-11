@@ -1,5 +1,5 @@
 import { redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import z from "zod";
 import { zfd } from "zod-form-data";
 import { AppError } from "~/errors";
@@ -24,32 +24,36 @@ export const signUpSchema = zfd
 
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;
 
+export const createUser = createServerOnlyFn(async (data: SignUpSchemaType) => {
+  const found = await prismaClient.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+
+  const password = await hashPassword(data.password);
+
+  if (found) {
+    throw new AppError(
+      "UNPROCESSABLE_ENTITY",
+      "This email is already registered."
+    );
+  }
+
+  return prismaClient.user.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      password,
+    },
+  });
+});
+
 export const signupFn = createServerFn({ method: "POST" })
   .inputValidator(data => data)
   .handler(async ctx => {
     const data = signUpSchema.parse(ctx.data);
-    const found = await prismaClient.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
-
-    const password = await hashPassword(data.password);
-
-    if (found) {
-      throw new AppError(
-        "UNPROCESSABLE_ENTITY",
-        "This email is already registered."
-      );
-    }
-
-    const user = await prismaClient.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password,
-      },
-    });
+    const user = await createUser(data);
 
     await createAndUseSession(user.id);
 

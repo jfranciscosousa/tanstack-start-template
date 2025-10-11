@@ -44,11 +44,11 @@ fi
 # Update .env files with database URLs
 # Cross-platform sed: macOS requires -i '', Linux requires -i
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' "s|DATABASE_URL=.*|DATABASE_URL=\"${dev_db_url}\"|g" .env
-  sed -i '' "s|DATABASE_URL=.*|DATABASE_URL=\"${test_db_url}\"|g" .env.test
+  sed -i '' "s|DATABASE_URL=.*|DATABASE_URL=${dev_db_url}|g" .env
+  sed -i '' "s|DATABASE_URL=.*|DATABASE_URL=${test_db_url}|g" .env.test
 else
-  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"${dev_db_url}\"|g" .env
-  sed -i "s|DATABASE_URL=.*|DATABASE_URL=\"${test_db_url}\"|g" .env.test
+  sed -i "s|DATABASE_URL=.*|DATABASE_URL=${dev_db_url}|g" .env
+  sed -i "s|DATABASE_URL=.*|DATABASE_URL=${test_db_url}|g" .env.test
 fi
 
 echo "✅ Environment files configured with database URLs"

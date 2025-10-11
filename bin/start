@@ -7,16 +7,16 @@ set -e  # Exit on error
 
 # Load environment variables
 ENV_FILE=.env . bin/load-env
+PORT="${PORT:-3000}"
+SERVER_FILE=".output/server/index.mjs"
 
-OUTPUT_DIR=".output"
-
-if [ ! -d "$OUTPUT_DIR" ]; then
-    echo "❌ Build output not found: $OUTPUT_DIR"
-    echo "💡 Run './bin/build' first to build the application"
+if [ ! -f "$SERVER_FILE" ]; then
+    echo "❌ Server file not found: $SERVER_FILE"
+    echo "💡 Run 'NODE_ENV=node_server bin/build' first to build the application"
     exit 1
 fi
 
-echo "🚀 Starting TanStack Start production server..."
+echo "🚀 Starting production server..."
 
 # Start the production server
-pnpm start
+node .output/server/index.mjs

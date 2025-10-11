@@ -25,7 +25,6 @@ function SignUp() {
     fn: useServerFn(signupFn),
     onSuccess: async () => {
       await router.invalidate();
-      await router.navigate({ to: "/" });
     },
   });
   const validator = useFormDataValidator(signUpSchema);
@@ -93,7 +92,7 @@ function SignUp() {
             <PasswordInput
               name="passwordConfirmation"
               id="passwordConfirmation"
-              label="Confirm Password"
+              label="Confirm password"
               icon={Eye}
               placeholder="Confirm your password"
               error={validator.errors?.properties?.passwordConfirmation?.errors}
@@ -118,7 +117,7 @@ function SignUp() {
                   Creating account...
                 </>
               ) : (
-                "Create Account"
+                "Create account"
               )}
             </button>
 
@@ -136,7 +135,7 @@ function SignUp() {
               search={{ redirectUrl }}
               className="btn btn-outline btn-block"
             >
-              Sign In
+              Sign in
             </Link>
           </form>
         </div>

@@ -12,6 +12,6 @@ bin/test-e2e-setup
 
 echo "🎭 Running end-to-end tests..."
 
-# TODO: pnpm playwright test
+pnpm playwright test
 
 echo "✅ End-to-end tests completed successfully!"

@@ -1,3 +1,4 @@
+import { redirect } from "@tanstack/react-router";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { verifyPassword } from "./passwords";
 import { prismaClient } from "./prisma";
@@ -31,6 +32,10 @@ export const loginFn = createServerFn({ method: "POST" })
     }
 
     await createAndUseSession(user.id);
+
+    throw redirect({
+      href: data.redirectUrl || "/",
+    });
   });
 
 /**

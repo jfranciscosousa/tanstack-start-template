@@ -28,7 +28,6 @@ function Login() {
     fn,
     onSuccess: async () => {
       await router.invalidate();
-      await router.navigate({ to: "/" });
     },
   });
   const validator = useFormDataValidator(loginSchema);
@@ -101,7 +100,7 @@ function Login() {
               ) : (
                 <>
                   <LogIn size={18} />
-                  Sign In
+                  Sign in
                 </>
               )}
             </button>
@@ -121,7 +120,7 @@ function Login() {
               className="btn btn-outline btn-block h-12 gap-2"
             >
               <UserPlus size={18} />
-              Create Account
+              Create account
             </Link>
           </form>
         </div>

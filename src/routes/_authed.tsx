@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Navbar } from "~/components/Navbar";
+import { useCurrentUser } from "./__root";
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context, location }) => {
@@ -18,10 +19,13 @@ export const Route = createFileRoute("/_authed")({
 });
 
 function AuthedLayout() {
-  const { user } = Route.useRouteContext();
+  const user = useCurrentUser();
 
   return (
-    <div className="min-h-screen bg-base-200">
+    <div
+      className="min-h-screen bg-base-200"
+      data-testid={`Welcome ${user.name}`}
+    >
       <Navbar user={user} />
 
       <main>

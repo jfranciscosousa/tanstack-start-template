@@ -15,7 +15,7 @@ echo "📦 Generating Prisma client..."
 pnpm prisma generate
 
 # Build the TanStack Start application
-pnpm build
+pnpm vite build
 
 echo "✅ Build completed successfully!"
 echo "📁 Build files are in: .output/"

@@ -1,35 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { Home, LogIn, LogOut, User, Menu, Settings } from "lucide-react";
+import { Home, LogOut, Settings, User } from "lucide-react";
 import { Avatar } from "./Avatar";
 
 interface NavbarProps {
-  user?: { email: string };
+  user: { email: string };
 }
 
 export function Navbar({ user }: NavbarProps) {
   return (
     <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50">
       <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            <Menu size={20} />
-          </div>
-          <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-56 p-2 shadow-lg border border-base-300">
-            <li>
-              <Link
-                to="/"
-                activeProps={{
-                  className: "active bg-primary/20 text-primary",
-                }}
-                activeOptions={{ exact: true }}
-                className="flex items-center gap-3 py-3"
-              >
-                <Home size={18} />
-                Dashboard
-              </Link>
-            </li>
-          </ul>
-        </div>
         <Link to="/" className="btn btn-ghost text-lg font-bold px-2">
           <div className="flex items-center gap-2">
             <Avatar size="sm">
@@ -59,57 +39,47 @@ export function Navbar({ user }: NavbarProps) {
       </div>
 
       <div className="navbar-end gap-2">
-        {user ? (
-          <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle"
-            >
-              <Avatar size="md">
-                <User size={18} />
-              </Avatar>
-            </div>
-            <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300">
-              <li className="menu-title">
-                <span className="text-xs uppercase tracking-wider">
-                  Account
-                </span>
-              </li>
-              <li>
-                <div className="flex flex-col px-4 py-3 bg-base-200 rounded-lg mb-2">
-                  <span className="text-sm font-medium">{user.email}</span>
-                  <span className="text-xs text-base-content/60">
-                    Signed in
-                  </span>
-                </div>
-              </li>
-              <li>
-                <Link
-                  to="/profile"
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-base-200 rounded-lg"
-                >
-                  <Settings size={18} />
-                  Edit Profile
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/logout"
-                  className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/10 rounded-lg"
-                >
-                  <LogOut size={18} />
-                  Sign out
-                </Link>
-              </li>
-            </ul>
+        <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle"
+            aria-label="Menu"
+          >
+            <Avatar size="md">
+              <User size={18} />
+            </Avatar>
           </div>
-        ) : (
-          <Link to="/login" className="btn btn-primary btn-sm gap-2">
-            <LogIn size={16} />
-            <span className="hidden sm:inline">Sign in</span>
-          </Link>
-        )}
+          <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300">
+            <li className="menu-title">
+              <span className="text-xs uppercase tracking-wider">Account</span>
+            </li>
+            <li>
+              <div className="flex flex-col px-4 py-3 bg-base-200 rounded-lg mb-2">
+                <span className="text-sm font-medium">{user.email}</span>
+                <span className="text-xs text-base-content/60">Signed in</span>
+              </div>
+            </li>
+            <li>
+              <Link
+                to="/profile"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-base-200 rounded-lg"
+              >
+                <Settings size={18} />
+                Edit Profile
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/logout"
+                className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/10 rounded-lg"
+              >
+                <LogOut size={18} />
+                Sign out
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
