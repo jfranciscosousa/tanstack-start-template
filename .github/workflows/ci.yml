@@ -71,14 +71,13 @@ jobs:
           pnpm prisma db push
           bin/test-vitest
         env:
-          SECRET_KEY_BASE: supersecret42069
+          SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/react-router-starter-test
 
       - name: E2E
         run: |
           bin/test-e2e
         env:
-          SECRET_KEY_BASE: supersecret42069
+          SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/react-router-starter-test
           NODE_ENV: production
-          PORT: 3001

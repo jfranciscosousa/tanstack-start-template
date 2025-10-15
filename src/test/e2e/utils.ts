@@ -22,7 +22,7 @@ export const test = base
         const id = test.info().parallelIndex;
         const fileName = path.resolve(
           test.info().project.outputDir,
-          `node_modules/.cache/.auth/${id}.json`
+          `.cache/${id}.json`
         );
         const page = await browser.newPage({ storageState: undefined });
         await page.context().storageState({ path: fileName });
