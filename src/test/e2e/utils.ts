@@ -5,39 +5,12 @@ import {
   locatorFixtures as fixtures,
   type LocatorFixtures as TestingLibraryFixtures,
 } from "@playwright-testing-library/test/fixture.js";
-import { type Page, test as base } from "@playwright/test";
-import path from "path";
+import { test as base, type Page } from "@playwright/test";
 import { createUser } from "~/server/users";
 
 export const USER_TEST_PASSWORD = "foobar";
 
-export const test = base
-  .extend<TestingLibraryFixtures>(fixtures)
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  .extend<{}, { workerStorageState: string }>({
-    // These two properties ensure each worker has an unique auth context
-    storageState: ({ workerStorageState }, u) => u(workerStorageState),
-    workerStorageState: [
-      async ({ browser }, u) => {
-        const id = test.info().parallelIndex;
-        const fileName = path.resolve(
-          test.info().project.outputDir,
-          `.cache/${id}.json`
-        );
-        const page = await browser.newPage({ storageState: undefined });
-        await page.context().storageState({ path: fileName });
-        await page.close();
-        await u(fileName);
-      },
-      { scope: "worker" },
-    ],
-  });
-
-/**
- * Truncates the database between each test
- */
-// test.beforeEach(truncateAll);
-
+export const test = base.extend<TestingLibraryFixtures>(fixtures);
 export const expect = test.expect;
 
 export async function createUserAndLogin(
