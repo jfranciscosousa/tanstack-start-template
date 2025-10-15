@@ -47,7 +47,9 @@ export async function createUserAndLogin(
 ) {
   const password = USER_TEST_PASSWORD;
   const user = await createUser({
-    email: faker.internet.email({ firstName: crypto.randomUUID() }),
+    email: faker.internet.email({
+      firstName: crypto.randomUUID().replaceAll("-", ""),
+    }),
     name: faker.person.firstName(),
     password,
     passwordConfirmation: password,
