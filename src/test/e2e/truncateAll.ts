@@ -1,19 +1,9 @@
-/* eslint-disable */
-import { Pool } from "pg";
+import { db } from "~/server/db";
+import { sessions, users, todos } from "~/server/db/schema";
 
-// This only works for postgres!
 export async function truncateAll() {
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
-
-  const tables = ["User", "Session"]; // Explicitly list table names from our schema
-
-  try {
-    for (const table of tables) {
-      await pool.query(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE`);
-    }
-  } finally {
-    await pool.end();
-  }
+  // Delete in proper order to respect foreign key constraints
+  await db.delete(sessions);
+  await db.delete(todos);
+  await db.delete(users);
 }

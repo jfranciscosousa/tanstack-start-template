@@ -1,22 +1,27 @@
 import { useSession } from "@tanstack/react-start/server";
-import { prismaClient } from "./prisma";
-import type { Session } from "@prisma/client";
+import { db } from "./db";
+import { users, sessions, type Session } from "./db/schema";
 import { AppError } from "~/errors";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+import { eq } from "drizzle-orm";
 
 const getUserBySession = async (sessionId?: string) => {
   if (!sessionId) return;
 
-  const session = await prismaClient.session.findUnique({
-    where: {
-      id: sessionId,
-    },
-    include: {
+  const [session] = await db
+    .select({
       user: {
-        omit: { password: true },
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
       },
-    },
-  });
+    })
+    .from(sessions)
+    .innerJoin(users, eq(sessions.userId, users.id))
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
 
   return session?.user;
 };

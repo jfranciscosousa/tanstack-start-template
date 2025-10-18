@@ -8,7 +8,7 @@ A modern full-stack React application built with TanStack Start, featuring compl
 - 🛡️ **Route Protection** - Automatic redirects for protected routes
 - 🎨 **Modern UI** - Tailwind CSS + DaisyUI component library
 - 📱 **Responsive Design** - Mobile-first approach with clean navigation
-- 🗄️ **Database Integration** - Prisma ORM with SQLite
+- 🗄️ **Database Integration** - Drizzle ORM with PostgreSQL
 - 🔒 **Secure Password Handling** - bcrypt encryption for password security
 - 🧩 **Type Safety** - Full TypeScript support throughout the stack
 
@@ -16,10 +16,10 @@ A modern full-stack React application built with TanStack Start, featuring compl
 
 - **Frontend**: React 19.2.0 + TypeScript + TanStack Router
 - **Backend**: TanStack Start server functions
-- **Database**: Prisma 6.17.0 + SQLite
-- **Styling**: Tailwind CSS 4.1.14 + DaisyUI 5.1.31
-- **Testing**: Vitest 3.2.4 + React Testing Library
-- **Build Tool**: Vite 7.1.9
+- **Database**: Drizzle ORM 0.44.6 + PostgreSQL
+- **Styling**: Tailwind CSS 4.1.14 + DaisyUI 5.3.2
+- **Testing**: Vitest 3.2.4 + React Testing Library + Playwright
+- **Build Tool**: Vite 7.1.10
 - **Package Manager**: pnpm
 
 ## Quick Start
@@ -28,6 +28,7 @@ A modern full-stack React application built with TanStack Start, featuring compl
 
 - Node.js (18+ recommended)
 - pnpm
+- PostgreSQL (for database)
 
 ### Installation
 
@@ -70,9 +71,10 @@ bin/ts-check       # Run TypeScript compiler check
 
 ### Database
 ```bash
-pnpm prisma-generate    # Generate Prisma client
-npx prisma migrate dev  # Run database migrations
-npx prisma studio      # Open database browser
+npx drizzle-kit generate    # Generate migration files
+npx drizzle-kit migrate     # Apply pending migrations
+npx drizzle-kit push        # Push schema changes directly
+npx drizzle-kit studio      # Open Drizzle Studio database browser
 ```
 
 ## Project Structure
@@ -91,7 +93,9 @@ src/
 ├── server/               # Server-side functions
 │   ├── sessions.ts       # Authentication logic
 │   ├── users.ts          # User management
-│   ├── prisma.ts         # Database client
+│   ├── db.ts             # Drizzle database client
+│   ├── db/
+│   │   └── schema.ts     # Database schema definitions
 │   └── __tests__/        # Server function tests
 ├── test/                 # Test utilities and setup
 │   ├── setup.ts          # Test configuration
@@ -117,23 +121,49 @@ bin/                      # Development scripts
 Create a `.env` file in the root directory:
 
 ```env
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 SECRET_KEY_BASE="your-secret-key-for-session-encryption"
 ```
 
+The setup script (`bin/setup`) will help you configure these variables interactively.
+
 ## Database Schema
 
-The application includes a User model with the following structure:
+The application includes the following tables:
 
-```prisma
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String   // bcrypt hashed
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+### Users
+```typescript
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),  // bcrypt hashed
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+```
+
+### Sessions
+```typescript
+export const sessions = pgTable("sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  location: text("location"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+```
+
+### Todos
+```typescript
+export const todos = pgTable("todos", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 ```
 
 ## Contributing
@@ -149,7 +179,7 @@ model User {
 - [TanStack Start](https://tanstack.com/start)
 - [TanStack Router](https://tanstack.com/router)
 - [DaisyUI Components](https://daisyui.com/docs/v5/)
-- [Prisma Documentation](https://www.prisma.io/docs)
+- [Drizzle ORM](https://orm.drizzle.team/docs/overview)
 
 ## License
 

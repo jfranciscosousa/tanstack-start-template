@@ -11,9 +11,9 @@ A production-ready TanStack Start template featuring complete authentication fun
 - **TanStack Start**: Full-stack React framework with file-based routing and server functions
 - **TanStack Router**: Type-safe routing with nested layouts and automatic code splitting
 - **React 19.2.0** with **TypeScript 5.x**: Latest React with concurrent features
-- **Prisma 6.17.0** with SQLite database for development (PostgreSQL ready)
-- **Tailwind CSS 4.1.14** + **DaisyUI 5.1.31**: Utility-first CSS with component library
-- **Vite 7.1.9**: Fast build tooling with HMR and optimized bundling
+- **Drizzle ORM 0.44.6** with PostgreSQL database
+- **Tailwind CSS 4.1.14** + **DaisyUI 5.3.2**: Utility-first CSS with component library
+- **Vite 7.1.10**: Fast build tooling with HMR and optimized bundling
 - **Vitest 3.2.4**: Fast unit testing with React Testing Library
 - **pnpm**: Fast, disk space efficient package manager
 - **bcrypt-ts**: Secure password hashing
@@ -31,11 +31,10 @@ bin/setup          # Initial project setup
 
 ### Database Management
 ```bash
-pnpm prisma-generate    # Generate Prisma client after schema changes
-npx prisma migrate dev  # Create and apply new migration
-npx prisma db push      # Push schema changes without migration
-npx prisma studio      # Open database browser UI
-npx prisma db seed     # Run database seed script (if configured)
+npx drizzle-kit generate    # Generate migration files after schema changes
+npx drizzle-kit migrate     # Apply pending migrations
+npx drizzle-kit push        # Push schema changes directly without migration
+npx drizzle-kit studio      # Open Drizzle Studio database browser UI
 ```
 
 ### Testing
@@ -76,21 +75,40 @@ Routes in `src/routes/` follow TanStack Router conventions with automatic type s
 - `users.ts`: User registration with email uniqueness validation and password hashing
 - `websession.ts`: Session utilities, user context management, and session validation
 - `passwords.ts`: Password hashing, verification utilities, and security helpers
-- `prisma.ts`: Database client configuration with connection pooling
+- `db.ts`: Drizzle database client configuration with connection pooling
+- `db/schema.ts`: Drizzle schema definitions with type exports
 
-### Database Schema (Prisma)
-Current schema optimized for authentication:
-```prisma
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String   // bcrypt hashed with salt
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+### Database Schema (Drizzle)
+Current schema optimized for authentication with three tables:
+```typescript
+// Users table
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),  // bcrypt hashed with salt
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+});
 
-  @@map("users")
-}
+// Sessions table
+export const sessions = pgTable("sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  location: text("location"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
+// Todos table
+export const todos = pgTable("todos", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 ```
 
 ### Error Handling & Validation
@@ -120,7 +138,8 @@ model User {
 ### Core Config
 - **vite.config.ts**: TanStack Start plugin + TypeScript paths + Tailwind + type checking
 - **tsconfig.json**: Strict TypeScript with path mapping (`~/src/*`) and modern target
-- **prisma/schema.prisma**: Database schema with SQLite for dev, PostgreSQL ready
+- **drizzle.config.ts**: Drizzle Kit configuration for migrations and schema management
+- **src/server/db/schema.ts**: Database schema with PostgreSQL
 - **tailwind.config.ts**: Tailwind configuration with DaisyUI plugin and custom theme
 
 ### Package Configuration
@@ -132,8 +151,8 @@ model User {
 
 ### Required Variables
 ```bash
-DATABASE_URL="file:./dev.db"              # SQLite for dev, PostgreSQL for prod
-SECRET_KEY_BASE="your-secret-key"         # Session encryption (32+ chars)
+DATABASE_URL="postgresql://user:pass@localhost:5432/dbname"  # PostgreSQL connection string
+SECRET_KEY_BASE="your-secret-key"                            # Session encryption (32+ chars)
 ```
 
 ### Optional Variables
@@ -145,8 +164,8 @@ PORT="3000"                               # Server port
 ## Styling Guidelines
 
 ### Design System
-- **Framework**: Tailwind CSS 4.1.11 for utility-first styling
-- **Components**: DaisyUI 5.0.46 for pre-built, accessible components
+- **Framework**: Tailwind CSS 4.1.14 for utility-first styling
+- **Components**: DaisyUI 5.3.2 for pre-built, accessible components
 - **Documentation**: https://daisyui.com/docs/v5/
 - **Theme**: Default DaisyUI theme with dark mode support
 - **Responsive**: Mobile-first approach with responsive breakpoints
@@ -173,7 +192,7 @@ PORT="3000"                               # Server port
 
 ### Performance Considerations
 - **Code Splitting**: Automatic with TanStack Router
-- **Database**: Use Prisma's query optimization features
+- **Database**: Use Drizzle's query optimization features and prepared statements
 - **Caching**: Leverage TanStack Start's built-in caching
 - **Bundle Size**: Monitor bundle size with Vite's analysis tools
 
@@ -181,12 +200,12 @@ PORT="3000"                               # Server port
 
 ### Production Setup
 - Set `NODE_ENV=production`
-- Use PostgreSQL instead of SQLite
+- Configure proper `DATABASE_URL` for PostgreSQL
 - Configure proper `SECRET_KEY_BASE`
 - Enable HTTPS for secure cookies
-- Set up database migrations pipeline
+- Set up database migrations pipeline with `drizzle-kit migrate`
 
 ### Environment-Specific Notes
-- **Development**: Uses SQLite with file-based database
-- **Production**: Recommended to use PostgreSQL or MySQL
+- **Development**: Uses PostgreSQL with connection pooling
+- **Production**: Uses PostgreSQL with optimized connection settings
 - **Testing**: Configure separate test database

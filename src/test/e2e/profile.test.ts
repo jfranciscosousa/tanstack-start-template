@@ -1,7 +1,9 @@
 import { faker } from "@faker-js/faker";
 import { expect } from "@playwright/test";
 import { verifyPassword } from "~/server/passwords";
-import { prismaClient } from "~/server/prisma";
+import { db } from "~/server/db";
+import { users } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 import { createUserAndLogin, test, USER_TEST_PASSWORD } from "./utils";
 import { waitFor } from "@playwright-testing-library/test";
 
@@ -48,9 +50,11 @@ test("updates profile", async ({ page, screen }) => {
     ).toBeVisible();
   });
 
-  const updatedUser = await prismaClient.user.findUnique({
-    where: { id: user.id },
-  });
+  const [updatedUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, user.id))
+    .limit(1);
 
   if (!updatedUser) throw new Error("user should exist");
 
@@ -75,9 +79,11 @@ test("does not update profile if password confirmation does not match", async ({
 
   await screen.findByText("Passwords must match");
 
-  const updatedUser = await prismaClient.user.findUnique({
-    where: { id: user.id },
-  });
+  const [updatedUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, user.id))
+    .limit(1);
 
   if (!updatedUser) throw new Error("user should exist");
 
@@ -99,9 +105,11 @@ test("does not update profile if password is bad", async ({ page, screen }) => {
 
   await screen.findByText("Your current password is wrong!");
 
-  const updatedUser = await prismaClient.user.findUnique({
-    where: { id: user.id },
-  });
+  const [updatedUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, user.id))
+    .limit(1);
 
   if (!updatedUser) throw new Error("user should exist");
 

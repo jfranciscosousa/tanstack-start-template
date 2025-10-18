@@ -4,10 +4,11 @@ import z from "zod";
 import { zfd } from "zod-form-data";
 import { AppError } from "~/errors";
 import { hashPassword, verifyPassword } from "~/server/passwords";
-import { prismaClient } from "~/server/prisma";
+import { db } from "~/server/db";
+import { users, type User } from "~/server/db/schema";
 import { useLoggedInAppSession } from "~/server/websession";
 import { createAndUseSession, invalidateAllSessions } from "./sessions";
-import type { User } from "@prisma/client";
+import { eq } from "drizzle-orm";
 
 export const signUpSchema = zfd
   .formData({
@@ -25,11 +26,11 @@ export const signUpSchema = zfd
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;
 
 export const createUser = createServerOnlyFn(async (data: SignUpSchemaType) => {
-  const found = await prismaClient.user.findUnique({
-    where: {
-      email: data.email,
-    },
-  });
+  const [found] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, data.email))
+    .limit(1);
 
   const password = await hashPassword(data.password);
 
@@ -40,13 +41,16 @@ export const createUser = createServerOnlyFn(async (data: SignUpSchemaType) => {
     );
   }
 
-  return prismaClient.user.create({
-    data: {
+  const [newUser] = await db
+    .insert(users)
+    .values({
       name: data.name,
       email: data.email,
       password,
-    },
-  });
+    })
+    .returning();
+
+  return newUser;
 });
 
 export const signupFn = createServerFn({ method: "POST" })
@@ -88,9 +92,8 @@ export const updateUserFn = createServerFn({ method: "POST" })
     const data = updateUserSchema.parse(ctx.data);
     const { user } = await useLoggedInAppSession();
 
-    const userPassword = await prismaClient.user.findUnique({
-      where: { id: user.id },
-      select: { password: true },
+    const userPassword = await db.query.users.findFirst({
+      where: eq(users.id, user.id),
     });
 
     if (!(await verifyPassword(data.currentPassword, userPassword!.password))) {
@@ -111,10 +114,7 @@ export const updateUserFn = createServerFn({ method: "POST" })
       await invalidateAllSessions(user.id);
     }
 
-    await prismaClient.user.update({
-      where: { id: user.id },
-      data: updateData,
-    });
+    await db.update(users).set(updateData).where(eq(users.id, user.id));
 
     if (data.password) {
       await createAndUseSession(user.id);

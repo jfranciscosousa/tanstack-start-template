@@ -68,7 +68,7 @@ jobs:
 
       - name: Vitest
         run: |
-          pnpm prisma db push
+          npx drizzle-kit push
           bin/test-vitest
         env:
           SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired

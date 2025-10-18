@@ -1,4 +1,4 @@
-import type { Session } from "@prisma/client";
+import type { Session } from "~/server/db/schema";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {

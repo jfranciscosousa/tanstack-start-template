@@ -21,6 +21,4 @@ yarn.lock
 .tanstack/
 dist/
 .nitro/*
-
-prisma/dev.db
 .claude/

@@ -14,10 +14,6 @@ fi
 
 echo "🧪 Running unit tests with Vitest..."
 
-# Generate Prisma client for tests
-echo "📦 Generating Prisma client..."
-pnpm prisma generate
-
 # Run Vitest in run mode (non-watch)
 NODE_ENV=test pnpm vitest run
 

@@ -1,13 +1,15 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { verifyPassword } from "./passwords";
-import { prismaClient } from "./prisma";
+import { db } from "./db";
+import { users, sessions } from "./db/schema";
 import { useWebSession } from "./websession";
 import { zfd } from "zod-form-data";
 import z from "zod";
 import { AppError } from "~/errors";
 import { getRequestInfo } from "./request-info";
 import { getRequest } from "@tanstack/react-start/server";
+import { eq } from "drizzle-orm";
 
 export const loginSchema = zfd.formData({
   email: zfd.text(z.email()),
@@ -18,11 +20,11 @@ export const loginSchema = zfd.formData({
 export const loginFn = createServerFn({ method: "POST" })
   .inputValidator((formData: FormData) => loginSchema.parse(formData))
   .handler(async ({ data }) => {
-    const user = await prismaClient.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, data.email))
+      .limit(1);
 
     if (!user || !(await verifyPassword(data.password, user.password))) {
       throw new AppError(
@@ -46,9 +48,11 @@ export const createAndUseSession = createServerOnlyFn(
     const request = getRequest();
     const { ipAddress, location, userAgent } = await getRequestInfo(request);
 
-    const session = await prismaClient.session.create({
-      data: { ipAddress, location, userAgent, userId },
-    });
+    const [session] = await db
+      .insert(sessions)
+      .values({ ipAddress, location, userAgent, userId })
+      .returning();
+
     const webSession = await useWebSession();
 
     await webSession.update({
@@ -60,12 +64,14 @@ export const createAndUseSession = createServerOnlyFn(
 export const invalidateCurrentSession = createServerOnlyFn(async () => {
   const webSession = await useWebSession();
 
-  await prismaClient.session.delete({ where: { id: webSession.data.id } });
+  if (webSession.data.id) {
+    await db.delete(sessions).where(eq(sessions.id, webSession.data.id));
+  }
   await webSession.clear();
 });
 
 export const invalidateAllSessions = createServerOnlyFn((userId: string) =>
-  prismaClient.session.deleteMany({ where: { userId } })
+  db.delete(sessions).where(eq(sessions.userId, userId))
 );
 
 /**
@@ -83,13 +89,14 @@ export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
       );
     }
 
-    const sessions = await prismaClient.session.findMany({
-      where: { userId: webSession.user.id },
-      orderBy: { updatedAt: "desc" },
-    });
+    const userSessions = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.userId, webSession.user.id))
+      .orderBy(sessions.updatedAt);
 
     return {
-      sessions,
+      sessions: userSessions,
       currentSessionId: webSession.data.id,
     };
   }
@@ -108,9 +115,11 @@ export const revokeSession = createServerFn({ method: "POST" })
     }
 
     // Verify the session belongs to the user
-    const session = await prismaClient.session.findUnique({
-      where: { id: sessionId },
-    });
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, sessionId))
+      .limit(1);
 
     if (!session || session.userId !== webSession.user.id) {
       throw new AppError("NOT_FOUND", "Session not found");
@@ -121,7 +130,5 @@ export const revokeSession = createServerFn({ method: "POST" })
       throw new AppError("BAD_REQUEST", "Cannot revoke your current session");
     }
 
-    await prismaClient.session.delete({
-      where: { id: sessionId },
-    });
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
   });

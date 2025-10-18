@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { vi } from "vitest";
-import type { User } from "@prisma/client";
+import type { User } from "~/server/db/schema";
 import { useLoggedInAppSession, useWebSession } from "~/server/websession";
 import { AppError } from "~/errors";
 

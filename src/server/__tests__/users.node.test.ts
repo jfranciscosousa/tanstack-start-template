@@ -1,11 +1,13 @@
 import { faker } from "@faker-js/faker";
-import type { User } from "@prisma/client";
+import type { User } from "~/server/db/schema";
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { ZodError } from "zod";
 import { AppError } from "~/errors";
 import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
 import { hashPassword, verifyPassword } from "../passwords";
-import { prismaClient } from "../prisma";
+import { db } from "../db";
+import { users, sessions } from "../db/schema";
+import { eq } from "drizzle-orm";
 import { signupFn, updateUserFn } from "../users";
 
 vi.mock("@tanstack/react-start/server", () => ({
@@ -45,9 +47,8 @@ describe("User schemas integration tests", () => {
       }
 
       // Verify user was actually created in the database
-      const createdUser = await prismaClient.user.findUnique({
-        where: { email: testData.email },
-        include: { sessions: true },
+      const createdUser = await db.query.users.findFirst({
+        where: eq(users.email, testData.email),
       });
 
       expect(createdUser).not.toBe(null);
@@ -56,8 +57,14 @@ describe("User schemas integration tests", () => {
       expect(createdUser!.id).toBeDefined();
       expect(createdUser!.createdAt).toBeInstanceOf(Date);
       expect(createdUser!.updatedAt).toBeInstanceOf(Date);
+
+      const userSessions = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, createdUser!.id));
+
       expect(updateSession).toBeCalledWith({
-        id: createdUser!.sessions[0].id,
+        id: userSessions[0].id,
       });
 
       // Verify password was hashed correctly
@@ -72,12 +79,10 @@ describe("User schemas integration tests", () => {
       const testEmail = faker.internet.email();
 
       // Create first user
-      await prismaClient.user.create({
-        data: {
-          name: faker.person.fullName(),
-          email: testEmail,
-          password: await hashPassword(faker.internet.password()),
-        },
+      await db.insert(users).values({
+        name: faker.person.fullName(),
+        email: testEmail,
+        password: await hashPassword(faker.internet.password()),
       });
 
       // Try to create second user with same email
@@ -125,13 +130,16 @@ describe("User schemas integration tests", () => {
     beforeEach(async () => {
       // Create a test user for update operations
 
-      testUser = await prismaClient.user.create({
-        data: {
+      const [createdUser] = await db
+        .insert(users)
+        .values({
           name: faker.person.fullName(),
           email: faker.internet.email(),
           password: await hashPassword("originalpass123"),
-        },
-      });
+        })
+        .returning();
+
+      testUser = createdUser;
 
       // Mock the session to return our test user
       updateSession = mockLoggedIn(testUser).update;
@@ -139,13 +147,14 @@ describe("User schemas integration tests", () => {
 
     it("should update user profile without changing password", async () => {
       // Create multiple sessions for the user
-      const initialSessions = await prismaClient.session.createManyAndReturn({
-        data: [
+      const initialSessions = await db
+        .insert(sessions)
+        .values([
           { id: crypto.randomUUID(), userId: testUser.id },
           { id: crypto.randomUUID(), userId: testUser.id },
           { id: crypto.randomUUID(), userId: testUser.id },
-        ],
-      });
+        ])
+        .returning();
 
       const updateFormData = new FormData();
       updateFormData.append("name", "Updated Name");
@@ -155,8 +164,8 @@ describe("User schemas integration tests", () => {
       await updateUserFn({ data: updateFormData });
 
       // Verify user was updated in the database
-      const updatedUser = await prismaClient.user.findUnique({
-        where: { id: testUser.id },
+      const updatedUser = await db.query.users.findFirst({
+        where: eq(users.id, testUser.id),
       });
 
       expect(updatedUser).toBeDefined();
@@ -171,9 +180,10 @@ describe("User schemas integration tests", () => {
       expect(isOriginalPasswordValid).toBe(true);
 
       // Verify sessions remain in database when password is not changed
-      const remainingSessions = await prismaClient.session.findMany({
-        where: { userId: testUser.id },
-      });
+      const remainingSessions = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, testUser.id));
       expect(remainingSessions).toHaveLength(3);
       expect(remainingSessions.map(s => s.id).sort()).toEqual(
         initialSessions.map(s => s.id).sort()
@@ -182,13 +192,11 @@ describe("User schemas integration tests", () => {
 
     it("should update user profile with new password and invalidate all sessions (except current one)", async () => {
       // Create multiple sessions for the user
-      await prismaClient.session.createMany({
-        data: [
-          { id: crypto.randomUUID(), userId: testUser.id },
-          { id: crypto.randomUUID(), userId: testUser.id },
-          { id: crypto.randomUUID(), userId: testUser.id },
-        ],
-      });
+      await db.insert(sessions).values([
+        { id: crypto.randomUUID(), userId: testUser.id },
+        { id: crypto.randomUUID(), userId: testUser.id },
+        { id: crypto.randomUUID(), userId: testUser.id },
+      ]);
 
       const newEmail = faker.internet.email();
       const updateFormData = new FormData();
@@ -201,8 +209,8 @@ describe("User schemas integration tests", () => {
       await updateUserFn({ data: updateFormData });
 
       // Verify user was updated in the database
-      const updatedUser = await prismaClient.user.findUnique({
-        where: { id: testUser.id },
+      const updatedUser = await db.query.users.findFirst({
+        where: eq(users.id, testUser.id),
       });
 
       expect(updatedUser).toBeDefined();
@@ -224,9 +232,10 @@ describe("User schemas integration tests", () => {
       expect(isOldPasswordValid).toBe(false);
 
       // Verify old sessions are deleted and only the current session remains
-      const remainingSessions = await prismaClient.session.findMany({
-        where: { userId: testUser.id },
-      });
+      const remainingSessions = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, testUser.id));
       expect(remainingSessions).toHaveLength(1);
 
       const [session] = remainingSessions;

@@ -10,10 +10,6 @@ ENV_FILE=.env . bin/load-env
 
 echo "🔍 Running TypeScript type checking..."
 
-# Generate Prisma client types
-echo "📦 Generating Prisma client..."
-pnpm prisma generate
-
 echo "🔍 Running TypeScript compiler..."
 pnpm tsc --project tsconfig.json --noEmit --skipLibCheck
 echo "✅ Type checking completed successfully!"

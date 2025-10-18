@@ -10,15 +10,11 @@ ENV_FILE=.env . bin/load-env
 
 echo "🔨 Building TanStack Start application..."
 
-# Generate Prisma client before building
-echo "📦 Generating Prisma client..."
-pnpm prisma generate
-
 # Build the TanStack Start application
 pnpm vite build
 
 echo "Pushing db changes"
-pnpm prisma db push
+pnpm drizzle-kit migrate
 
 echo "✅ Build completed successfully!"
 echo "📁 Build files are in: .output/"

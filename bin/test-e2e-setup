@@ -10,6 +10,6 @@ ENV_FILE=.env.test . bin/load-env
 
 echo "🎭 Building end-to-end test dependencies"
 
-pnpm prisma db push --force-reset
+pnpm drizzle-kit push
 
 echo "✅ End-to-end dependencies built successfully!"

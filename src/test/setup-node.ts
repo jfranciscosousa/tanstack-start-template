@@ -1,9 +1,11 @@
 import { beforeAll } from "vitest";
-import { prismaClient } from "~/server/prisma";
+import { db } from "~/server/db";
+import { sessions, users, todos } from "~/server/db/schema";
 
 async function cleanup() {
-  await prismaClient.session.deleteMany({});
-  await prismaClient.user.deleteMany({});
+  await db.delete(sessions);
+  await db.delete(todos);
+  await db.delete(users);
 }
 
 beforeAll(cleanup);

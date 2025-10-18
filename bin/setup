@@ -58,11 +58,6 @@ echo ""
 echo "📦 Installing dependencies..."
 pnpm install
 
-# Generate Prisma client
-echo ""
-echo "🔧 Generating Prisma client..."
-pnpm prisma generate
-
 # Apply database schema
 echo ""
 echo "🗄️  Setting up databases..."
@@ -73,10 +68,10 @@ echo "Creating test database: ${test_db_name}"
 createdb "${test_db_name}" 2>/dev/null || echo "   Database ${test_db_name} already exists (or createdb failed)"
 
 echo "Applying schema to development database..."
-npx prisma db push
+npx drizzle-kit push
 
 echo "Applying schema to test database..."
-DATABASE_URL="${test_db_url}" npx prisma db push
+DATABASE_URL="${test_db_url}" npx drizzle-kit push
 
 echo ""
 echo "🎉 Setup complete! Your TanStack Start project is ready to go:"
@@ -85,7 +80,6 @@ echo "   ✅ Environment files configured"
 echo "   ✅ Development database created: ${dev_db_name}"
 echo "   ✅ Test database created: ${test_db_name}"
 echo "   ✅ Database schemas applied"
-echo "   ✅ Prisma client generated"
 echo ""
 echo "Next steps:"
 echo "   - Run 'bin/dev' to start the development server"

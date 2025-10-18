@@ -11,9 +11,5 @@ PORT="${PORT:-3000}"
 
 echo "🚀 Starting TanStack Start development server..."
 
-# Generate Prisma client if needed
-echo "📦 Generating Prisma client..."
-pnpm prisma generate
-
 # Start the development server
 pnpm vite dev --port $PORT
