@@ -31,7 +31,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       ...seo({
-        title: "Tanstack Start Sqlite",
+        title: "Tanstack start drizzle template",
         description: "TODO",
       }),
     ],

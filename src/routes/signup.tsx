@@ -50,7 +50,7 @@ function SignUp() {
               <span className="text-2xl text-primary-content">💰</span>
             </div>
             <h1 className="card-title text-2xl justify-center">
-              Tanstack Start Sqlite
+              Tanstack start drizzle template
             </h1>
             <p className="text-base-content/70 mt-2">Create your account</p>
           </div>

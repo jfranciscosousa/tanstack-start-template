@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Avatar } from "~/components/Avatar";
 import { useCurrentUser } from "~/routes/__root";
 import { fetchUserSessions } from "~/server/sessions";
-import { ProfileTab } from "./profile/_ProfileTab";
-import { SessionsTab } from "./profile/_SessionsTab";
+import { ProfileTab } from "./profile/-ProfileTab";
+import { SessionsTab } from "./profile/-SessionsTab";
 
 export const Route = createFileRoute("/_authed/profile")({
   component: ProfileComponent,
