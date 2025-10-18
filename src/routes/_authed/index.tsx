@@ -59,12 +59,15 @@ function RouteComponent() {
 
     if (!content.trim()) return;
 
-    createTodoMutation.mutateAsync({ data: { content } }).catch(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.value = "";
-      }
-    });
+    createTodoMutation
+      .mutateAsync({ data: { content } })
+      .then(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.value = "";
+        }
+      })
+      .catch(console.error);
   }
 
   function handleDeleteTodo(id: string) {
