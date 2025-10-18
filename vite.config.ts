@@ -1,6 +1,5 @@
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { defineConfig } from "vite";
-import tsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import checker from "vite-plugin-checker";
 import react from "@vitejs/plugin-react";
@@ -19,10 +18,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     mode === "serve" &&
       checker({ typescript: true /** or an object config */ }),
-
-    tsConfigPaths({
-      projects: ["./tsconfig.json"],
-    }),
 
     tanstackStart(),
 
