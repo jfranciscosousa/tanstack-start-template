@@ -68,7 +68,7 @@ jobs:
 
       - name: Vitest
         run: |
-          npx drizzle-kit push
+          pnpm drizzle-kit migrate
           bin/test-vitest
         env:
           SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired
