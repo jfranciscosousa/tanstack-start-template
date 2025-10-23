@@ -42,9 +42,7 @@ export const todos = pgTable(
     content: text("content").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  table => ({
-    userIdIdx: index("todos_user_id_idx").on(table.userId),
-  })
+  table => [index("todos_user_id_idx").on(table.userId)]
 );
 
 // Relations
@@ -69,6 +67,7 @@ export const todosRelations = relations(todos, ({ one }) => ({
 
 // Type exports
 export type User = typeof users.$inferSelect;
+export type UserWithoutPassword = Omit<User, "password">;
 export type NewUser = typeof users.$inferInsert;
 export type Session = typeof sessions.$inferSelect;
 export type NewSession = typeof sessions.$inferInsert;

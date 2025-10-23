@@ -90,13 +90,23 @@ src/
 │   └── logout.tsx         # Logout functionality
 ├── components/            # Reusable components
 │   └── __tests__/         # Component tests
-├── server/               # Server-side functions
-│   ├── sessions.ts       # Authentication logic
-│   ├── users.ts          # User management
-│   ├── db.ts             # Drizzle database client
-│   ├── db/
-│   │   └── schema.ts     # Database schema definitions
-│   └── __tests__/        # Server function tests
+├── server/               # Server-side functions (layered architecture)
+│   ├── db/               # Database layer
+│   │   ├── index.ts      # Drizzle database client
+│   │   └── schema.ts     # Database schema with relations
+│   ├── services/         # Business logic layer
+│   │   ├── userServices.ts     # User operations
+│   │   ├── sessionService.ts   # Session management
+│   │   ├── passwordService.ts  # Password utilities
+│   │   └── todoService.ts      # Todo operations
+│   ├── handlers/         # API endpoint layer
+│   │   ├── userHandlers.ts     # User endpoints
+│   │   ├── sessionHandlers.ts  # Auth endpoints
+│   │   └── todoHandlers.ts     # Todo endpoints
+│   ├── websession.ts     # Session utilities
+│   ├── request-info.ts   # Request metadata
+│   ├── seo.ts           # SEO utilities
+│   └── __tests__/       # Server function tests
 ├── test/                 # Test utilities and setup
 │   ├── setup.ts          # Test configuration
 │   └── utils.tsx         # Testing utilities
@@ -129,7 +139,7 @@ The setup script (`bin/setup`) will help you configure these variables interacti
 
 ## Database Schema
 
-The application includes the following tables:
+The application uses a PostgreSQL database with Drizzle ORM, featuring optimized schemas with relations and performance indexes:
 
 ### Users
 ```typescript
@@ -139,7 +149,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),  // bcrypt hashed
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
 });
 ```
 
@@ -152,8 +162,10 @@ export const sessions = pgTable("sessions", {
   userAgent: text("user_agent"),
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+}, table => [
+  index("sessions_user_id_idx").on(table.userId)  // Performance optimization
+]);
 ```
 
 ### Todos
@@ -163,7 +175,24 @@ export const todos = pgTable("todos", {
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, table => [
+  index("todos_user_id_idx").on(table.userId)  // Performance optimization
+]);
+```
+
+### Relations & Types
+The schema includes Drizzle relations for type-safe queries and comprehensive TypeScript types:
+```typescript
+// Relations enable type-safe joins
+export const usersRelations = relations(users, ({ many }) => ({
+  sessions: many(sessions),
+  todos: many(todos),
+}));
+
+// Exported types for full type safety
+export type User = typeof users.$inferSelect;
+export type UserWithoutPassword = Omit<User, "password">;
+// ... and more
 ```
 
 ## Contributing

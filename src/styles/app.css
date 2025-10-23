@@ -7,6 +7,10 @@
     color-scheme: light dark;
   }
 
+  input::placeholder {
+    opacity: 0.5;
+  }
+
   .using-mouse * {
     outline: none !important;
   }

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { expect } from "@playwright/test";
-import { verifyPassword } from "~/server/passwords";
+import { verifyPassword } from "~/server/services/passwordService";
 import { db } from "~/server/db";
 import { users } from "~/server/db/schema";
 import { eq } from "drizzle-orm";

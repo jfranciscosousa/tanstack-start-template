@@ -8,7 +8,7 @@ import { TextInput } from "~/components/TextInput";
 import { useFormDataValidator } from "~/hooks/useFormDataValidator";
 import { useMutation } from "~/hooks/useMutation";
 import { useCurrentUser } from "~/routes/__root";
-import { updateUserFn, updateUserSchema } from "~/server/users";
+import { updateUserFn, updateUserSchema } from "~/server/handlers/userHandlers";
 import { renderError } from "~/errors";
 
 export function ProfileTab() {

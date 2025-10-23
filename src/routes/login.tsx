@@ -9,7 +9,7 @@ import { TextInput } from "~/components/TextInput";
 import { renderError } from "~/errors";
 import { useFormDataValidator } from "~/hooks/useFormDataValidator";
 import { useMutation } from "~/hooks/useMutation";
-import { loginFn, loginSchema } from "~/server/sessions";
+import { loginFn, loginSchema } from "~/server/handlers/sessionHandlers";
 
 const searchSchema = z.object({
   redirectUrl: z.string().optional(),

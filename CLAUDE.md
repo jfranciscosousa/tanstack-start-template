@@ -70,16 +70,31 @@ Routes in `src/routes/` follow TanStack Router conventions with automatic type s
 - **Session Persistence**: Secure sessions survive browser restarts
 - **CSRF Protection**: Built-in protection through TanStack Start's session handling
 
-### Key Server Functions (src/server/)
-- `sessions.ts`: Login functionality with password verification and session creation
-- `users.ts`: User registration with email uniqueness validation and password hashing
+### Server Architecture (src/server/)
+The server code has been refactored into a layered architecture pattern:
+
+#### Database Layer (`db/`)
+- `db/index.ts`: Drizzle database client configuration with connection pooling and schema imports
+- `db/schema.ts`: Drizzle schema definitions with relations and type exports
+
+#### Service Layer (`services/`)
+- `userServices.ts`: User management operations (create, update, fetch by email/session)
+- `sessionService.ts`: Session management (create, fetch, verify, delete sessions)
+- `passwordService.ts`: Password hashing and verification utilities using bcrypt-ts
+- `todoService.ts`: Todo CRUD operations and user-specific todo management
+
+#### Handler Layer (`handlers/`)
+- `sessionHandlers.ts`: Authentication endpoints (login, session management, logout)
+- `userHandlers.ts`: User endpoints (registration, profile updates)
+- `todoHandlers.ts`: Todo API endpoints with validation
+
+#### Utilities
 - `websession.ts`: Session utilities, user context management, and session validation
-- `passwords.ts`: Password hashing, verification utilities, and security helpers
-- `db.ts`: Drizzle database client configuration with connection pooling
-- `db/schema.ts`: Drizzle schema definitions with type exports
+- `request-info.ts`: Request metadata extraction for session tracking
+- `seo.ts`: SEO and meta tag utilities
 
 ### Database Schema (Drizzle)
-Current schema optimized for authentication with three tables:
+Current schema optimized for authentication with three tables, including relations and performance indexes:
 ```typescript
 // Users table
 export const users = pgTable("users", {
@@ -91,7 +106,7 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
 });
 
-// Sessions table
+// Sessions table with indexes for performance
 export const sessions = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -100,15 +115,42 @@ export const sessions = pgTable("sessions", {
   location: text("location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
-});
+}, table => [
+  index("sessions_user_id_idx").on(table.userId)
+]);
 
-// Todos table
+// Todos table with indexes for performance
 export const todos = pgTable("todos", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, table => [
+  index("todos_user_id_idx").on(table.userId)
+]);
+
+// Drizzle relations for type-safe joins and queries
+export const usersRelations = relations(users, ({ many }) => ({
+  sessions: many(sessions),
+  todos: many(todos),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));
+
+export const todosRelations = relations(todos, ({ one }) => ({
+  user: one(users, { fields: [todos.userId], references: [users.id] }),
+}));
+
+// Exported types for TypeScript
+export type User = typeof users.$inferSelect;
+export type UserWithoutPassword = Omit<User, "password">;
+export type NewUser = typeof users.$inferInsert;
+export type Session = typeof sessions.$inferSelect;
+export type NewSession = typeof sessions.$inferInsert;
+export type Todo = typeof todos.$inferSelect;
+export type NewTodo = typeof todos.$inferInsert;
 ```
 
 ### Error Handling & Validation
@@ -180,9 +222,14 @@ PORT="3000"                               # Server port
 
 ### Code Organization
 - **Imports**: Use absolute imports with `~/` prefix for src directory
-- **Types**: Define TypeScript interfaces in component files or shared types
-- **Server Functions**: Keep server logic in `src/server/` directory
+- **Types**: Define TypeScript interfaces in component files or shared types directory
+- **Server Architecture**: Follows layered architecture pattern:
+  - **Database Layer** (`src/server/db/`): Schema definitions and database client
+  - **Service Layer** (`src/server/services/`): Business logic and data operations
+  - **Handler Layer** (`src/server/handlers/`): API endpoints and request/response handling
+  - **Utilities** (`src/server/`): Session management, request info, and shared utilities
 - **Components**: Reusable components in `src/components/`
+- **Routes**: File-based routing in `src/routes/` with layouts and protected routes
 
 ### Security Practices
 - **Input Validation**: Validate all user inputs with Zod schemas

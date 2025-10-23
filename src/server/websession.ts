@@ -1,30 +1,8 @@
-import { useSession } from "@tanstack/react-start/server";
-import { db } from "./db";
-import { users, sessions, type Session } from "./db/schema";
-import { AppError } from "~/errors";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
-
-const getUserBySession = async (sessionId?: string) => {
-  if (!sessionId) return;
-
-  const [session] = await db
-    .select({
-      user: {
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-      },
-    })
-    .from(sessions)
-    .innerJoin(users, eq(sessions.userId, users.id))
-    .where(eq(sessions.id, sessionId))
-    .limit(1);
-
-  return session?.user;
-};
+import { useSession } from "@tanstack/react-start/server";
+import { AppError } from "~/errors";
+import { type Session } from "./db/schema";
+import { getUserBySessionId } from "./services/userServices";
 
 type SessionUser = {
   id: Session["id"];
@@ -40,7 +18,7 @@ export const useWebSession = createServerOnlyFn(async () => {
 
   return {
     ...sessionProps,
-    user: await getUserBySession(sessionProps.data.id),
+    user: await getUserBySessionId(sessionProps.data.id),
   };
 });
 

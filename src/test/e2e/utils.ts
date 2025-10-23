@@ -6,7 +6,7 @@ import {
   type LocatorFixtures as TestingLibraryFixtures,
 } from "@playwright-testing-library/test/fixture.js";
 import { test as base, type Page } from "@playwright/test";
-import { createUser } from "~/server/users";
+import { createUser } from "~/server/services/userServices";
 
 export const USER_TEST_PASSWORD = "foobar";
 
@@ -25,7 +25,6 @@ export async function createUserAndLogin(
     }),
     name: faker.person.firstName(),
     password,
-    passwordConfirmation: password,
   });
 
   await page.goto(originalPage || "/");

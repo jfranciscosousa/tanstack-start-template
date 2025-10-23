@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Avatar } from "~/components/Avatar";
 import { renderError } from "~/errors";
 import { useMutation } from "~/hooks/useMutation";
-import { revokeSession } from "~/server/sessions";
+import { revokeSession } from "~/server/handlers/sessionHandlers";
 
 interface SessionsTabProps {
   sessions: Session[];
@@ -138,7 +138,7 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
                         </div>
                       </div>
 
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         {!isCurrentSession && (
                           <button
                             className="btn btn-error btn-sm"

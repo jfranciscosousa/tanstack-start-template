@@ -1,15 +1,20 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
-import { verifyPassword } from "./passwords";
-import { db } from "./db";
-import { users, sessions } from "./db/schema";
-import { useWebSession } from "./websession";
+import { verifyPassword } from "../services/passwordService";
+import { type User } from "../db/schema";
+import { useWebSession } from "../websession";
 import { zfd } from "zod-form-data";
 import z from "zod";
 import { AppError } from "~/errors";
-import { getRequestInfo } from "./request-info";
+import { getRequestInfo } from "../request-info";
 import { getRequest } from "@tanstack/react-start/server";
-import { eq } from "drizzle-orm";
+import {
+  createSession,
+  deleteSession,
+  getUserSessions,
+  verifyUserSession,
+} from "../services/sessionService";
+import { getUserByEmail } from "../services/userServices";
 
 export const loginSchema = zfd.formData({
   email: zfd.text(z.email()),
@@ -20,11 +25,7 @@ export const loginSchema = zfd.formData({
 export const loginFn = createServerFn({ method: "POST" })
   .inputValidator((formData: FormData) => loginSchema.parse(formData))
   .handler(async ({ data }) => {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, data.email))
-      .limit(1);
+    const user = await getUserByEmail(data.email);
 
     if (!user || !(await verifyPassword(data.password, user.password))) {
       throw new AppError(
@@ -33,7 +34,7 @@ export const loginFn = createServerFn({ method: "POST" })
       );
     }
 
-    await createAndUseSession(user.id);
+    await createAndUseSession(user);
 
     throw redirect({
       href: data.redirectUrl || "/",
@@ -43,41 +44,29 @@ export const loginFn = createServerFn({ method: "POST" })
 /**
  * Creates a session in the database and updates the web session (cookie)
  */
-export const createAndUseSession = createServerOnlyFn(
-  async (userId: string) => {
-    const request = getRequest();
-    const { ipAddress, location, userAgent } = await getRequestInfo(request);
+export const createAndUseSession = createServerOnlyFn(async (user: User) => {
+  const request = getRequest();
+  const session = await createSession(user, await getRequestInfo(request));
+  const webSession = await useWebSession();
 
-    const [session] = await db
-      .insert(sessions)
-      .values({ ipAddress, location, userAgent, userId })
-      .returning();
-
-    const webSession = await useWebSession();
-
-    await webSession.update({
-      id: session.id,
-    });
-  }
-);
+  await webSession.update({
+    id: session.id,
+  });
+});
 
 export const invalidateCurrentSession = createServerOnlyFn(async () => {
   const webSession = await useWebSession();
 
   if (webSession.data.id) {
-    await db.delete(sessions).where(eq(sessions.id, webSession.data.id));
+    await deleteSession(webSession.data.id);
   }
+
   await webSession.clear();
 });
-
-export const invalidateAllSessions = createServerOnlyFn((userId: string) =>
-  db.delete(sessions).where(eq(sessions.userId, userId))
-);
 
 /**
  * Fetches all sessions for the current user
  */
-
 export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
   async () => {
     const webSession = await useWebSession();
@@ -89,11 +78,7 @@ export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
       );
     }
 
-    const userSessions = await db
-      .select()
-      .from(sessions)
-      .where(eq(sessions.userId, webSession.user.id))
-      .orderBy(sessions.updatedAt);
+    const userSessions = await getUserSessions(webSession.user);
 
     return {
       sessions: userSessions,
@@ -106,7 +91,7 @@ export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
  * Revokes a specific session
  */
 export const revokeSession = createServerFn({ method: "POST" })
-  .inputValidator((sessionId: string) => z.string().uuid().parse(sessionId))
+  .inputValidator((sessionId: string) => z.uuid().parse(sessionId))
   .handler(async ({ data: sessionId }) => {
     const webSession = await useWebSession();
 
@@ -115,13 +100,9 @@ export const revokeSession = createServerFn({ method: "POST" })
     }
 
     // Verify the session belongs to the user
-    const [session] = await db
-      .select()
-      .from(sessions)
-      .where(eq(sessions.id, sessionId))
-      .limit(1);
+    const session = await verifyUserSession(webSession.user, sessionId);
 
-    if (!session || session.userId !== webSession.user.id) {
+    if (!session) {
       throw new AppError("NOT_FOUND", "Session not found");
     }
 
@@ -130,5 +111,5 @@ export const revokeSession = createServerFn({ method: "POST" })
       throw new AppError("BAD_REQUEST", "Cannot revoke your current session");
     }
 
-    await db.delete(sessions).where(eq(sessions.id, sessionId));
+    await deleteSession(session.id);
   });

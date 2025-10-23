@@ -3,7 +3,7 @@ import { Shield, User } from "lucide-react";
 import { useState } from "react";
 import { Avatar } from "~/components/Avatar";
 import { useCurrentUser } from "~/routes/__root";
-import { fetchUserSessions } from "~/server/sessions";
+import { fetchUserSessions } from "~/server/handlers/sessionHandlers";
 import { ProfileTab } from "./profile/-ProfileTab";
 import { SessionsTab } from "./profile/-SessionsTab";
 

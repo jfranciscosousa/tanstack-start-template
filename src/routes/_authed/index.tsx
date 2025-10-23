@@ -4,15 +4,15 @@ import { useRef } from "react";
 import { toast } from "sonner";
 import { useMutation } from "~/hooks/useMutation";
 import {
-  createTodo as createTodoFn,
-  deleteAllTodos as deleteAllTodosFn,
-  deleteTodo as deleteTodoFn,
-  getTodos,
-} from "~/server/todos";
+  createTodoFn as createTodoFn,
+  deleteAllTodosFn as deleteAllTodosFn,
+  deleteTodoFn as deleteTodoFn,
+  getTodosFn,
+} from "~/server/handlers/todoHandlers";
 
 export const Route = createFileRoute("/_authed/")({
   component: RouteComponent,
-  loader: () => getTodos(),
+  loader: () => getTodosFn(),
 });
 
 function RouteComponent() {
@@ -120,7 +120,7 @@ function RouteComponent() {
           <div key={todo.id} className="break-inside-avoid">
             <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
               <div className="card-body p-4">
-                <p className="whitespace-pre-wrap break-words">
+                <p className="whitespace-pre-wrap wrap-break-word">
                   {todo.content}
                 </p>
                 <div className="card-actions justify-between items-center mt-3">

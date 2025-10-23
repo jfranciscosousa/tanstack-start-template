@@ -4,11 +4,11 @@ import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { ZodError } from "zod";
 import { AppError } from "~/errors";
 import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
-import { hashPassword, verifyPassword } from "../passwords";
+import { hashPassword, verifyPassword } from "../services/passwordService";
 import { db } from "../db";
 import { users, sessions } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { signupFn, updateUserFn } from "../users";
+import { signupFn, updateUserFn } from "../handlers/userHandlers";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
