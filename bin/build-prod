@@ -13,7 +13,7 @@ echo "🔨 Building TanStack Start application..."
 # Build the TanStack Start application
 pnpm vite build
 
-echo "Pushing db changes"
+echo "Applying migrations"
 pnpm drizzle-kit migrate
 
 echo "✅ Build completed successfully!"

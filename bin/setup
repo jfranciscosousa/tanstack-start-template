@@ -57,6 +57,7 @@ echo "✅ Environment files configured with database URLs"
 echo ""
 echo "📦 Installing dependencies..."
 pnpm install
+pnpm exec playwright install chromium
 
 # Apply database schema
 echo ""
@@ -68,10 +69,10 @@ echo "Creating test database: ${test_db_name}"
 createdb "${test_db_name}" 2>/dev/null || echo "   Database ${test_db_name} already exists (or createdb failed)"
 
 echo "Applying schema to development database..."
-npx drizzle-kit push
+npx drizzle-kit migrate
 
 echo "Applying schema to test database..."
-DATABASE_URL="${test_db_url}" npx drizzle-kit push
+DATABASE_URL="${test_db_url}" npx drizzle-kit migrate
 
 echo ""
 echo "🎉 Setup complete! Your TanStack Start project is ready to go:"

@@ -1,8 +1,10 @@
 import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 import { type ComponentPropsWithoutRef, useState } from "react";
 
-export interface PasswordInputProps
-  extends Omit<ComponentPropsWithoutRef<"input">, "type"> {
+export interface PasswordInputProps extends Omit<
+  ComponentPropsWithoutRef<"input">,
+  "type"
+> {
   label: string;
   icon?: LucideIcon;
   error?: string | string[];
