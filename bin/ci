@@ -17,7 +17,7 @@ echo "🔍 Running type checks..."
 ./bin/ts-check
 
 echo "🎭 Installing Playwright browsers..."
-pnpm dlx playwright install
+pnpm exec playwright install chromium
 
 echo "🧪 Running all tests..."
 ./bin/test
