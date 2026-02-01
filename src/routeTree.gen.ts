@@ -47,11 +47,11 @@ const AuthedProfileRoute = AuthedProfileRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthedIndexRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
   '/profile': typeof AuthedProfileRoute
-  '/': typeof AuthedIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -71,7 +71,7 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/logout' | '/signup' | '/profile' | '/'
+  fullPaths: '/' | '/login' | '/logout' | '/signup' | '/profile'
   fileRoutesByTo: FileRoutesByTo
   to: '/login' | '/logout' | '/signup' | '/profile' | '/'
   id:
@@ -117,7 +117,7 @@ declare module '@tanstack/react-router' {
     '/_authed': {
       id: '/_authed'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }

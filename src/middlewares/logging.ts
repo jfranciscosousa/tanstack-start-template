@@ -40,19 +40,30 @@ function getRequestAsString(request: Request) {
 export const requestLoggingMiddleware = createMiddleware().server(
   async ({ next, request }) => {
     const requestAsString = getRequestAsString(request);
+    const startTime = performance.now();
 
     try {
       const response = await next();
+      const duration = performance.now() - startTime;
 
       console.log(
         "\x1b[33m%s\x1b[0m",
         "http",
         requestAsString,
-        response.response.status
+        response.response.status,
+        `${duration.toFixed(2)}ms`
       );
 
       return response;
     } catch (error) {
+      const duration = performance.now() - startTime;
+      console.error(
+        "\x1b[31m%s\x1b[0m",
+        "http",
+        requestAsString,
+        "ERROR",
+        `${duration.toFixed(2)}ms`
+      );
       console.error(error);
       throw error;
     }
