@@ -52,7 +52,7 @@ export function Navbar({ user }: NavbarProps) {
               <User size={18} />
             </Avatar>
           </div>
-          <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-3 shadow-lg border border-base-300">
+          <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-64 p-3 shadow-lg border border-base-300">
             <li className="menu-title">
               <span className="text-xs uppercase tracking-wider">Account</span>
             </li>
