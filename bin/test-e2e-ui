@@ -5,16 +5,20 @@
 
 set -e  # Exit on error
 
-# Test scripts must use .env.test — refuse to run with any other environment
-if [ ! -f ".env.test" ]; then
-    echo "❌ .env.test not found. Copy .env.test.sample to .env.test and configure it."
-    exit 1
+# Test scripts require .env.test — skipped in CI where env vars are set directly
+if [ -z "${CI:-}" ]; then
+    if [ ! -f ".env.test" ]; then
+        echo "❌ .env.test not found. Copy .env.test.sample to .env.test and configure it."
+        exit 1
+    fi
+    if [ -n "${ENV_LOADED:-}" ] && [ "$ENV_LOADED" != ".env.test" ]; then
+        echo "❌ Environment '$ENV_LOADED' already loaded. Test scripts require .env.test."
+        exit 1
+    fi
 fi
-if [ -n "${ENV_LOADED:-}" ] && [ "$ENV_LOADED" != ".env.test" ]; then
-    echo "❌ Environment '$ENV_LOADED' already loaded. Test scripts require .env.test."
-    exit 1
+if [ -f ".env.test" ]; then
+    ENV_FILE=.env.test . bin/load-env
 fi
-ENV_FILE=.env.test . bin/load-env
 
 bin/test-e2e-setup
 
