@@ -30,3 +30,4 @@ Load these when working on the relevant area:
 - [Database](docs/agents/DATABASE.md) — schema, Drizzle ORM patterns, migrations
 - [UI](docs/agents/UI.md) — DaisyUI components, Tailwind utilities, Lucide icons
 - [Testing](docs/agents/TESTING.md) — Vitest environments, Playwright e2e, test utilities
+- [Bin Scripts](docs/agents/BIN.md) — all available bin/ scripts and their args

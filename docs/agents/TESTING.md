@@ -9,7 +9,7 @@ bin/test                                     # All tests
 bin/test-vitest                              # Unit tests
 bin/test-vitest-watch                        # Unit tests watch
 bin/test-e2e                                 # E2E tests
-pnpm vitest run path/to/file.test.ts         # Single unit test file
+bin/test-vitest path/to/file.test.ts         # Single unit test file
 ```
 
 ## Test Environments

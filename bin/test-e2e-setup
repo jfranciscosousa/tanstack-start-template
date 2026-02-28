@@ -5,7 +5,15 @@
 
 set -e  # Exit on error
 
-# Load test environment variables (automatically uses .env.test)
+# Test scripts must use .env.test — refuse to run with any other environment
+if [ ! -f ".env.test" ]; then
+    echo "❌ .env.test not found. Copy .env.test.sample to .env.test and configure it."
+    exit 1
+fi
+if [ -n "${ENV_LOADED:-}" ] && [ "$ENV_LOADED" != ".env.test" ]; then
+    echo "❌ Environment '$ENV_LOADED' already loaded. Test scripts require .env.test."
+    exit 1
+fi
 ENV_FILE=.env.test . bin/load-env
 
 echo "🎭 Building end-to-end test dependencies"

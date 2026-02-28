@@ -47,17 +47,17 @@ Never use raw SQL. Always use the Drizzle query builder.
 ```bash
 # 1. Edit src/server/db/schema.ts
 # 2. Generate migration file
-pnpm drizzle-kit generate
+bin/db generate
 
 # 3. Review the generated SQL in drizzle/ before applying — never skip this
 # 4. Apply
-pnpm drizzle-kit migrate
+bin/db migrate
 
 # Dev shortcut (no migration file, direct push)
-pnpm drizzle-kit push
+bin/db push
 
 # Visual UI
-pnpm drizzle-kit studio
+bin/db studio
 ```
 
 **Never auto-apply migrations** without reviewing the generated SQL.
