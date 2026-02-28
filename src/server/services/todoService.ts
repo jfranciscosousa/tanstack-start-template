@@ -1,9 +1,10 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
 import { and, desc, eq } from "drizzle-orm";
+import { createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";
+
+import { type UserWithoutPassword, todos } from "../db/schema";
 import { db } from "../db";
-import { todos, type UserWithoutPassword } from "../db/schema";
 
 export const getTodos = createServerOnlyFn(
   async (user: UserWithoutPassword) => {

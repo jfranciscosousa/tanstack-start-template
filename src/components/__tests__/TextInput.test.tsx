@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "../../test/utils";
-import { TextInput } from "../TextInput";
+import { describe, expect, it } from "vitest";
 import { Mail } from "lucide-react";
+
+import { TextInput } from "../TextInput";
+import { render, screen } from "../../test/utils";
 
 describe("TextInput", () => {
   it("renders with label", () => {

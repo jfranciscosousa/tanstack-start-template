@@ -1,6 +1,7 @@
 import { beforeAll } from "vitest";
+
+import { sessions, todos, users } from "~/server/db/schema";
 import { db } from "~/server/db";
-import { sessions, users, todos } from "~/server/db/schema";
 
 async function cleanup() {
   await db.delete(sessions);

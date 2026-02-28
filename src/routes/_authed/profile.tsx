@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Shield, User } from "lucide-react";
 import { useState } from "react";
-import { Avatar } from "~/components/Avatar";
-import { useCurrentUser } from "~/routes/__root";
+import { Shield, User } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+
 import { fetchUserSessions } from "~/server/handlers/sessionHandlers";
-import { ProfileTab } from "./profile/-ProfileTab";
+import { useCurrentUser } from "~/routes/__root";
+import { Avatar } from "~/components/Avatar";
+
 import { SessionsTab } from "./profile/-SessionsTab";
+import { ProfileTab } from "./profile/-ProfileTab";
 
 export const Route = createFileRoute("/_authed/profile")({
   component: ProfileComponent,
@@ -19,6 +21,14 @@ function ProfileComponent() {
   const user = useCurrentUser();
   const { sessions, currentSessionId } = Route.useLoaderData();
   const [activeTab, setActiveTab] = useState<"profile" | "sessions">("profile");
+
+  function handleSetProfileTab() {
+    setActiveTab("profile");
+  }
+
+  function handleSetSessionsTab() {
+    setActiveTab("sessions");
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -40,17 +50,19 @@ function ProfileComponent() {
 
         <div role="tablist" className="tabs tabs-boxed bg-base-100 shadow">
           <button
+            type="button"
             role="tab"
             className={`tab ${activeTab === "profile" ? "tab-active" : ""}`}
-            onClick={() => setActiveTab("profile")}
+            onClick={handleSetProfileTab}
           >
             <User size={16} className="mr-2" />
             Profile
           </button>
           <button
+            type="button"
             role="tab"
             className={`tab ${activeTab === "sessions" ? "tab-active" : ""}`}
-            onClick={() => setActiveTab("sessions")}
+            onClick={handleSetSessionsTab}
           >
             <Shield size={16} className="mr-2" />
             Sessions ({sessions.length})

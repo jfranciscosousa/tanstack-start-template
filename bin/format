@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Format script with oxfmt
+
+set -e  # Exit on error
+
+# Load environment variables
+ENV_FILE=.env . bin/load-env
+
+echo "🔍 Running oxfmt..."
+
+pnpm oxfmt "$@"
+
+echo "✅ Formatting completed successfully!"

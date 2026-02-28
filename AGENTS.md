@@ -6,13 +6,14 @@
 
 Production-ready TanStack Start template with session-based authentication, PostgreSQL database, and modern React patterns. Features user management, profile pages with session tracking, and todo functionality.
 
-**Key Technologies:** TanStack Start (v1.157) • React 19 • TypeScript 5 • Drizzle ORM • PostgreSQL • Tailwind v4 • DaisyUI • Vitest • Playwright
+**Key Technologies:** TanStack Start (v1.157) • React 19 • TypeScript 5 • Drizzle ORM • PostgreSQL • Tailwind v4 • DaisyUI • Vitest • Playwright • oxlint • oxfmt
 
 ---
 
 ## Critical Rules (DO / DON'T)
 
 ### DO:
+
 - ✅ Use **layered architecture**: Database layer (`db/`) → Service layer (`services/`) → Handler layer (`handlers/`)
 - ✅ Use **absolute imports** with `~/` prefix (e.g., `import { db } from '~/server/db'`)
 - ✅ Use **Zod validation** on all server functions with `.validator(schema)`
@@ -22,9 +23,11 @@ Production-ready TanStack Start template with session-based authentication, Post
 - ✅ Hash passwords with **bcrypt-ts** before storing
 - ✅ Use **Drizzle ORM** query builder (never raw SQL)
 - ✅ Use **`createServerFn`** for all server-side operations
-- ✅ Check files with **file-scoped commands** (see below) before committing
+- ✅ Check files with **file-scoped TypeScript** (see below) before committing
+- ✅ Do not use root /tmp, instead use a project scopped ./tmp
 
 ### DON'T:
+
 - ❌ **Never** put database queries directly in handlers - use service layer
 - ❌ **Never** put business logic in database layer - keep it in services
 - ❌ **Never** expose sensitive data in error messages
@@ -39,6 +42,7 @@ Production-ready TanStack Start template with session-based authentication, Post
 ## Architecture Quick Reference
 
 ### Layered Pattern (STRICT)
+
 ```
 Database (db/) → Services (services/) → Handlers (handlers/) → Routes (routes/)
      ↓              ↓                      ↓                       ↓
@@ -46,11 +50,13 @@ Database (db/) → Services (services/) → Handlers (handlers/) → Routes (rou
 ```
 
 **Example files to follow:**
+
 - Service pattern: [src/server/services/userServices.ts](src/server/services/userServices.ts)
 - Handler pattern: [src/server/handlers/sessionHandlers.ts](src/server/handlers/sessionHandlers.ts)
-- Route pattern: [src/routes/_authed/profile.tsx](src/routes/_authed/profile.tsx)
+- Route pattern: [src/routes/\_authed/profile.tsx](src/routes/_authed/profile.tsx)
 
 ### File Organization
+
 - **Routes:** `src/routes/` (file-based routing with TanStack Router)
   - Protected routes: `_authed/*.tsx` (requires authentication)
   - Public routes: `login.tsx`, `signup.tsx`
@@ -63,6 +69,7 @@ Database (db/) → Services (services/) → Handlers (handlers/) → Routes (rou
 - **Middleware:** `src/middlewares/` (request logging, etc.)
 
 ### Database Schema
+
 Three tables: `users`, `sessions`, `todos` with Drizzle relations. See [src/server/db/schema.ts](src/server/db/schema.ts) for details.
 
 ---
@@ -75,16 +82,14 @@ Three tables: `users`, `sessions`, `todos` with Drizzle relations. See [src/serv
 # TypeScript check single file
 bin/ts-check path/to/file.ts
 
-# Lint single file
-pnpm run eslint path/to/file.tsx
-
 # Test single file
 pnpm run vitest run path/to/test.test.ts
 
 # Full project checks (use sparingly)
 bin/test           # All tests
 bin/ts-check       # Full type check
-bin/lint           # All files
+bin/lint           # Lint with oxlint
+bin/format         # Format with oxfmt
 ```
 
 ---
@@ -92,12 +97,14 @@ bin/lint           # All files
 ## Safety Boundaries
 
 ### ✅ Allowed (No Approval Needed)
+
 - Reading any file
 - Running file-scoped validation commands
 - Writing/editing code files
 - Running database queries via Drizzle
 
 ### ⚠️ Require Approval
+
 - Installing/removing packages (`pnpm add/remove`)
 - Git operations (`git commit`, `git push`)
 - Database migrations (`drizzle-kit generate/migrate`)
@@ -110,12 +117,14 @@ bin/lint           # All files
 ## Development Workflow
 
 ### Starting Development
+
 ```bash
 bin/setup          # First time setup (creates DB, runs migrations)
 bin/dev            # Start dev server (http://localhost:3000)
 ```
 
 ### Database Changes
+
 ```bash
 # 1. Edit src/server/db/schema.ts
 # 2. Generate migration
@@ -128,6 +137,7 @@ pnpm run drizzle-kit studio
 ```
 
 ### Testing Strategy
+
 ```bash
 bin/test-vitest-watch     # Unit tests (watch mode)
 bin/test-e2e              # E2E tests (Playwright)
@@ -139,28 +149,31 @@ bin/test                  # All tests
 ## Code Patterns
 
 ### Server Function Pattern (FOLLOW THIS)
+
 ```typescript
 // ✅ GOOD - In handlers file
 export const updateProfileServerFn = createServerFn({ method: "POST" })
-  .validator(updateProfileSchema)  // Zod validation
+  .validator(updateProfileSchema) // Zod validation
   .handler(async ({ data, context }) => {
     const user = await getUserSession(context);
     if (!user) throw new AppError("Unauthenticated", "UNAUTHENTICATED");
 
-    return await updateUser(user.id, data);  // Call service function
+    return await updateUser(user.id, data); // Call service function
   });
 ```
 
 ```typescript
 // ❌ BAD - Database query directly in handler
-export const updateProfileServerFn = createServerFn({ method: "POST" })
-  .handler(async ({ data, context }) => {
+export const updateProfileServerFn = createServerFn({ method: "POST" }).handler(
+  async ({ data, context }) => {
     // ❌ Don't query database directly
     await db.update(users).set(data).where(eq(users.id, context.user.id));
-  });
+  }
+);
 ```
 
 ### Component Pattern (FOLLOW THIS)
+
 ```typescript
 // ✅ GOOD - DaisyUI components with Tailwind
 import { Mail } from 'lucide-react';
@@ -185,6 +198,7 @@ export function ProfileCard() {
 ## Documentation References
 
 **Primary Docs (check these first):**
+
 - TanStack Start: https://tanstack.com/start/latest/docs
 - TanStack Router: https://tanstack.com/router/latest/docs
 - Drizzle ORM: https://orm.drizzle.team/docs
@@ -192,6 +206,7 @@ export function ProfileCard() {
 - Tailwind CSS: https://tailwindcss.com/docs
 
 **When stuck:**
+
 1. Check example files in codebase (patterns above)
 2. Search relevant docs
 3. Ask clarifying questions if approach is unclear
@@ -201,8 +216,10 @@ export function ProfileCard() {
 ## PR Checklist
 
 Before completing work:
-- [ ] File-scoped type checks pass
-- [ ] File-scoped linting passes
+
+- [ ] File-scoped type checks pass (`bin/ts-check`)
+- [ ] Lint passes (`bin/lint`)
+- [ ] Code formatted (`bin/format`)
 - [ ] Tests added/updated for new functionality
 - [ ] No sensitive data exposed in errors
 - [ ] Passwords are hashed with bcrypt-ts
@@ -215,10 +232,12 @@ Before completing work:
 ## Environment Variables
 
 **Required:**
+
 - `DATABASE_URL`: PostgreSQL connection string
 - `SECRET_KEY_BASE`: Session encryption key (32+ chars)
 
 **Optional:**
+
 - `NODE_ENV`: Environment mode (default: development)
 - `PORT`: Server port (default: 3000)
 
@@ -229,6 +248,7 @@ Before completing work:
 ## When Uncertain
 
 **Instead of making large speculative changes, ASK:**
+
 - "Should this be a new service function or extend an existing one?"
 - "Which architectural pattern should I follow for this feature?"
 - "Do you want me to add tests before implementing?"

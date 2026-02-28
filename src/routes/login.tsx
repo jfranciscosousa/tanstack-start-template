@@ -1,23 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Lock, Mail, LogIn, UserPlus } from "lucide-react";
 import z from "zod";
-import { Avatar } from "~/components/Avatar";
-import { PasswordInput } from "~/components/PasswordInput";
-import { TextInput } from "~/components/TextInput";
-import { renderError } from "~/errors";
-import { useFormDataValidator } from "~/hooks/useFormDataValidator";
-import { useMutation } from "~/hooks/useMutation";
+import React from "react";
+import { Loader2, Lock, LogIn, Mail, UserPlus } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+
 import { loginFn, loginSchema } from "~/server/handlers/sessionHandlers";
+import { useMutation } from "~/hooks/useMutation";
+import { useFormDataValidator } from "~/hooks/useFormDataValidator";
+import { renderError } from "~/errors";
+import { TextInput } from "~/components/TextInput";
+import { PasswordInput } from "~/components/PasswordInput";
+import { Avatar } from "~/components/Avatar";
 
 const searchSchema = z.object({
   redirectUrl: z.string().optional(),
 });
 
 export const Route = createFileRoute("/login")({
-  validateSearch: search => searchSchema.parse(search),
   component: Login,
+  validateSearch: search => searchSchema.parse(search),
 });
 
 function Login() {
@@ -32,10 +33,10 @@ function Login() {
   });
   const validator = useFormDataValidator(loginSchema);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(event.currentTarget);
 
     if (validator.validate(formData)) {
       loginMutation.mutate({
@@ -105,7 +106,7 @@ function Login() {
               )}
             </button>
 
-            {!!loginMutation.error && (
+            {Boolean(loginMutation.error) && (
               <div className="alert alert-error mt-4">
                 {renderError(loginMutation.error)}
               </div>

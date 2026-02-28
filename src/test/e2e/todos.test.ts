@@ -1,7 +1,8 @@
-import { faker } from "@faker-js/faker";
-import { waitFor } from "@playwright-testing-library/test";
-import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 import { expect } from "@playwright/test";
+import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
+import { waitFor } from "@playwright-testing-library/test";
+import { faker } from "@faker-js/faker";
+
 import { createUserAndLogin, test } from "./utils";
 
 async function createNote(screen: Screen) {

@@ -1,15 +1,16 @@
-import { useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { User, Mail, Lock, Save, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Avatar } from "~/components/Avatar";
-import { PasswordInput } from "~/components/PasswordInput";
-import { TextInput } from "~/components/TextInput";
-import { useFormDataValidator } from "~/hooks/useFormDataValidator";
-import { useMutation } from "~/hooks/useMutation";
-import { useCurrentUser } from "~/routes/__root";
+import { Eye, Loader2, Lock, Mail, Save, User } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
+
 import { updateUserFn, updateUserSchema } from "~/server/handlers/userHandlers";
+import { useCurrentUser } from "~/routes/__root";
+import { useMutation } from "~/hooks/useMutation";
+import { useFormDataValidator } from "~/hooks/useFormDataValidator";
 import { renderError } from "~/errors";
+import { TextInput } from "~/components/TextInput";
+import { PasswordInput } from "~/components/PasswordInput";
+import { Avatar } from "~/components/Avatar";
 
 export function ProfileTab() {
   const user = useCurrentUser();
@@ -25,10 +26,14 @@ export function ProfileTab() {
     },
   });
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleCancel() {
+    void router.navigate({ to: "/" });
+  }
 
-    const formData = new FormData(e.currentTarget);
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
 
     if (validator.validate(formData)) {
       updateMutation.mutate({
@@ -138,7 +143,7 @@ export function ProfileTab() {
               />
             </div>
 
-            {!!updateMutation.error && (
+            {Boolean(updateMutation.error) && (
               <div className="alert alert-error">
                 <span>{renderError(updateMutation.error)}</span>
               </div>
@@ -149,7 +154,7 @@ export function ProfileTab() {
               <button
                 type="button"
                 className="btn btn-outline"
-                onClick={() => void router.navigate({ to: "/" })}
+                onClick={handleCancel}
               >
                 Cancel
               </button>

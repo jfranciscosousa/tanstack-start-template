@@ -1,43 +1,43 @@
-import * as React from "react";
 import { flushSync } from "react-dom";
+import * as React from "react";
 
 export function useMutation<TVariables, TData, TError = unknown>(opts: {
   fn: (variables: TVariables) => Promise<TData>;
   onSuccess?: (ctx: { data: TData }) => void | Promise<void>;
   onError?: (ctx: { error: TError }) => void | Promise<void>;
 }) {
-  const [submittedAt, setSubmittedAt] = React.useState<number | undefined>();
-  const [variables, setVariables] = React.useState<TVariables | undefined>();
-  const [error, setError] = React.useState<TError | undefined>();
-  const [data, setData] = React.useState<TData | undefined>();
+  const [submittedAt, setSubmittedAt] = React.useState<number | null>(null);
+  const [variables, setVariables] = React.useState<TVariables | null>(null);
+  const [error, setError] = React.useState<TError | null>(null);
+  const [data, setData] = React.useState<TData | null>(null);
   const [status, setStatus] = React.useState<
     "idle" | "pending" | "success" | "error"
   >("idle");
 
   const mutateAsync = React.useCallback(
-    async (variables: TVariables): Promise<TData | undefined> => {
+    async (newVariables: TVariables): Promise<TData | undefined> => {
       flushSync(() => {
         setStatus("pending");
         setSubmittedAt(Date.now());
-        setVariables(variables);
+        setVariables(newVariables);
       });
 
       try {
-        const data = await opts.fn(variables);
-        await opts.onSuccess?.({ data });
+        const newData = await opts.fn(newVariables);
+        await opts.onSuccess?.({ data: newData });
         flushSync(() => {
           setStatus("success");
-          setError(undefined);
-          setData(data);
+          setError(null);
+          setData(newData);
         });
 
-        return data;
+        return newData;
       } catch (uerror: unknown) {
-        const error = uerror as TError;
-        await opts.onError?.({ error });
+        const newError = uerror as TError;
+        await opts.onError?.({ error: newError });
         flushSync(() => {
           setStatus("error");
-          setError(error);
+          setError(newError);
         });
       }
     },
@@ -45,19 +45,19 @@ export function useMutation<TVariables, TData, TError = unknown>(opts: {
   );
 
   const mutate = React.useCallback(
-    (variables: TVariables): void => {
-      void mutateAsync(variables);
+    (mutationVars: TVariables): void => {
+      mutateAsync(mutationVars);
     },
     [mutateAsync]
   );
 
   return {
-    status,
-    variables,
-    submittedAt,
+    data,
+    error,
     mutate,
     mutateAsync,
-    error,
-    data,
+    status,
+    submittedAt,
+    variables,
   };
 }

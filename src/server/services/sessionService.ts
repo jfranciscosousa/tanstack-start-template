@@ -1,7 +1,8 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
+import { createServerOnlyFn } from "@tanstack/react-start";
+
+import { type Session, type UserWithoutPassword, sessions } from "../db/schema";
 import { db } from "../db";
-import { type Session, sessions, type UserWithoutPassword } from "../db/schema";
 
 export const createSession = createServerOnlyFn(
   (
@@ -21,19 +22,19 @@ export const createSession = createServerOnlyFn(
 
 export const getUserSessions = createServerOnlyFn((user: UserWithoutPassword) =>
   db.query.sessions.findMany({
-    where: sessions => eq(sessions.userId, user.id),
+    where: sessionsQuery => eq(sessionsQuery.userId, user.id),
   })
 );
 
 export const verifyUserSession = createServerOnlyFn(
   (user: UserWithoutPassword, sessionId: string) =>
     db.query.sessions.findFirst({
-      where: sessions =>
-        and(eq(sessions.userId, user.id), eq(sessions.id, sessionId)),
+      where: sessionsQuery =>
+        and(eq(sessionsQuery.userId, user.id), eq(sessionsQuery.id, sessionId)),
     })
 );
 
-export const deleteSession = createServerOnlyFn(async (sessionId: string) =>
+export const deleteSession = createServerOnlyFn((sessionId: string) =>
   db.delete(sessions).where(eq(sessions.id, sessionId))
 );
 

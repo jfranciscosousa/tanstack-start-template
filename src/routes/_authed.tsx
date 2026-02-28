@@ -1,17 +1,21 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+
 import { Navbar } from "~/components/Navbar";
+
 import { useCurrentUser } from "./__root";
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context, location }) => {
     let redirectUrl = `${location.pathname}`;
 
-    if (location.searchStr) redirectUrl += `${location.searchStr}`;
+    if (location.searchStr) {
+      redirectUrl += `${location.searchStr}`;
+    }
 
     if (!context.user) {
       throw redirect({
-        to: "/login",
         search: { redirectUrl },
+        to: "/login",
       });
     }
   },

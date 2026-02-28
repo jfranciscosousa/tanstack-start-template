@@ -1,12 +1,12 @@
-import { pgTable, text, timestamp, uuid, index } from "drizzle-orm/pg-core";
+import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  email: text("email").notNull().unique(),
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
@@ -16,18 +16,18 @@ export const users = pgTable("users", {
 export const sessions = pgTable(
   "sessions",
   {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    location: text("location"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    id: uuid("id").defaultRandom().primaryKey(),
+    ipAddress: text("ip_address"),
+    location: text("location"),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .notNull()
       .$onUpdate(() => new Date()),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
   },
   table => [index("sessions_user_id_idx").on(table.userId)]
 );
@@ -35,12 +35,12 @@ export const sessions = pgTable(
 export const todos = pgTable(
   "todos",
   {
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    content: text("content").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   table => [index("todos_user_id_idx").on(table.userId)]
 );

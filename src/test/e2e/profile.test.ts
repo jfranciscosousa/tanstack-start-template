@@ -1,11 +1,13 @@
-import { faker } from "@faker-js/faker";
-import { expect } from "@playwright/test";
-import { verifyPassword } from "~/server/services/passwordService";
-import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
-import { createUserAndLogin, test, USER_TEST_PASSWORD } from "./utils";
+import { expect } from "@playwright/test";
 import { waitFor } from "@playwright-testing-library/test";
+import { faker } from "@faker-js/faker";
+
+import { verifyPassword } from "~/server/services/passwordService";
+import { users } from "~/server/db/schema";
+import { db } from "~/server/db";
+
+import { USER_TEST_PASSWORD, createUserAndLogin, test } from "./utils";
 
 function assertUserSame(user1: object, user2: object) {
   return expect(
@@ -56,7 +58,9 @@ test("updates profile", async ({ page, screen }) => {
     .where(eq(users.id, user.id))
     .limit(1);
 
-  if (!updatedUser) throw new Error("user should exist");
+  if (!updatedUser) {
+    throw new Error("user should exist");
+  }
 
   expect(updatedUser.name).toEqual(newName);
   expect(updatedUser.email).toEqual(newEmail);
@@ -73,7 +77,7 @@ test("does not update profile if password confirmation does not match", async ({
 
   await page.goto("/profile");
   await page.locator("#password").fill(newPassword);
-  await page.getByLabel("Confirm New Password").fill(newPassword + "bad");
+  await page.getByLabel("Confirm New Password").fill(`${newPassword}bad`);
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
@@ -85,7 +89,9 @@ test("does not update profile if password confirmation does not match", async ({
     .where(eq(users.id, user.id))
     .limit(1);
 
-  if (!updatedUser) throw new Error("user should exist");
+  if (!updatedUser) {
+    throw new Error("user should exist");
+  }
 
   assertUserSame(updatedUser, user);
   // Check that the old password is still valid
@@ -111,7 +117,9 @@ test("does not update profile if password is bad", async ({ page, screen }) => {
     .where(eq(users.id, user.id))
     .limit(1);
 
-  if (!updatedUser) throw new Error("user should exist");
+  if (!updatedUser) {
+    throw new Error("user should exist");
+  }
 
   assertUserSame(updatedUser, user);
 });

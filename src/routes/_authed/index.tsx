@@ -1,19 +1,67 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useRef } from "react";
 import { toast } from "sonner";
-import { useMutation } from "~/hooks/useMutation";
+import { useRef } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+
 import {
-  createTodoFn as createTodoFn,
-  deleteAllTodosFn as deleteAllTodosFn,
-  deleteTodoFn as deleteTodoFn,
+  createTodoFn,
+  deleteAllTodosFn,
+  deleteTodoFn,
   getTodosFn,
 } from "~/server/handlers/todoHandlers";
+import { useMutation } from "~/hooks/useMutation";
 
 export const Route = createFileRoute("/_authed/")({
   component: RouteComponent,
   loader: () => getTodosFn(),
 });
+
+interface Todo {
+  id: string;
+  content: string;
+  createdAt: Date;
+}
+
+interface TodoCardProps {
+  todo: Todo;
+  onDelete: (id: string) => void;
+  disabled: boolean;
+}
+
+function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
+  function handleDelete() {
+    onDelete(todo.id);
+  }
+
+  return (
+    <div className="break-inside-avoid">
+      <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
+        <div className="card-body p-4">
+          <p className="whitespace-pre-wrap wrap-break-word">{todo.content}</p>
+          <div className="card-actions justify-between items-center mt-3">
+            <time className="text-xs text-base-content/50">
+              {new Date(todo.createdAt).toLocaleDateString("en-US", {
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </time>
+            <button
+              type="button"
+              className="btn btn-xs btn-error"
+              onClick={handleDelete}
+              disabled={disabled}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RouteComponent() {
   const router = useRouter();
@@ -21,43 +69,45 @@ function RouteComponent() {
   const inputRef = useRef<HTMLInputElement>(null);
   const createTodoMutation = useMutation({
     fn: useServerFn(createTodoFn),
-    onSuccess: async () => {
-      await router.invalidate({ sync: true });
-    },
     onError: () => {
       toast.error("Error while creating todo, try again later");
+    },
+    onSuccess: async () => {
+      await router.invalidate({ sync: true });
     },
   });
   const deleteTodoMutation = useMutation({
     fn: useServerFn(deleteTodoFn),
-    onSuccess: async () => {
-      await router.invalidate({ sync: true });
-    },
     onError: () => {
       toast.error("Error while deleting todo, try again later");
+    },
+    onSuccess: async () => {
+      await router.invalidate({ sync: true });
     },
   });
   const deleteAllTodosMutation = useMutation({
     fn: useServerFn(deleteAllTodosFn),
+    onError: () => {
+      toast.error("Error while deleting todos, try again later");
+    },
     onSuccess: async () => {
       await router.invalidate({ sync: true });
       toast.success("All todos were deleted");
-    },
-    onError: () => {
-      toast.error("Error while deleting todos, try again later");
     },
   });
   const isSubmitting =
     createTodoMutation.status === "pending" ||
     deleteAllTodosMutation.status === "pending";
 
-  function handleCreateTodo(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleCreateTodo(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(event.currentTarget);
     const content = formData.get("content") as string;
 
-    if (!content.trim()) return;
+    if (!content.trim()) {
+      return;
+    }
 
     createTodoMutation
       .mutateAsync({ data: { content } })
@@ -67,6 +117,8 @@ function RouteComponent() {
           inputRef.current.value = "";
         }
       })
+      // TODO: error handle
+      // eslint-disable-next-line no-console
       .catch(console.error);
   }
 
@@ -117,32 +169,12 @@ function RouteComponent() {
 
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
         {todos.map(todo => (
-          <div key={todo.id} className="break-inside-avoid">
-            <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
-              <div className="card-body p-4">
-                <p className="whitespace-pre-wrap wrap-break-word">
-                  {todo.content}
-                </p>
-                <div className="card-actions justify-between items-center mt-3">
-                  <time className="text-xs text-base-content/50">
-                    {new Date(todo.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </time>
-                  <button
-                    className="btn btn-xs btn-error"
-                    onClick={() => handleDeleteTodo(todo.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TodoCard
+            key={todo.id}
+            todo={todo}
+            onDelete={handleDeleteTodo}
+            disabled={deleteTodoMutation.status === "pending"}
+          />
         ))}
       </div>
 

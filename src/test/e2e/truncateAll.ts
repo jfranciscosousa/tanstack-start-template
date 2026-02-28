@@ -1,5 +1,5 @@
+import { sessions, todos, users } from "~/server/db/schema";
 import { db } from "~/server/db";
-import { sessions, users, todos } from "~/server/db/schema";
 
 export async function truncateAll() {
   // Delete in proper order to respect foreign key constraints

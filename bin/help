@@ -15,7 +15,10 @@ cat << 'EOF'
   ./bin/start         Start production server (requires build first)
 
 🔍 Code Quality Commands:
-  ./bin/lint          Run ESLint on the codebase
+  ./bin/lint          Run oxlint on the codebase
+  ./bin/lint-fix      Run oxlint with auto-fix
+  ./bin/format        Format code with oxfmt
+  ./bin/format-check  Check formatting without writing changes
   ./bin/ts-check      Run TypeScript type checking
   ./bin/ts-watch      Run TypeScript type checking in watch mode
 

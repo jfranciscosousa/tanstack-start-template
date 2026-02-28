@@ -1,6 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import { Home, LogOut, Settings, User } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+
 import { Avatar } from "./Avatar";
+
+const homeActiveProps = { className: "active bg-primary/20 text-primary" };
+const homeActiveOptions = { exact: true };
 
 interface NavbarProps {
   user: { email: string };
@@ -25,10 +29,8 @@ export function Navbar({ user }: NavbarProps) {
           <li>
             <Link
               to="/"
-              activeProps={{
-                className: "active bg-primary/20 text-primary",
-              }}
-              activeOptions={{ exact: true }}
+              activeProps={homeActiveProps}
+              activeOptions={homeActiveOptions}
               className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-base-200"
             >
               <Home size={18} />

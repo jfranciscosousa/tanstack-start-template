@@ -1,4 +1,5 @@
 import path from "path";
+
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -15,24 +16,24 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          include: ["**/*.test.{ts,js,tsx,jsx}"],
+          environment: "jsdom",
           exclude: [
             "**/node_modules/**",
             "**/*.node.test.{ts,js}",
             "./src/test/e2e",
           ],
+          include: ["**/*.test.{ts,js,tsx,jsx}"],
           name: "jsdom",
-          environment: "jsdom",
           setupFiles: "./src/test/setup-jsdom.ts",
         },
       },
       {
         extends: true,
         test: {
-          include: ["**/*.node.test.{ts,js}"],
-          exclude: ["**/node_modules/**", "./src/test/e2e"],
-          name: { label: "node", color: "green" },
           environment: "node",
+          exclude: ["**/node_modules/**", "./src/test/e2e"],
+          include: ["**/*.node.test.{ts,js}"],
+          name: { color: "green", label: "node" },
           setupFiles: "./src/test/setup-node.ts",
         },
       },

@@ -21,4 +21,4 @@ yarn.lock
 .tanstack/
 dist/
 .nitro/*
-.claude/
+.claude/*.local.*

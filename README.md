@@ -49,6 +49,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see your application.
 ## Available Scripts
 
 ### Development
+
 ```bash
 bin/dev            # Start development server
 bin/build          # Build for production
@@ -57,6 +58,7 @@ bin/setup          # Initial project setup
 ```
 
 ### Testing
+
 ```bash
 bin/test           # Run all tests (unit + e2e)
 bin/test-vitest    # Run unit tests with Vitest
@@ -64,12 +66,14 @@ bin/test-vitest-watch  # Run unit tests in watch mode
 ```
 
 ### Code Quality
+
 ```bash
-bin/lint           # Run ESLint
+bin/lint           # Run linter
 bin/ts-check       # Run TypeScript compiler check
 ```
 
 ### Database
+
 ```bash
 npx drizzle-kit generate    # Generate migration files
 npx drizzle-kit migrate     # Apply pending migrations
@@ -142,46 +146,69 @@ The setup script (`bin/setup`) will help you configure these variables interacti
 The application uses a PostgreSQL database with Drizzle ORM, featuring optimized schemas with relations and performance indexes:
 
 ### Users
+
 ```typescript
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  password: text("password").notNull(),  // bcrypt hashed
+  password: text("password").notNull(), // bcrypt hashed
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
 ```
 
 ### Sessions
+
 ```typescript
-export const sessions = pgTable("sessions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  location: text("location"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
-}, table => [
-  index("sessions_user_id_idx").on(table.userId)  // Performance optimization
-]);
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    location: text("location"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  table => [
+    index("sessions_user_id_idx").on(table.userId), // Performance optimization
+  ]
+);
 ```
 
 ### Todos
+
 ```typescript
-export const todos = pgTable("todos", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, table => [
-  index("todos_user_id_idx").on(table.userId)  // Performance optimization
-]);
+export const todos = pgTable(
+  "todos",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  table => [
+    index("todos_user_id_idx").on(table.userId), // Performance optimization
+  ]
+);
 ```
 
 ### Relations & Types
+
 The schema includes Drizzle relations for type-safe queries and comprehensive TypeScript types:
+
 ```typescript
 // Relations enable type-safe joins
 export const usersRelations = relations(users, ({ many }) => ({

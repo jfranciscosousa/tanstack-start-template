@@ -1,17 +1,21 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
+import { createServerOnlyFn } from "@tanstack/react-start";
+
 import { AppError } from "~/errors";
-import { db } from "../db";
-import { type User, users } from "../db/schema";
-import { hashPassword, verifyPassword } from "./passwordService";
+
 import { deleteAllSessions } from "./sessionService";
+import { hashPassword, verifyPassword } from "./passwordService";
+import { type User, users } from "../db/schema";
+import { db } from "../db";
 
 export const getUserBySessionId = createServerOnlyFn(
   async (sessionId?: string) => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      return;
+    }
 
     const session = await db.query.sessions.findFirst({
-      where: session => eq(session.id, sessionId),
+      where: sessionsQuery => eq(sessionsQuery.id, sessionId),
       with: { user: true },
     });
 
@@ -20,10 +24,12 @@ export const getUserBySessionId = createServerOnlyFn(
 );
 
 export const getUserByEmail = createServerOnlyFn((email?: string) => {
-  if (!email) return;
+  if (!email) {
+    return;
+  }
 
   return db.query.users.findFirst({
-    where: users => eq(users.email, email),
+    where: usersQuery => eq(usersQuery.email, email),
   });
 });
 
@@ -47,8 +53,8 @@ export const createUser = createServerOnlyFn(
     const [newUser] = await db
       .insert(users)
       .values({
-        name: data.name,
         email: data.email,
+        name: data.name,
         password,
       })
       .returning();
@@ -74,8 +80,8 @@ export const updateUser = createServerOnlyFn(
     }
 
     const updateData: Partial<User> = {
-      name: data.name,
       email: data.email,
+      name: data.name,
     };
 
     // Only update password if a new one is provided

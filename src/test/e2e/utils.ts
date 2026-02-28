@@ -1,17 +1,18 @@
-import { faker } from "@faker-js/faker";
-import { waitFor } from "@playwright-testing-library/test";
-import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
+import { type Page, test as base } from "@playwright/test";
 import {
-  locatorFixtures as fixtures,
   type LocatorFixtures as TestingLibraryFixtures,
+  locatorFixtures as fixtures,
 } from "@playwright-testing-library/test/fixture.js";
-import { test as base, type Page } from "@playwright/test";
+import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
+import { waitFor } from "@playwright-testing-library/test";
+import { faker } from "@faker-js/faker";
+
 import { createUser } from "~/server/services/userServices";
 
 export const USER_TEST_PASSWORD = "foobar";
 
 export const test = base.extend<TestingLibraryFixtures>(fixtures);
-export const expect = test.expect;
+export const { expect } = test;
 
 export async function createUserAndLogin(
   page: Page,

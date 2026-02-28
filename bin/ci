@@ -10,9 +10,6 @@ ENV_FILE=.env.test . bin/load-env
 
 echo "🤖 Running CI pipeline..."
 
-echo "🔍 Running lint checks..."
-./bin/lint
-
 echo "🔍 Running type checks..."
 ./bin/ts-check
 

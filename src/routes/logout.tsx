@@ -1,5 +1,6 @@
-import { redirect, createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { invalidateCurrentSession } from "~/server/handlers/sessionHandlers";
 
 const logoutFn = createServerFn().handler(async () => {
@@ -11,6 +12,6 @@ const logoutFn = createServerFn().handler(async () => {
 });
 
 export const Route = createFileRoute("/logout")({
-  preload: false,
   loader: () => logoutFn(),
+  preload: false,
 });

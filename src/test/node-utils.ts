@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable @typescript-eslint/no-unsafe-argument */
+/* oxlint-disable @typescript-eslint/no-explicit-any */
 import { vi } from "vitest";
-import type { User } from "~/server/db/schema";
+
 import { useLoggedInAppSession, useWebSession } from "~/server/websession";
+import type { User } from "~/server/db/schema";
 import { AppError } from "~/errors";
 
 /**
@@ -14,26 +15,26 @@ import { AppError } from "~/errors";
  * Mock a logged-in user state
  * @param user - The user object to return from useLoggedInAppSession
  */
-export const mockLoggedIn = (user: User) => {
+export function mockLoggedIn(user: User) {
   const mock = {
-    sessionId: "test-session-id",
-    user,
-    update: vi.fn(),
     clear: vi.fn(),
+    sessionId: "test-session-id",
+    update: vi.fn(),
+    user,
   };
 
   vi.mocked(useWebSession).mockResolvedValue(mock as any);
   vi.mocked(useLoggedInAppSession).mockResolvedValue(mock as any);
 
   return mock;
-};
+}
 
-export const mockLoggedOut = () => {
+export function mockLoggedOut() {
   const mock = {
-    sessionId: "test-session-id",
-    user: null,
-    update: vi.fn(),
     clear: vi.fn(),
+    sessionId: "test-session-id",
+    update: vi.fn(),
+    user: null,
   };
 
   vi.mocked(useWebSession).mockResolvedValue(mock as any);
@@ -41,4 +42,4 @@ export const mockLoggedOut = () => {
   vi.mocked(useLoggedInAppSession).mockRejectedValue(new AppError("NOT_FOUND"));
 
   return mock;
-};
+}

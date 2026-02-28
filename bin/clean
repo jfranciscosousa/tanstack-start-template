@@ -11,8 +11,7 @@ ENV_FILE=.env . bin/load-env
 echo "🧹 Cleaning build artifacts and cache files..."
 
 # Remove build artifacts and cache
-rm -rf .eslintcache \
-       playwright-report \
+rm -rf playwright-report \
        build \
        public/build \
        .cache \

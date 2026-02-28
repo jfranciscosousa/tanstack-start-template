@@ -1,5 +1,5 @@
-import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 import { type ComponentPropsWithoutRef, useState } from "react";
+import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 
 export interface PasswordInputProps extends Omit<
   ComponentPropsWithoutRef<"input">,
@@ -20,6 +20,10 @@ export function PasswordInput({
   const [showPassword, setShowPassword] = useState(false);
   const errorMessage = Array.isArray(error) ? error.join(", ") : error;
 
+  function handleTogglePassword() {
+    setShowPassword(!showPassword);
+  }
+
   return (
     <div className="form-control">
       {label && (
@@ -39,7 +43,7 @@ export function PasswordInput({
         <button
           type="button"
           className="btn btn-ghost btn-sm absolute right-2 top-1/2 transform -translate-y-1/2"
-          onClick={() => setShowPassword(!showPassword)}
+          onClick={handleTogglePassword}
         >
           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>

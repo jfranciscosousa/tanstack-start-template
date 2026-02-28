@@ -1,21 +1,22 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { Eye, Loader2, Lock, Mail, User } from "lucide-react";
 import z from "zod";
-import { PasswordInput } from "~/components/PasswordInput";
-import { TextInput } from "~/components/TextInput";
-import { renderError } from "~/errors";
-import { useFormDataValidator } from "~/hooks/useFormDataValidator";
+import { Eye, Loader2, Lock, Mail, User } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
+
+import { signUpSchema, signupFn } from "~/server/handlers/userHandlers";
 import { useMutation } from "~/hooks/useMutation";
-import { signupFn, signUpSchema } from "~/server/handlers/userHandlers";
+import { useFormDataValidator } from "~/hooks/useFormDataValidator";
+import { renderError } from "~/errors";
+import { TextInput } from "~/components/TextInput";
+import { PasswordInput } from "~/components/PasswordInput";
 
 const searchSchema = z.object({
   redirectUrl: z.string().optional(),
 });
 
 export const Route = createFileRoute("/signup")({
-  validateSearch: search => searchSchema.parse(search),
   component: SignUp,
+  validateSearch: search => searchSchema.parse(search),
 });
 
 function SignUp() {
@@ -28,11 +29,12 @@ function SignUp() {
     },
   });
   const validator = useFormDataValidator(signUpSchema);
+  const loginSearch = { redirectUrl };
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(event.currentTarget);
 
     if (validator.validate(formData)) {
       signupMutation.mutate({
@@ -121,7 +123,7 @@ function SignUp() {
               )}
             </button>
 
-            {!!signupMutation.error && (
+            {Boolean(signupMutation.error) && (
               <div className="alert alert-error mt-4">
                 {renderError(signupMutation.error)}
               </div>
@@ -132,7 +134,7 @@ function SignUp() {
             </div>
             <Link
               to="/login"
-              search={{ redirectUrl }}
+              search={loginSearch}
               className="btn btn-outline btn-block"
             >
               Sign in

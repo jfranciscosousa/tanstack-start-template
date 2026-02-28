@@ -16,10 +16,14 @@ function getClientIP(request: Request): string {
   }
 
   const realIP = request.headers.get("x-real-ip");
-  if (realIP) return realIP;
+  if (realIP) {
+    return realIP;
+  }
 
   const cfConnectingIP = request.headers.get("cf-connecting-ip");
-  if (cfConnectingIP) return cfConnectingIP;
+  if (cfConnectingIP) {
+    return cfConnectingIP;
+  }
 
   return request.headers.get("x-client-ip") || "unknown";
 }
@@ -48,7 +52,9 @@ function getLocationFromHeaders(request: Request): string | null {
 
   // AWS CloudFront
   const awsCountry = request.headers.get("cloudfront-viewer-country");
-  if (awsCountry) return awsCountry;
+  if (awsCountry) {
+    return awsCountry;
+  }
 
   return null;
 }
@@ -71,14 +77,16 @@ async function getLocationFromIP(ip: string): Promise<string | null> {
 
     const schema = z.object({
       city: z.string(),
-      region: z.string(),
       country_name: z.string(),
       error: z.string().optional(),
+      region: z.string(),
     });
 
     const data = schema.parse(await response.json());
 
-    if (data.error) return null;
+    if (data.error) {
+      return null;
+    }
 
     const parts = [data.city, data.region, data.country_name].filter(Boolean);
 
@@ -105,7 +113,7 @@ export async function getRequestInfo(request: Request): Promise<RequestInfo> {
 
   return {
     ipAddress,
-    userAgent,
     location: location || "unknown",
+    userAgent,
   };
 }

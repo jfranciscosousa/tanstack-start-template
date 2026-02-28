@@ -1,20 +1,22 @@
-import { redirect } from "@tanstack/react-router";
-import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
-import { verifyPassword } from "../services/passwordService";
-import { type User } from "../db/schema";
-import { useWebSession } from "../websession";
 import { zfd } from "zod-form-data";
 import z from "zod";
-import { AppError } from "~/errors";
-import { getRequestInfo } from "../request-info";
 import { getRequest } from "@tanstack/react-start/server";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+import { redirect } from "@tanstack/react-router";
+
+import { AppError } from "~/errors";
+
+import { useWebSession } from "../websession";
+import { getUserByEmail } from "../services/userServices";
 import {
   createSession,
   deleteSession,
   getUserSessions,
   verifyUserSession,
 } from "../services/sessionService";
-import { getUserByEmail } from "../services/userServices";
+import { verifyPassword } from "../services/passwordService";
+import { getRequestInfo } from "../request-info";
+import { type User } from "../db/schema";
 
 export const loginSchema = zfd.formData({
   email: zfd.text(z.email()),
@@ -81,8 +83,8 @@ export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
     const userSessions = await getUserSessions(webSession.user);
 
     return {
-      sessions: userSessions,
       currentSessionId: webSession.data.id,
+      sessions: userSessions,
     };
   }
 );

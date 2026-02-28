@@ -1,5 +1,5 @@
+import { type ComponentPropsWithoutRef, useId } from "react";
 import { type LucideIcon } from "lucide-react";
-import { useId, type ComponentPropsWithoutRef } from "react";
 
 export interface TextInputProps extends ComponentPropsWithoutRef<"input"> {
   label: string;

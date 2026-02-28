@@ -1,11 +1,11 @@
-import { createMiddleware } from "@tanstack/react-start";
+/* eslint-disable no-console */
 import z from "zod";
+import { createMiddleware } from "@tanstack/react-start";
 
 function decodeBase64URI(str: string) {
   // Convert URI-safe Base64 to standard Base64
-  let base64 = str
-    .replace(/-/g, "+") // Replace - with +
-    .replace(/_/g, "/"); // Replace _ with /
+  // Replace - with + and _ with /
+  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
 
   // Add padding if needed (Base64 strings should be multiple of 4)
   while (base64.length % 4) {

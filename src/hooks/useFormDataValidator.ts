@@ -1,17 +1,18 @@
+import { z, type ZodError, type ZodSchema } from "zod";
 import { useMemo, useState } from "react";
-import type { ZodError, ZodSchema } from "zod";
-import { z } from "zod";
 
 export function useFormDataValidator<T extends ZodSchema>(schema: T) {
   const [zodErrors, setZodErrors] = useState<ZodError<z.infer<T>>>();
 
   const errors = useMemo(() => {
-    if (!zodErrors) return undefined;
+    if (!zodErrors) {
+      return undefined;
+    }
 
     return z.treeifyError(zodErrors);
   }, [zodErrors]);
 
-  const validate = (formData: FormData) => {
+  function validate(formData: FormData) {
     const validationResult = schema.safeParse(formData);
 
     if (validationResult.error) {
@@ -21,10 +22,10 @@ export function useFormDataValidator<T extends ZodSchema>(schema: T) {
 
     setZodErrors(undefined);
     return true;
-  };
+  }
 
   return {
-    validate,
     errors,
+    validate,
   };
 }

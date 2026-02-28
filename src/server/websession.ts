@@ -1,16 +1,19 @@
-import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { useSession } from "@tanstack/react-start/server";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+
 import { AppError } from "~/errors";
-import { type Session } from "./db/schema";
+
 import { getUserBySessionId } from "./services/userServices";
+import { type Session } from "./db/schema";
 
 type SessionUser = {
   id: Session["id"];
 };
 
 export const useWebSession = createServerOnlyFn(async () => {
-  if (!process.env.SECRET_KEY_BASE)
+  if (!process.env.SECRET_KEY_BASE) {
     throw new Error("SECRET_KEY_BASE is not set");
+  }
 
   const sessionProps = await useSession<SessionUser>({
     password: process.env.SECRET_KEY_BASE,
@@ -24,9 +27,11 @@ export const useWebSession = createServerOnlyFn(async () => {
 
 export const useLoggedInAppSession = createServerOnlyFn(async () => {
   const session = await useWebSession();
-  const user = session.user;
+  const { user } = session;
 
-  if (!user) throw new AppError("NOT_FOUND");
+  if (!user) {
+    throw new AppError("NOT_FOUND");
+  }
 
   return { ...session, user };
 });

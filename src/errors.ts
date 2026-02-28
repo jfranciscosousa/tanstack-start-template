@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* oxlint-disable @typescript-eslint/no-unsafe-argument */
+/* oxlint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable @typescript-eslint/no-unsafe-return */
+/* oxlint-disable @typescript-eslint/no-unsafe-member-access */
 const ERROR_CODES = {
-  NOT_FOUND: "NOT_FOUND",
-  UNPROCESSEABLE_ENTITY: "UNPROCESSABLE_ENTITY",
-  UNAUTHORIZED: "UNAUTHORIZED",
-  UNAUTHENTICATED: "UNAUTHENTICATED",
-  FORBIDDEN: "FORBIDDEN",
   BAD_REQUEST: "BAD_REQUEST",
+  FORBIDDEN: "FORBIDDEN",
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+  NOT_FOUND: "NOT_FOUND",
+  UNAUTHENTICATED: "UNAUTHENTICATED",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  UNPROCESSEABLE_ENTITY: "UNPROCESSABLE_ENTITY",
 } as const;
 
 const DEFAULT_MESSAGES = {
@@ -39,7 +39,9 @@ export class AppError extends Error {
 }
 
 function isZodIssues(error: any) {
-  if (typeof error.message !== "string") return;
+  if (typeof error.message !== "string") {
+    return;
+  }
 
   try {
     return JSON.parse(error.message);

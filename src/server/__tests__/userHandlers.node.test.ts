@@ -1,14 +1,16 @@
-import { faker } from "@faker-js/faker";
-import type { User } from "~/server/db/schema";
-import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { ZodError } from "zod";
-import { AppError } from "~/errors";
-import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
-import { hashPassword, verifyPassword } from "../services/passwordService";
-import { db } from "../db";
-import { users, sessions } from "../db/schema";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
+import { faker } from "@faker-js/faker";
+
+import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
+import type { User } from "~/server/db/schema";
+import { AppError } from "~/errors";
+
+import { hashPassword, verifyPassword } from "../services/passwordService";
 import { signupFn, updateUserFn } from "../handlers/userHandlers";
+import { sessions, users } from "../db/schema";
+import { db } from "../db";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
@@ -20,10 +22,11 @@ describe("User schemas integration tests", () => {
     it("should create a user with its given params", async () => {
       const { update: updateSession } = mockLoggedOut();
       const testData = {
-        name: faker.person.fullName(),
         email: faker.internet.email(),
+        name: faker.person.fullName(),
         password: faker.internet.password(),
-        passwordConfirmation: "", // Will be set to match password
+        // Will be set to match password
+        passwordConfirmation: "",
         redirectUrl: "/dashboard",
       };
       testData.passwordConfirmation = testData.password;
@@ -80,8 +83,8 @@ describe("User schemas integration tests", () => {
 
       // Create first user
       await db.insert(users).values({
-        name: faker.person.fullName(),
         email: testEmail,
+        name: faker.person.fullName(),
         password: await hashPassword(faker.internet.password()),
       });
 
@@ -133,8 +136,8 @@ describe("User schemas integration tests", () => {
       const [createdUser] = await db
         .insert(users)
         .values({
-          name: faker.person.fullName(),
           email: faker.internet.email(),
+          name: faker.person.fullName(),
           password: await hashPassword("originalpass123"),
         })
         .returning();
@@ -185,8 +188,8 @@ describe("User schemas integration tests", () => {
         .from(sessions)
         .where(eq(sessions.userId, testUser.id));
       expect(remainingSessions).toHaveLength(3);
-      expect(remainingSessions.map(s => s.id).sort()).toEqual(
-        initialSessions.map(s => s.id).sort()
+      expect(remainingSessions.map(session => session.id).sort()).toEqual(
+        initialSessions.map(session => session.id).sort()
       );
     });
 

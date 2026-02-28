@@ -1,79 +1,80 @@
-/// <reference types="vite/client" />
+import { Toaster } from "sonner";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRoute,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Toaster } from "sonner";
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
-import { NotFound } from "~/components/NotFound.js";
-import { AppError } from "~/errors";
-import { seo } from "~/server/seo.js";
+
 import { fetchCurrentUser } from "~/server/websession";
+import { seo } from "~/server/seo.js";
+import { AppError } from "~/errors";
+import { NotFound } from "~/components/NotFound.js";
+import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
+
 import appCss from "~/styles/app.css?url";
 
 export const Route = createRootRoute({
   beforeLoad: async () => ({
     user: await fetchCurrentUser(),
   }),
-  loader: ctx => ({
-    user: ctx.context.user,
-  }),
+  component: RootComponent,
+  errorComponent: props => (
+    <RootDocument>
+      <DefaultCatchBoundary {...props} />
+    </RootDocument>
+  ),
   head: () => ({
+    links: [
+      { href: appCss, rel: "stylesheet" },
+      {
+        href: "/apple-touch-icon.png",
+        rel: "apple-touch-icon",
+        sizes: "180x180",
+      },
+      {
+        href: "/favicon-32x32.png",
+        rel: "icon",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        href: "/favicon-16x16.png",
+        rel: "icon",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      { color: "#fffff", href: "/site.webmanifest", rel: "manifest" },
+      { href: "/favicon.ico", rel: "icon" },
+    ],
     meta: [
       {
         charSet: "utf-8",
       },
       {
-        name: "viewport",
         content: "width=device-width, initial-scale=1",
+        name: "viewport",
       },
       ...seo({
-        title: "Tanstack start drizzle template",
         description: "TODO",
+        title: "Tanstack start drizzle template",
       }),
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      {
-        rel: "apple-touch-icon",
-        sizes: "180x180",
-        href: "/apple-touch-icon.png",
-      },
-      {
-        rel: "icon",
-        type: "image/png",
-        sizes: "32x32",
-        href: "/favicon-32x32.png",
-      },
-      {
-        rel: "icon",
-        type: "image/png",
-        sizes: "16x16",
-        href: "/favicon-16x16.png",
-      },
-      { rel: "manifest", href: "/site.webmanifest", color: "#fffff" },
-      { rel: "icon", href: "/favicon.ico" },
-    ],
   }),
-  errorComponent: props => {
-    return (
-      <RootDocument>
-        <DefaultCatchBoundary {...props} />
-      </RootDocument>
-    );
-  },
+  loader: ctx => ({
+    user: ctx.context.user,
+  }),
   notFoundComponent: () => <NotFound />,
-  component: RootComponent,
   ssr: true,
 });
 
 export function useCurrentUser() {
   const user = Route.useLoaderData()?.user;
 
-  if (!user) throw new AppError("NOT_FOUND");
+  if (!user) {
+    throw new AppError("NOT_FOUND");
+  }
 
   return user;
 }

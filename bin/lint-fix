@@ -1,15 +1,15 @@
 #!/bin/sh
 
 # Lint script
-# This script runs ESLint on the codebase
+# This script runs oxlint on the codebase
 
 set -e  # Exit on error
 
 # Load environment variables
 ENV_FILE=.env . bin/load-env
 
-echo "🔍 Running ESLint..."
+echo "🔍 Running oxlint..."
 
-pnpm eslint ./src --fix
+pnpm oxlint --fix "$@"
 
-echo "✅ Linting completed successfully!"
+echo "✅ Lint auto-fix completed successfully!"

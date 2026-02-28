@@ -1,4 +1,4 @@
-import { hash, compare } from "bcrypt-ts";
+import { compare, hash } from "bcrypt-ts";
 
 export function hashPassword(password: string): Promise<string> {
   return hash(password, 12);

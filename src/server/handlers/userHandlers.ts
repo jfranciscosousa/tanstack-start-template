@@ -1,15 +1,17 @@
-import { redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import z from "zod";
 import { zfd } from "zod-form-data";
+import z from "zod";
+import { createServerFn } from "@tanstack/react-start";
+import { redirect } from "@tanstack/react-router";
+
 import { useLoggedInAppSession } from "~/server/websession";
-import { createUser, updateUser } from "../services/userServices";
+
 import { createAndUseSession } from "./sessionHandlers";
+import { createUser, updateUser } from "../services/userServices";
 
 export const signUpSchema = zfd
   .formData({
-    name: zfd.text(),
     email: zfd.text(z.email()),
+    name: zfd.text(),
     password: zfd.text(),
     passwordConfirmation: zfd.text(),
     redirectUrl: zfd.text(z.string().optional()),
@@ -36,15 +38,17 @@ export const signupFn = createServerFn({ method: "POST" })
 
 export const updateUserSchema = zfd
   .formData({
-    name: zfd.text(),
-    email: zfd.text(z.email()),
     currentPassword: zfd.text(),
+    email: zfd.text(z.email()),
+    name: zfd.text(),
     password: zfd.text(z.string().optional()),
     passwordConfirmation: zfd.text(z.string().optional()),
   })
   .refine(
     data => {
-      if (!data.password) return true;
+      if (!data.password) {
+        return true;
+      }
 
       return data.password === data.passwordConfirmation;
     },
