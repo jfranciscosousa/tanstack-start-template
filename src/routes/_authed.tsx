@@ -27,12 +27,12 @@ function AuthedLayout() {
 
   return (
     <div
-      className="min-h-screen bg-base-200"
+      className="min-h-screen"
       data-testid={`Welcome ${user.name}`}
     >
       <Navbar user={user} />
 
-      <main>
+      <main className="py-6">
         <Outlet />
       </main>
     </div>

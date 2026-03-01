@@ -93,7 +93,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-base-200">
+      <body className="min-h-screen">
         <Toaster />
 
         {children}

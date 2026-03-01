@@ -16,6 +16,11 @@ import type { Session } from "~/server/db/schema";
 import { useMutation } from "~/hooks/useMutation";
 import { renderError } from "~/errors";
 import { Avatar } from "~/components/Avatar";
+import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent } from "~/components/ui/card";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { cn } from "~/lib/utils";
 
 interface SessionsTabProps {
   sessions: Session[];
@@ -84,30 +89,28 @@ function SessionCard({
   }
 
   return (
-    <div
-      className={`card bg-base-200 ${isCurrentSession ? "ring-2 ring-primary" : ""}`}
-    >
-      <div className="card-body p-4">
+    <Card className={cn(isCurrentSession && "ring-2 ring-primary")}>
+      <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-4 flex-1">
+          <div className="flex flex-1 items-start gap-4">
             <Avatar
               size="lg"
-              variant={isCurrentSession ? "primary" : "secondary"}
+              variant={isCurrentSession ? "default" : "secondary"}
             >
               <DeviceIcon size={24} />
             </Avatar>
 
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex items-center gap-2">
                 <h3 className="font-semibold">
                   {getDeviceName(session.userAgent)}
                 </h3>
                 {isCurrentSession && (
-                  <span className="badge badge-primary badge-sm">Current</span>
+                  <Badge variant="default" className="text-xs">Current</Badge>
                 )}
               </div>
 
-              <div className="space-y-1 text-sm text-base-content/70">
+              <div className="space-y-1 text-sm text-muted-foreground">
                 {session.location && (
                   <div className="flex items-center gap-2">
                     <MapPin size={14} />
@@ -130,9 +133,10 @@ function SessionCard({
 
           <div className="shrink-0">
             {!isCurrentSession && (
-              <button
+              <Button
                 type="button"
-                className="btn btn-error btn-sm"
+                variant="destructive"
+                size="sm"
                 onClick={handleRevoke}
                 disabled={isRevoking}
               >
@@ -141,12 +145,12 @@ function SessionCard({
                 ) : (
                   "Revoke"
                 )}
-              </button>
+              </Button>
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -167,22 +171,22 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
   }
 
   return (
-    <div className="card bg-base-100 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title text-xl mb-4 flex items-center gap-2">
+    <Card className="shadow-xl">
+      <CardContent className="p-6">
+        <h2 className="mb-2 flex items-center gap-2 text-xl font-semibold">
           <Avatar size="sm" variant="info">
             <Shield size={18} />
           </Avatar>
           Active Sessions
         </h2>
-        <p className="text-base-content/70 mb-6">
+        <p className="mb-6 text-muted-foreground">
           Manage your active sessions across different devices. You can revoke
           access from any device except your current one.
         </p>
 
         {sessions.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-base-content/70">No active sessions</p>
+          <div className="py-8 text-center">
+            <p className="text-muted-foreground">No active sessions</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -199,11 +203,11 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
         )}
 
         {Boolean(revokeMutation.error) && (
-          <div className="alert alert-error mt-4">
-            <span>{renderError(revokeMutation.error)}</span>
-          </div>
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription>{renderError(revokeMutation.error)}</AlertDescription>
+          </Alert>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

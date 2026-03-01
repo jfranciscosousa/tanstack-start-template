@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { Shield, User } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { fetchUserSessions } from "~/server/handlers/sessionHandlers";
-import { useCurrentUser } from "~/routes/__root";
-import { Avatar } from "~/components/Avatar";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 
 import { SessionsTab } from "./profile/-SessionsTab";
 import { ProfileTab } from "./profile/-ProfileTab";
@@ -18,67 +16,42 @@ export const Route = createFileRoute("/_authed/profile")({
 });
 
 function ProfileComponent() {
-  const user = useCurrentUser();
   const { sessions, currentSessionId } = Route.useLoaderData();
-  const [activeTab, setActiveTab] = useState<"profile" | "sessions">("profile");
-
-  function handleSetProfileTab() {
-    setActiveTab("profile");
-  }
-
-  function handleSetSessionsTab() {
-    setActiveTab("sessions");
-  }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto max-w-4xl px-4 py-8">
       <div className="space-y-8">
         {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex justify-center">
-            <Avatar size="xl" className="w-20 h-20 p-6 rounded-2xl">
-              <span className="text-3xl font-bold">
-                {user?.name?.charAt(0).toUpperCase()}
-              </span>
-            </Avatar>
-          </div>
+        <div className="">
           <h1 className="text-3xl font-bold">Profile Settings</h1>
-          <p className="text-base-content/70 mt-2">
+          <p className="mt-2 text-muted-foreground">
             Manage your account information, password, and active sessions
           </p>
         </div>
 
-        <div role="tablist" className="tabs tabs-boxed bg-base-100 shadow">
-          <button
-            type="button"
-            role="tab"
-            className={`tab ${activeTab === "profile" ? "tab-active" : ""}`}
-            onClick={handleSetProfileTab}
-          >
-            <User size={16} className="mr-2" />
-            Profile
-          </button>
-          <button
-            type="button"
-            role="tab"
-            className={`tab ${activeTab === "sessions" ? "tab-active" : ""}`}
-            onClick={handleSetSessionsTab}
-          >
-            <Shield size={16} className="mr-2" />
-            Sessions ({sessions.length})
-          </button>
-        </div>
+        <Tabs defaultValue="profile" className="flex flex-col">
+          <TabsList className="w-full">
+            <TabsTrigger value="profile" className="flex-1">
+              <User size={16} />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="sessions" className="flex-1">
+              <Shield size={16} />
+              Sessions ({sessions.length})
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Profile Tab */}
-        {activeTab === "profile" && <ProfileTab />}
+          <TabsContent value="profile" className="mt-6">
+            <ProfileTab />
+          </TabsContent>
 
-        {/* Sessions Tab */}
-        {activeTab === "sessions" && (
-          <SessionsTab
-            sessions={sessions}
-            currentSessionId={currentSessionId}
-          />
-        )}
+          <TabsContent value="sessions" className="mt-6">
+            <SessionsTab
+              sessions={sessions}
+              currentSessionId={currentSessionId}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

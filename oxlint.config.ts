@@ -37,6 +37,7 @@ export default defineConfig({
     "func-style": ["error", "declaration"],
     "id-length": ["warn", { exceptions: ["T", "z"] }],
     "jsx-max-depth": "off",
+    "jsx-no-jsx-as-prop": "off",
     "jsx-no-new-array-as-prop": "off",
     "jsx-no-new-function-as-prop": "off",
     "jsx-no-new-object-as-prop": "off",

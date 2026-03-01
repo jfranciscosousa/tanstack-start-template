@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
@@ -9,14 +9,14 @@ async function createNote(screen: Screen) {
   const note = faker.git.commitSha();
 
   await screen.getByPlaceholderText("What needs to be done?").fill(note);
-  await screen.getByText("Add").click();
+  await screen.getByText("Add task").click();
   await screen.findByText(note);
 
   return note;
 }
 
-async function getNotesLength(screen: Screen) {
-  return (await screen.queryAllByText("Delete").allTextContents()).length;
+function getNotesLength(page: Page) {
+  return page.locator(".break-inside-avoid").count();
 }
 
 test("creates todos", async ({ page, screen }) => {
@@ -31,11 +31,11 @@ test("deletes todos", async ({ page, screen }) => {
   await createUserAndLogin(page, screen);
   await createNote(screen);
 
-  const notesCountBefore = await getNotesLength(screen);
-  await screen.getAllByText("Delete").first().click();
+  const notesCountBefore = await getNotesLength(page);
+  await page.locator(".break-inside-avoid button").first().click();
 
   await waitFor(async () =>
-    expect(await getNotesLength(screen)).toBe(notesCountBefore - 1)
+    expect(await getNotesLength(page)).toBe(notesCountBefore - 1),
   );
 });
 
@@ -45,7 +45,8 @@ test("deletes all todos", async ({ page, screen }) => {
   await createNote(screen);
   await createNote(screen);
 
-  await screen.getByText("Delete all").click();
+  await page.getByRole("button", { name: "Delete all" }).first().click();
+  await page.getByRole("button", { name: "Delete all" }).last().click();
 
-  await waitFor(async () => expect(await getNotesLength(screen)).toBe(0));
+  await waitFor(async () => expect(await getNotesLength(page)).toBe(0));
 });

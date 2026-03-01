@@ -9,7 +9,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ mode }) => ({
   plugins: [
-    mode === "serve" && checker({ oxlint: true, typescript: true }),
+    mode === "development" && checker({ oxlint: true, typescript: true }),
 
     tanstackStart(),
 

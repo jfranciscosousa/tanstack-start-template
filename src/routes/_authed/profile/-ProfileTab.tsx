@@ -1,5 +1,14 @@
 import { toast } from "sonner";
-import { Eye, Loader2, Lock, Mail, Save, User } from "lucide-react";
+import {
+  CalendarDays,
+  Clock,
+  Eye,
+  Loader2,
+  Lock,
+  Mail,
+  Save,
+  User,
+} from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 
@@ -8,9 +17,14 @@ import { useCurrentUser } from "~/routes/__root";
 import { useMutation } from "~/hooks/useMutation";
 import { useFormDataValidator } from "~/hooks/useFormDataValidator";
 import { renderError } from "~/errors";
-import { TextInput } from "~/components/TextInput";
-import { PasswordInput } from "~/components/PasswordInput";
+import { PasswordField } from "~/components/PasswordField";
 import { Avatar } from "~/components/Avatar";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Card, CardContent, CardTitle } from "~/components/ui/card";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Separator } from "~/components/ui/separator";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 
 export function ProfileTab() {
   const user = useCurrentUser();
@@ -45,122 +59,113 @@ export function ProfileTab() {
   return (
     <>
       {/* Profile Form */}
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
+      <Card className="shadow-xl">
+        <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
+              <h2 className="flex items-center gap-2 text-xl font-semibold">
                 <Avatar size="sm">
                   <User size={18} />
                 </Avatar>
                 Basic Information
               </h2>
 
-              <TextInput
-                type="text"
-                name="name"
-                id="name"
-                label="Full Name"
-                icon={User}
-                defaultValue={user?.name}
-                placeholder="Enter your full name"
-                error={validator.errors?.properties?.name?.errors}
-                required
-              />
+              <Field
+                data-invalid={Boolean(validator.errors?.name?.length) || undefined}
+              >
+                <FieldLabel htmlFor="name">
+                  <User size={14} className="text-muted-foreground" />
+                  Full Name
+                </FieldLabel>
+                <Input
+                  type="text"
+                  name="name"
+                  id="name"
+                  defaultValue={user?.name}
+                  placeholder="Enter your full name"
+                  aria-invalid={Boolean(validator.errors?.name?.length)}
+                  required
+                />
+                <FieldError errors={validator.errors?.name} />
+              </Field>
 
-              <TextInput
-                type="email"
-                name="email"
-                id="email"
-                label="Email Address"
-                icon={Mail}
-                defaultValue={user?.email}
-                placeholder="Enter your email"
-                error={validator.errors?.properties?.email?.errors}
-                required
-              />
+              <Field
+                data-invalid={Boolean(validator.errors?.email?.length) || undefined}
+              >
+                <FieldLabel htmlFor="email">
+                  <Mail size={14} className="text-muted-foreground" />
+                  Email Address
+                </FieldLabel>
+                <Input
+                  type="email"
+                  name="email"
+                  id="email"
+                  defaultValue={user?.email}
+                  placeholder="Enter your email"
+                  aria-invalid={Boolean(validator.errors?.email?.length)}
+                  required
+                />
+                <FieldError errors={validator.errors?.email} />
+              </Field>
             </div>
 
-            <div className="divider">Security</div>
+            <Separator />
 
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
+              <h2 className="flex items-center gap-2 text-xl font-semibold">
                 <Avatar size="sm" variant="warning">
                   <Lock size={18} />
                 </Avatar>
                 Change Password
               </h2>
 
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="label-text flex items-center gap-2">
-                    <Lock size={16} />
-                    Current Password
-                  </span>
-                  <span className="label-text-alt text-error">Required</span>
-                </div>
-                <PasswordInput
-                  name="currentPassword"
-                  id="currentPassword"
-                  label=""
-                  placeholder="Enter your current password"
-                  error={validator.errors?.properties?.currentPassword?.errors}
-                  required
-                />
-              </div>
+              <PasswordField
+                id="currentPassword"
+                name="currentPassword"
+                label="Current Password"
+                icon={Lock}
+                placeholder="Enter your current password"
+                errors={validator.errors?.currentPassword}
+                required
+              />
 
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="label-text flex items-center gap-2">
-                    <Lock size={16} />
-                    New Password
-                  </span>
-                  <span className="label-text-alt text-base-content/60">
-                    Optional
-                  </span>
-                </div>
-                <PasswordInput
-                  name="password"
-                  id="password"
-                  label=""
-                  placeholder="Enter new password (leave blank to keep current)"
-                  error={validator.errors?.properties?.password?.errors}
-                  minLength={6}
-                />
-              </div>
+              <PasswordField
+                id="password"
+                name="password"
+                label="New Password"
+                icon={Lock}
+                placeholder="Enter new password (leave blank to keep current)"
+                errors={validator.errors?.password}
+                minLength={6}
+              />
 
-              <PasswordInput
-                name="passwordConfirmation"
+              <PasswordField
                 id="passwordConfirmation"
+                name="passwordConfirmation"
                 label="Confirm New Password"
                 icon={Eye}
                 placeholder="Confirm your new password"
-                error={
-                  validator.errors?.properties?.passwordConfirmation?.errors
-                }
+                errors={validator.errors?.passwordConfirmation}
                 minLength={6}
               />
             </div>
 
             {Boolean(updateMutation.error) && (
-              <div className="alert alert-error">
-                <span>{renderError(updateMutation.error)}</span>
-              </div>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  {renderError(updateMutation.error)}
+                </AlertDescription>
+              </Alert>
             )}
 
             {/* Actions */}
-            <div className="card-actions justify-end pt-4">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={handleCancel}
-              >
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={handleCancel}>
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="btn btn-primary gap-2"
                 disabled={updateMutation.status === "pending"}
               >
                 {updateMutation.status === "pending" ? (
@@ -174,36 +179,54 @@ export function ProfileTab() {
                     Save Changes
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Account Info */}
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title text-lg mb-4">Account Information</h2>
-          <div className="stats shadow">
-            <div className="stat">
-              <div className="stat-title">Member Since</div>
-              <div className="stat-value text-sm">
-                {user?.createdAt
-                  ? new Date(user.createdAt).toLocaleDateString()
-                  : "N/A"}
+      <Card className="shadow-xl mt-4">
+        <CardContent className="p-6">
+          <CardTitle className="mb-4 text-lg">Account Information</CardTitle>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-4">
+              <div className="rounded-md bg-background p-2">
+                <CalendarDays size={18} className="text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Member Since</p>
+                <p className="text-sm font-semibold">
+                  {user?.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "N/A"}
+                </p>
               </div>
             </div>
-            <div className="stat">
-              <div className="stat-title">Last Updated</div>
-              <div className="stat-value text-sm">
-                {user?.updatedAt
-                  ? new Date(user.updatedAt).toLocaleDateString()
-                  : "N/A"}
+            <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-4">
+              <div className="rounded-md bg-background p-2">
+                <Clock size={18} className="text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Last Updated</p>
+                <p className="text-sm font-semibold">
+                  {user?.updatedAt
+                    ? new Date(user.updatedAt).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "N/A"}
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { CheckCircle2, Loader2, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
@@ -10,6 +11,17 @@ import {
   getTodosFn,
 } from "~/server/handlers/todoHandlers";
 import { useMutation } from "~/hooks/useMutation";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Card, CardContent } from "~/components/ui/card";
+import {
+  DialogRoot,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "~/components/ui/dialog";
 
 export const Route = createFileRoute("/_authed/")({
   component: RouteComponent,
@@ -35,11 +47,13 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
 
   return (
     <div className="break-inside-avoid">
-      <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
-        <div className="card-body p-4">
-          <p className="whitespace-pre-wrap wrap-break-word">{todo.content}</p>
-          <div className="card-actions justify-between items-center mt-3">
-            <time className="text-xs text-base-content/50">
+      <Card className="shadow-sm">
+        <CardContent className="flex items-start gap-2 p-3">
+          <div className="min-w-0 flex-1">
+            <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed">
+              {todo.content}
+            </p>
+            <time className="mt-1 block text-xs text-muted-foreground">
               {new Date(todo.createdAt).toLocaleDateString("en-US", {
                 day: "numeric",
                 hour: "2-digit",
@@ -48,18 +62,73 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
                 year: "numeric",
               })}
             </time>
-            <button
-              type="button"
-              className="btn btn-xs btn-error"
-              onClick={handleDelete}
-              disabled={disabled}
-            >
-              Delete
-            </button>
           </div>
-        </div>
-      </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            onClick={handleDelete}
+            disabled={disabled}
+            className="mt-0.5 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 size={14} />
+          </Button>
+        </CardContent>
+      </Card>
     </div>
+  );
+}
+
+const deleteAllTrigger = (
+  <Button
+    variant="outline"
+    size="sm"
+    className="gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+  >
+    <Trash2 size={14} />
+    Delete all
+  </Button>
+);
+
+const cancelButton = <Button variant="outline">Cancel</Button>;
+
+interface DeleteAllDialogProps {
+  count: number;
+  onConfirm: () => void;
+  isLoading: boolean;
+}
+
+function DeleteAllDialog({
+  count,
+  onConfirm,
+  isLoading,
+}: DeleteAllDialogProps) {
+  return (
+    <DialogRoot>
+      <DialogTrigger render={deleteAllTrigger} />
+      <DialogContent>
+        <DialogTitle>Delete all todos?</DialogTitle>
+        <DialogDescription>
+          This will permanently delete all {count}{" "}
+          {count === 1 ? "todo" : "todos"}. This action cannot be undone.
+        </DialogDescription>
+        <div className="mt-6 flex justify-end gap-3">
+          <DialogClose render={cancelButton} />
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Trash2 size={16} />
+            )}
+            Delete all
+          </Button>
+        </div>
+      </DialogContent>
+    </DialogRoot>
   );
 }
 
@@ -67,6 +136,7 @@ function RouteComponent() {
   const router = useRouter();
   const todos = Route.useLoaderData();
   const inputRef = useRef<HTMLInputElement>(null);
+
   const createTodoMutation = useMutation({
     fn: useServerFn(createTodoFn),
     onError: () => {
@@ -95,9 +165,8 @@ function RouteComponent() {
       toast.success("All todos were deleted");
     },
   });
-  const isSubmitting =
-    createTodoMutation.status === "pending" ||
-    deleteAllTodosMutation.status === "pending";
+
+  const isCreating = createTodoMutation.status === "pending";
 
   function handleCreateTodo(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,44 +200,64 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6">Todos</h1>
-
-      <div className="flex flex-row justify-between items-center mb-8">
-        <form onSubmit={handleCreateTodo} className=" max-w-2xl w-full">
-          <div className="flex gap-2">
-            <input
-              name="content"
-              ref={inputRef}
-              type="text"
-              className="input input-bordered flex-1"
-              placeholder="What needs to be done?"
-              disabled={isSubmitting}
-              required
-              autoComplete="off"
-            />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={isSubmitting}
-            >
-              Add
-            </button>
-          </div>
-        </form>
-
-        <button
-          className="btn btn-error"
-          type="button"
-          onClick={handleDeleteAllTodos}
-          disabled={isSubmitting}
-        >
-          Delete all
-        </button>
+    <div className="container mx-auto max-w-5xl px-4 py-6">
+      {/* Header */}
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">My Todos</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {todos.length === 0
+              ? "No tasks yet"
+              : `${todos.length} ${todos.length === 1 ? "task" : "tasks"}`}
+          </p>
+        </div>
+        {todos.length > 0 && (
+          <DeleteAllDialog
+            count={todos.length}
+            onConfirm={handleDeleteAllTodos}
+            isLoading={deleteAllTodosMutation.status === "pending"}
+          />
+        )}
       </div>
 
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-        {todos.map(todo => (
+      {/* Create form */}
+      <form onSubmit={handleCreateTodo} className="mb-8 flex gap-2">
+        <Input
+          name="content"
+          ref={inputRef}
+          type="text"
+          className="text-sm py-3"
+          placeholder="What needs to be done?"
+          disabled={isCreating}
+          required
+          autoComplete="off"
+        />
+        <Button type="submit" disabled={isCreating} className="shrink-0 self-stretch py-3 text-sm">
+          {isCreating ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Plus size={16} />
+          )}
+          Add task
+        </Button>
+      </form>
+
+      {/* Empty state */}
+      {todos.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="mb-4 rounded-full bg-muted p-6">
+            <CheckCircle2 size={40} className="text-muted-foreground" />
+          </div>
+          <h2 className="text-xl font-semibold">All clear!</h2>
+          <p className="mt-2 max-w-sm text-muted-foreground">
+            You have no todos yet. Add your first task above to get started.
+          </p>
+        </div>
+      )}
+
+      {/* Todo grid */}
+      <div className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
+        {todos.map((todo) => (
           <TodoCard
             key={todo.id}
             todo={todo}
@@ -177,12 +266,6 @@ function RouteComponent() {
           />
         ))}
       </div>
-
-      {todos.length === 0 && (
-        <div className="text-center py-12 text-base-content/60">
-          <p className="text-lg">No todos yet. Create your first one above!</p>
-        </div>
-      )}
     </div>
   );
 }

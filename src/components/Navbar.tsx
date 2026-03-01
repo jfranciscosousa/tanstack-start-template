@@ -1,88 +1,91 @@
-import { Home, LogOut, Settings, User } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { LogOut, Settings, User } from "lucide-react";
 
+import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { Avatar } from "./Avatar";
 
-const homeActiveProps = { className: "active bg-primary/20 text-primary" };
-const homeActiveOptions = { exact: true };
+const accountTrigger = (
+  <Button variant="ghost" size="icon" aria-label="Account menu">
+    <Avatar size="sm">
+      <User size={16} />
+    </Avatar>
+  </Button>
+);
+
+const profileLink = (
+  <Link to="/profile" className="flex w-full items-center gap-2">
+    <Settings size={14} />
+    Edit Profile
+  </Link>
+);
+
+const signOutLink = (
+  <Link to="/logout" className="flex w-full items-center gap-2">
+    <LogOut size={14} />
+    Sign out
+  </Link>
+);
 
 interface NavbarProps {
-  user: { email: string };
+  user: { email: string; name?: string | null };
 }
 
 export function Navbar({ user }: NavbarProps) {
   return (
-    <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50">
-      <div className="navbar-start">
-        <Link to="/" className="btn btn-ghost text-lg font-bold px-2">
-          <div className="flex items-center gap-2">
-            <Avatar size="sm">
-              <span className="text-sm font-bold">TS</span>
-            </Avatar>
-            <span className="hidden sm:inline">TanStack Start</span>
-          </div>
+    <header className="sticky top-0 z-50 flex h-14 items-center border-b bg-card px-4 shadow-sm">
+      {/* Brand */}
+      <div className="flex flex-1 items-center gap-2">
+        <Link
+          to="/"
+          className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-accent"
+        >
+          <Avatar size="sm">
+            <span className="text-xs font-bold">TS</span>
+          </Avatar>
+          <span className="hidden sm:inline">TanStack Start</span>
         </Link>
       </div>
 
-      <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1 gap-1">
-          <li>
-            <Link
-              to="/"
-              activeProps={homeActiveProps}
-              activeOptions={homeActiveOptions}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:bg-base-200"
-            >
-              <Home size={18} />
-              Dashboard
-            </Link>
-          </li>
-        </ul>
+      {/* User menu */}
+      <div className="flex flex-1 items-center justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger render={accountTrigger} />
+          <DropdownMenuContent align="end" className="min-w-min" sideOffset={8}>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                {user.name && (
+                  <p className="text-sm font-medium">{user.name}</p>
+                )}
+                <p
+                  className={
+                    user.name
+                      ? "text-xs text-muted-foreground"
+                      : "text-sm font-medium"
+                  }
+                >
+                  {user.email}
+                </p>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem render={profileLink} />
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-destructive data-highlighted:text-destructive"
+              render={signOutLink}
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-
-      <div className="navbar-end gap-2">
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle"
-            aria-label="Menu"
-          >
-            <Avatar size="md">
-              <User size={18} />
-            </Avatar>
-          </div>
-          <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-64 p-3 shadow-lg border border-base-300">
-            <li className="menu-title">
-              <span className="text-xs uppercase tracking-wider">Account</span>
-            </li>
-            <li>
-              <div className="flex flex-col px-4 py-3 bg-base-200 rounded-lg mb-2">
-                <span className="text-sm font-medium">{user.email}</span>
-                <span className="text-xs text-base-content/60">Signed in</span>
-              </div>
-            </li>
-            <li>
-              <Link
-                to="/profile"
-                className="flex items-center gap-3 px-4 py-3 hover:bg-base-200 rounded-lg"
-              >
-                <Settings size={18} />
-                Edit Profile
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/logout"
-                className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error/10 rounded-lg"
-              >
-                <LogOut size={18} />
-                Sign out
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    </header>
   );
 }
