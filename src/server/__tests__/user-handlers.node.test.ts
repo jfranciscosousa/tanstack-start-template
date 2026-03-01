@@ -7,15 +7,15 @@ import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
 import type { User } from "~/server/db/schema";
 import { AppError } from "~/errors";
 
-import { hashPassword, verifyPassword } from "../services/passwordService";
-import { signupFn, updateUserFn } from "../handlers/userHandlers";
+import { hashPassword, verifyPassword } from "../services/password-service";
+import { signupFn, updateUserFn } from "../handlers/user-handlers";
 import { sessions, users } from "../db/schema";
 import { db } from "../db";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
 }));
-vi.mock("~/server/websession");
+vi.mock("~/server/web-session");
 
 describe("User schemas integration tests", () => {
   describe("signupFn", () => {

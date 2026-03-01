@@ -6,22 +6,6 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 **Package manager:** pnpm
 
-## Commands
-
-```bash
-bin/dev                          # Dev server at http://localhost:3000
-bin/build                        # Production build
-bin/start                        # Start production server
-bin/setup                        # First-time setup (deps + DB + migrations)
-bin/ts-check [path/to/file.ts]   # TypeScript check (file or full project)
-bin/lint                         # oxlint
-bin/format                       # oxfmt
-bin/test                         # All tests (unit + e2e)
-bin/test-vitest                  # Unit tests only
-bin/test-vitest-watch            # Unit tests in watch mode
-bin/test-e2e                     # Playwright e2e tests
-```
-
 ## Domain Guides
 
 Load these when working on the relevant area:
@@ -35,3 +19,4 @@ Load these when working on the relevant area:
 ## Code guidelines
 
 - Variables should have clear simple names. Don't: `e`. Do `event`
+- All source files must use hyphen-case (kebab-case) naming except specific TanstackRouter files

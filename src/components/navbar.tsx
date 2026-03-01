@@ -3,8 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { LogOut, Moon, Settings, Sun } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 
-import { updateThemeFn } from "~/server/handlers/userHandlers";
-import { useTheme } from "~/hooks/useTheme";
+import { updateThemeFn } from "~/server/handlers/user-handlers";
+import { useTheme } from "~/hooks/use-theme";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,

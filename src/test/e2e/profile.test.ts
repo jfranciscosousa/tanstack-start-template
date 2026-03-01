@@ -3,7 +3,7 @@ import { expect } from "@playwright/test";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
 
-import { verifyPassword } from "~/server/services/passwordService";
+import { verifyPassword } from "~/server/services/password-service";
 import { users } from "~/server/db/schema";
 import { db } from "~/server/db";
 

@@ -3,7 +3,7 @@ import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";
 
-import { getUserBySessionId } from "./services/userServices";
+import { getUserBySessionId } from "./services/user-services";
 import { type Session } from "./db/schema";
 
 type SessionUser = {

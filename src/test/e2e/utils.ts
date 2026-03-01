@@ -7,7 +7,7 @@ import type { Screen } from "@playwright-testing-library/test/dist/fixture/types
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
 
-import { createUser } from "~/server/services/userServices";
+import { createUser } from "~/server/services/user-services";
 
 export const USER_TEST_PASSWORD = "foobar";
 

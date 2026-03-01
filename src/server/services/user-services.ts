@@ -3,8 +3,8 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";
 
-import { deleteAllSessions } from "./sessionService";
-import { hashPassword, verifyPassword } from "./passwordService";
+import { deleteAllSessions } from "./session-service";
+import { hashPassword, verifyPassword } from "./password-service";
 import { type User, users } from "../db/schema";
 import { db } from "../db";
 

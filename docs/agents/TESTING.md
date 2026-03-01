@@ -2,6 +2,8 @@
 
 **Unit:** Vitest | **E2E:** Playwright (Chromium only) | **Helpers:** Testing Library, Faker
 
+Do not test what typescript already guarantees
+
 ## Commands
 
 ```bash
@@ -14,10 +16,10 @@ bin/test-vitest path/to/file.test.ts         # Single unit test file
 
 ## Test Environments
 
-| File suffix | Environment | Use for |
-|---|---|---|
-| `*.test.ts` / `*.test.tsx` | jsdom | Components, hooks, browser behavior |
-| `*.node.test.ts` | Node | Server functions, services, handlers |
+| File suffix                | Environment | Use for                              |
+| -------------------------- | ----------- | ------------------------------------ |
+| `*.test.ts` / `*.test.tsx` | jsdom       | Components, hooks, browser behavior  |
+| `*.node.test.ts`           | Node        | Server functions, services, handlers |
 
 ## Component Test (jsdom)
 
@@ -38,13 +40,15 @@ Use `~/test/utils` (not `@testing-library/react` directly) — it wraps with nec
 
 ```typescript
 // src/server/__tests__/myHandler.node.test.ts
-import { describe, test, expect, beforeEach } from 'vitest';
-import { createTestUser } from '../../test/node-utils';
+import { describe, test, expect, beforeEach } from "vitest";
+import { createTestUser } from "../../test/node-utils";
 
-describe('myHandler', () => {
-  beforeEach(async () => { /* reset test DB state */ });
+describe("myHandler", () => {
+  beforeEach(async () => {
+    /* reset test DB state */
+  });
 
-  test('creates record', async () => {
+  test("creates record", async () => {
     const user = await createTestUser();
     // call handler, assert result
   });
@@ -57,13 +61,13 @@ Use `~/test/node-utils` for server-side test helpers. Use `@faker-js/faker` for 
 
 ```typescript
 // src/test/e2e/feature.test.ts
-import { test, expect } from '@playwright/test';
-import { loginAs } from './utils';
+import { test, expect } from "@playwright/test";
+import { loginAs } from "./utils";
 
-test('user can do thing', async ({ page }) => {
-  await loginAs(page, 'user@example.com', 'password');
-  await page.goto('/');
-  await expect(page.getByRole('heading')).toBeVisible();
+test("user can do thing", async ({ page }) => {
+  await loginAs(page, "user@example.com", "password");
+  await page.goto("/");
+  await expect(page.getByRole("heading")).toBeVisible();
 });
 ```
 

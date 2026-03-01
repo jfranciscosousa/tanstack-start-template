@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { invalidateCurrentSession } from "~/server/handlers/sessionHandlers";
+import { invalidateCurrentSession } from "~/server/handlers/session-handlers";
 
 const logoutFn = createServerFn().handler(async () => {
   await invalidateCurrentSession();

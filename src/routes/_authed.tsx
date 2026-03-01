@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 
-import { Navbar } from "~/components/Navbar";
+import { Navbar } from "~/components/navbar";
 
 import { useCurrentUser } from "./__root";
 

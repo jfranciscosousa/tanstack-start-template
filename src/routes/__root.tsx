@@ -7,11 +7,11 @@ import {
   createRootRoute,
 } from "@tanstack/react-router";
 
-import { fetchCurrentUser } from "~/server/websession";
+import { fetchCurrentUser } from "~/server/web-session";
 import { seo } from "~/server/seo.js";
 import { AppError } from "~/errors";
-import { NotFound } from "~/components/NotFound.js";
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary.js";
+import { NotFound } from "~/components/not-found.js";
+import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
 
 import appCss from "~/styles/app.css?url";
 
@@ -80,25 +80,27 @@ export function useCurrentUser() {
 }
 
 function RootComponent() {
+  const { user } = Route.useLoaderData();
+  const theme = user?.theme ?? "dark";
+
   return (
-    <RootDocument>
+    <RootDocument theme={theme}>
       <Outlet />
     </RootDocument>
   );
 }
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({
+  children,
+  theme = "dark",
+}: {
+  children: React.ReactNode;
+  theme?: "dark" | "light";
+}) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={theme === "dark" ? "dark" : ""}>
       <head>
         <HeadContent />
-        {/* Reads localStorage before first paint to prevent theme flash */}
-        <script
-          // oxlint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else if(t==='dark')document.documentElement.classList.add('dark');}())`,
-          }}
-        />
       </head>
       <body className="min-h-screen">
         <a

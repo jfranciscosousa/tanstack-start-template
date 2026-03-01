@@ -2,7 +2,7 @@
 /* oxlint-disable @typescript-eslint/no-explicit-any */
 import { vi } from "vitest";
 
-import { useLoggedInAppSession, useWebSession } from "~/server/websession";
+import { useLoggedInAppSession, useWebSession } from "~/server/web-session";
 import type { User } from "~/server/db/schema";
 import { AppError } from "~/errors";
 

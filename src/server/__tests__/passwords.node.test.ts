@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hashPassword, verifyPassword } from "../services/passwordService";
+import { hashPassword, verifyPassword } from "../services/password-service";
 
 describe("Password utilities", () => {
   describe("hashPassword", () => {

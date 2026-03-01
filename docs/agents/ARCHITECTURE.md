@@ -13,42 +13,83 @@ only     no HTTP    + validation
 - `db/schema.ts` — schema definitions only, no queries
 - `services/` — Drizzle queries, pure business logic, use `createServerOnlyFn`
 - `handlers/` — `createServerFn` + `.inputValidator()` + Zod, delegates to services
-- `routes/` — loaders call handlers, components call handlers via `useServerFn`
+- `routes/` — thin shells: route config, loader, and `validateSearch` only
+- `domains/` — all page UI and sub-components, grouped by feature
 
-Never put DB queries in handlers. Never put HTTP/session logic in services.
+Never put DB queries in handlers. Never put HTTP/session logic in services. Never put UI logic in route files.
 
 ## File Organization
 
 ```
 src/
 ├── routes/
-│   ├── __root.tsx          # Root layout; loads user via fetchCurrentUser()
-│   ├── _authed.tsx         # Protected layout; redirects if !context.user
-│   ├── _authed/            # Authenticated pages
-│   │   ├── index.tsx       # Todo dashboard
-│   │   ├── profile.tsx     # Profile page
-│   │   └── profile/
-│   │       ├── -ProfileTab.tsx    # Private sub-component (- prefix)
-│   │       └── -SessionsTab.tsx
-│   ├── login.tsx / signup.tsx / logout.tsx
+│   ├── __root.tsx              # Root layout; loads user via fetchCurrentUser()
+│   ├── _authed.tsx             # Protected layout; redirects if !context.user
+│   ├── _authed/
+│   │   ├── index.tsx           # Todo dashboard (thin route shell)
+│   │   └── profile.tsx         # Profile route (thin route shell)
+│   ├── _unauthed/
+│   │   ├── login.tsx           # Login route (thin route shell)
+│   │   └── signup.tsx          # Signup route (thin route shell)
+│   └── logout.tsx
+├── domains/                    # Feature UI — grouped by domain
+│   ├── login/
+│   │   └── login-page.tsx      # Full login page component
+│   ├── signup/
+│   │   └── signup-page.tsx     # Full signup page component
+│   └── profile/
+│       ├── profile-page.tsx    # Profile page component (renders tabs)
+│       ├── profile-tab.tsx     # Profile info & password form
+│       └── sessions-tab.tsx    # Active sessions management
 ├── server/
-│   ├── db/index.ts         # Drizzle client
-│   ├── db/schema.ts        # Tables + relations
-│   ├── services/           # userServices, sessionService, passwordService, todoService
-│   ├── handlers/           # userHandlers, sessionHandlers, todoHandlers
-│   ├── websession.ts       # useWebSession(), useLoggedInAppSession()
-│   ├── request-info.ts     # IP/geo/user-agent extraction
+│   ├── db/index.ts             # Drizzle client
+│   ├── db/schema.ts            # Tables + relations
+│   ├── services/               # user-services, session-service, password-service, todo-service
+│   ├── handlers/               # user-handlers, session-handlers, todo-handlers
+│   ├── web-session.ts          # useWebSession(), useLoggedInAppSession()
+│   ├── request-info.ts         # IP/geo/user-agent extraction
 │   └── seo.ts
-├── components/             # Reusable React components
+├── components/                 # Shared reusable React components
+│   └── ui/                     # Base UI primitives (button, input, etc.)
 ├── hooks/
-│   ├── useMutation.ts      # Async mutation with loading/error state
-│   └── useFormDataValidator.ts
+│   ├── use-mutation.ts         # Async mutation with loading/error state
+│   └── use-form-data-validator.ts
 ├── middlewares/logging.ts
-├── errors.ts               # AppError class
+├── errors.ts                   # AppError class
 └── styles/app.css
 ```
 
 Use `~/` absolute imports everywhere (maps to `src/`).
+
+## Domain Pattern
+
+Route files are thin shells — they only define the route config, loader, and search params. All UI lives in `src/domains/<feature>/`.
+
+**Route file** (`src/routes/_unauthed/login.tsx`):
+```typescript
+import z from 'zod';
+import { createFileRoute } from '@tanstack/react-router';
+import LoginPage from '~/domains/login/login-page';
+
+const searchSchema = z.object({ redirectUrl: z.string().optional() });
+
+export const Route = createFileRoute('/_unauthed/login')({
+  component: LoginPage,
+  validateSearch: (search) => searchSchema.parse(search),
+});
+```
+
+**Domain page** (`src/domains/login/login-page.tsx`):
+```typescript
+import { Route } from '~/routes/_unauthed/login'; // import Route for useSearch/useLoaderData
+
+export default function LoginPage() {
+  const { redirectUrl } = Route.useSearch();
+  // ... full component
+}
+```
+
+Domain sub-components (tabs, cards, sections) live alongside the page in the same domain folder. No `-` prefix needed — the `domains/` folder itself scopes them.
 
 ## Server Function Pattern
 
@@ -56,8 +97,8 @@ Use `~/` absolute imports everywhere (maps to `src/`).
 import { createServerFn } from '@tanstack/react-start';
 import { zfd } from 'zod-form-data';
 import { z } from 'zod';
-import { useLoggedInAppSession } from '~/server/websession';
-import { updateUser } from '~/server/services/userServices';
+import { useLoggedInAppSession } from '~/server/web-session';
+import { updateUser } from '~/server/services/user-services';
 import { AppError } from '~/errors';
 
 const schema = zfd.formData({
@@ -155,18 +196,22 @@ const message = renderError(error); // → string
 
 ## File Naming
 
-| Pattern | Meaning |
+All files use hyphen-case. Exceptions: TanStack Router conventions (`__root.tsx`, `_authed.tsx`, `_unauthed.tsx`).
+
+| Location | Contains |
 |---|---|
-| `_authed/*.tsx` | Protected route |
-| `-ComponentName.tsx` | Private sub-component (not a route) |
-| `*Services.ts` | Service layer |
-| `*Handlers.ts` | Handler layer |
+| `routes/*.tsx` | Thin route shell (config + loader + validateSearch only) |
+| `domains/<feature>/` | Page components and feature-scoped sub-components |
+| `components/` | Shared components used across multiple domains |
+| `server/services/` | Pure business logic, Drizzle queries |
+| `server/handlers/` | Server functions with input validation |
 
 ## PR Checklist
 
 - [ ] `bin/ts-check` passes on changed files
 - [ ] `bin/lint` and `bin/format` clean
 - [ ] Layered architecture respected (no DB in handlers, no HTTP in services)
+- [ ] Route files are thin shells — UI lives in `domains/`
 - [ ] All server functions use `.inputValidator()` with Zod schema
 - [ ] No sensitive data in error messages
 - [ ] Passwords hashed with `bcrypt-ts` — never plain-text

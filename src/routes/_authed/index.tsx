@@ -9,8 +9,8 @@ import {
   deleteAllTodosFn,
   deleteTodoFn,
   getTodosFn,
-} from "~/server/handlers/todoHandlers";
-import { useMutation } from "~/hooks/useMutation";
+} from "~/server/handlers/todo-handlers";
+import { useMutation } from "~/hooks/use-mutation";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {

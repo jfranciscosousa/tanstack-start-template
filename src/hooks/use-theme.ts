@@ -15,8 +15,6 @@ export function useTheme(
     } else {
       root.classList.remove("dark");
     }
-    // Keep localStorage in sync so the anti-FOUC script works on next load
-    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggle = useCallback(() => {

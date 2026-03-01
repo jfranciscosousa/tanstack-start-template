@@ -12,13 +12,16 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 
-import { updateUserFn, updateUserSchema } from "~/server/handlers/userHandlers";
+import {
+  updateUserFn,
+  updateUserSchema,
+} from "~/server/handlers/user-handlers";
 import { useCurrentUser } from "~/routes/__root";
-import { useMutation } from "~/hooks/useMutation";
-import { useFormDataValidator } from "~/hooks/useFormDataValidator";
+import { useMutation } from "~/hooks/use-mutation";
+import { useFormDataValidator } from "~/hooks/use-form-data-validator";
 import { renderError } from "~/errors";
-import { PasswordField } from "~/components/PasswordField";
-import { Avatar } from "~/components/Avatar";
+import { PasswordField } from "~/components/password-field";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
@@ -72,7 +75,9 @@ export function ProfileTab() {
               </h2>
 
               <Field
-                data-invalid={Boolean(validator.errors?.name?.length) || undefined}
+                data-invalid={
+                  Boolean(validator.errors?.name?.length) || undefined
+                }
               >
                 <FieldLabel htmlFor="name">
                   <User size={14} className="text-muted-foreground" />
@@ -91,7 +96,9 @@ export function ProfileTab() {
               </Field>
 
               <Field
-                data-invalid={Boolean(validator.errors?.email?.length) || undefined}
+                data-invalid={
+                  Boolean(validator.errors?.email?.length) || undefined
+                }
               >
                 <FieldLabel htmlFor="email">
                   <Mail size={14} className="text-muted-foreground" />

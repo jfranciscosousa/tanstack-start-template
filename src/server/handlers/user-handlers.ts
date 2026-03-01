@@ -3,10 +3,10 @@ import z from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
 
-import { useLoggedInAppSession } from "~/server/websession";
+import { useLoggedInAppSession } from "~/server/web-session";
 
-import { createAndUseSession } from "./sessionHandlers";
-import { createUser, updateUser, updateUserTheme } from "../services/userServices";
+import { createAndUseSession } from "./session-handlers";
+import { createUser, updateUser, updateUserTheme } from "../services/user-services";
 
 export const signUpSchema = zfd
   .formData({

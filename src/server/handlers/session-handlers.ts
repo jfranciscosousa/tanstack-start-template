@@ -6,15 +6,15 @@ import { redirect } from "@tanstack/react-router";
 
 import { AppError } from "~/errors";
 
-import { useWebSession } from "../websession";
-import { getUserByEmail } from "../services/userServices";
+import { useWebSession } from "../web-session";
+import { getUserByEmail } from "../services/user-services";
 import {
   createSession,
   deleteSession,
   getUserSessions,
   verifyUserSession,
-} from "../services/sessionService";
-import { verifyPassword } from "../services/passwordService";
+} from "../services/session-service";
+import { verifyPassword } from "../services/password-service";
 import { getRequestInfo } from "../request-info";
 import { type User } from "../db/schema";
 

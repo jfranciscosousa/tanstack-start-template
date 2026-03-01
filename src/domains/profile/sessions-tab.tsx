@@ -11,11 +11,11 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 
-import { revokeSession } from "~/server/handlers/sessionHandlers";
+import { revokeSession } from "~/server/handlers/session-handlers";
 import type { Session } from "~/server/db/schema";
-import { useMutation } from "~/hooks/useMutation";
+import { useMutation } from "~/hooks/use-mutation";
 import { renderError } from "~/errors";
-import { Avatar } from "~/components/Avatar";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
@@ -106,7 +106,9 @@ function SessionCard({
                   {getDeviceName(session.userAgent)}
                 </h3>
                 {isCurrentSession && (
-                  <Badge variant="default" className="text-xs">Current</Badge>
+                  <Badge variant="default" className="text-xs">
+                    Current
+                  </Badge>
                 )}
               </div>
 
@@ -190,7 +192,7 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            {sessions.map(session => (
+            {sessions.map((session) => (
               <SessionCard
                 key={session.id}
                 session={session}
@@ -204,7 +206,9 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
 
         {Boolean(revokeMutation.error) && (
           <Alert variant="destructive" className="mt-4">
-            <AlertDescription>{renderError(revokeMutation.error)}</AlertDescription>
+            <AlertDescription>
+              {renderError(revokeMutation.error)}
+            </AlertDescription>
           </Alert>
         )}
       </CardContent>
