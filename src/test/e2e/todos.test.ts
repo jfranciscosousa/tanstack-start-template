@@ -45,8 +45,8 @@ test("deletes all todos", async ({ page, screen }) => {
   await createNote(screen);
   await createNote(screen);
 
-  await page.getByRole("button", { name: "Delete all" }).first().click();
-  await page.getByRole("button", { name: "Delete all" }).last().click();
+  await page.getByRole("button", { name: "Clear all" }).first().click();
+  await page.getByRole("button", { name: "Clear all" }).last().click();
 
   await waitFor(async () => expect(await getNotesLength(page)).toBe(0));
 });

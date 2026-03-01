@@ -6,7 +6,7 @@ import { redirect } from "@tanstack/react-router";
 import { useLoggedInAppSession } from "~/server/websession";
 
 import { createAndUseSession } from "./sessionHandlers";
-import { createUser, updateUser } from "../services/userServices";
+import { createUser, updateUser, updateUserTheme } from "../services/userServices";
 
 export const signUpSchema = zfd
   .formData({
@@ -69,4 +69,11 @@ export const updateUserFn = createServerFn({ method: "POST" })
     if (data.password) {
       await createAndUseSession(user);
     }
+  });
+
+export const updateThemeFn = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ theme: z.enum(["dark", "light"]) }))
+  .handler(async ({ data }) => {
+    const { user } = await useLoggedInAppSession();
+    await updateUserTheme(user.id, data.theme);
   });

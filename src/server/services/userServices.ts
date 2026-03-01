@@ -63,6 +63,12 @@ export const createUser = createServerOnlyFn(
   }
 );
 
+export const updateUserTheme = createServerOnlyFn(
+  async (userId: string, theme: "dark" | "light") => {
+    await db.update(users).set({ theme }).where(eq(users.id, userId));
+  }
+);
+
 export const updateUser = createServerOnlyFn(
   async (
     user: Omit<User, "password">,

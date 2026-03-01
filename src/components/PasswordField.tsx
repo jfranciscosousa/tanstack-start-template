@@ -15,6 +15,7 @@ export interface PasswordFieldProps {
   label: string;
   icon?: LucideIcon;
   placeholder?: string;
+  autoComplete?: string;
   required?: boolean;
   minLength?: number;
   errors?: { message: string }[];
@@ -26,6 +27,7 @@ export function PasswordField({
   label,
   icon: Icon,
   placeholder,
+  autoComplete,
   required,
   minLength,
   errors,
@@ -39,7 +41,7 @@ export function PasswordField({
   return (
     <Field data-invalid={errors?.length ? true : undefined}>
       <FieldLabel htmlFor={id}>
-        {Icon && <Icon size={14} className="text-muted-foreground" />}
+        {Icon && <Icon size={14} className="text-muted-foreground" aria-hidden="true" />}
         {label}
       </FieldLabel>
       <InputGroup>
@@ -48,6 +50,7 @@ export function PasswordField({
           name={name}
           type={showPassword ? "text" : "password"}
           placeholder={placeholder}
+          autoComplete={autoComplete}
           required={required}
           minLength={minLength}
           aria-invalid={Boolean(errors?.length)}
@@ -58,7 +61,7 @@ export function PasswordField({
             onClick={handleToggle}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+            {showPassword ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>

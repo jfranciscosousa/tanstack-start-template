@@ -20,7 +20,7 @@ export const Route = createRootRoute({
     user: await fetchCurrentUser(),
   }),
   component: RootComponent,
-  errorComponent: props => (
+  errorComponent: (props) => (
     <RootDocument>
       <DefaultCatchBoundary {...props} />
     </RootDocument>
@@ -62,7 +62,7 @@ export const Route = createRootRoute({
       }),
     ],
   }),
-  loader: ctx => ({
+  loader: (ctx) => ({
     user: ctx.context.user,
   }),
   notFoundComponent: () => <NotFound />,
@@ -89,11 +89,24 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
+        {/* Reads localStorage before first paint to prevent theme flash */}
+        <script
+          // oxlint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else if(t==='dark')document.documentElement.classList.add('dark');}())`,
+          }}
+        />
       </head>
       <body className="min-h-screen">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-md"
+        >
+          Skip to main content
+        </a>
         <Toaster />
 
         {children}

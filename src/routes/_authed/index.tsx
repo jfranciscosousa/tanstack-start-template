@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
@@ -13,7 +13,6 @@ import {
 import { useMutation } from "~/hooks/useMutation";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Card, CardContent } from "~/components/ui/card";
 import {
   DialogRoot,
   DialogTrigger,
@@ -46,15 +45,15 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
   }
 
   return (
-    <div className="break-inside-avoid">
-      <Card className="shadow-sm">
-        <CardContent className="flex items-start gap-2 p-3">
+    <div className="group break-inside-avoid">
+      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-foreground/5 ring-1 transition-all duration-200 hover:border-primary/40 hover:shadow-primary/5 hover:shadow-md">
+        <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed">
+            <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed text-foreground/90">
               {todo.content}
             </p>
-            <time className="mt-1 block text-xs text-muted-foreground">
-              {new Date(todo.createdAt).toLocaleDateString("en-US", {
+            <time className="mt-2.5 block font-mono text-[11px] tracking-wide text-muted-foreground/60 uppercase">
+              {new Date(todo.createdAt).toLocaleDateString(undefined, {
                 day: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
@@ -69,28 +68,29 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
             size="xs"
             onClick={handleDelete}
             disabled={disabled}
+            aria-label="Delete task"
             className="mt-0.5 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
           >
-            <Trash2 size={14} />
+            <Trash2 size={13} aria-hidden="true" />
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
 
 const deleteAllTrigger = (
   <Button
-    variant="outline"
+    variant="ghost"
     size="sm"
-    className="gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+    className="gap-1.5 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
   >
-    <Trash2 size={14} />
-    Delete all
+    <Trash2 size={13} aria-hidden="true" />
+    Clear all
   </Button>
 );
 
-const cancelButton = <Button variant="outline">Cancel</Button>;
+const cancelButton = <Button variant="outline" size="sm">Cancel</Button>;
 
 interface DeleteAllDialogProps {
   count: number;
@@ -107,24 +107,25 @@ function DeleteAllDialog({
     <DialogRoot>
       <DialogTrigger render={deleteAllTrigger} />
       <DialogContent>
-        <DialogTitle>Delete all todos?</DialogTitle>
+        <DialogTitle>Clear all tasks?</DialogTitle>
         <DialogDescription>
           This will permanently delete all {count}{" "}
-          {count === 1 ? "todo" : "todos"}. This action cannot be undone.
+          {count === 1 ? "task" : "tasks"}. This cannot be undone.
         </DialogDescription>
         <div className="mt-6 flex justify-end gap-3">
           <DialogClose render={cancelButton} />
           <Button
             variant="destructive"
+            size="sm"
             onClick={onConfirm}
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 size={16} className="animate-spin" />
+              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
             ) : (
-              <Trash2 size={16} />
+              <Trash2 size={14} aria-hidden="true" />
             )}
-            Delete all
+            Clear all
           </Button>
         </div>
       </DialogContent>
@@ -162,13 +163,13 @@ function RouteComponent() {
     },
     onSuccess: async () => {
       await router.invalidate({ sync: true });
-      toast.success("All todos were deleted");
+      toast.success("All tasks cleared");
     },
   });
 
   const isCreating = createTodoMutation.status === "pending";
 
-  function handleCreateTodo(event: React.FormEvent<HTMLFormElement>) {
+  function handleCreateTodo(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
@@ -200,15 +201,17 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-6">
+    <div className="container mx-auto max-w-5xl px-5 py-8">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Todos</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="font-display text-4xl font-bold italic tracking-tight text-foreground">
+            My Tasks
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
             {todos.length === 0
-              ? "No tasks yet"
-              : `${todos.length} ${todos.length === 1 ? "task" : "tasks"}`}
+              ? "Nothing on the list — enjoy your day"
+              : `${todos.length} ${todos.length === 1 ? "task" : "tasks"} waiting`}
           </p>
         </div>
         {todos.length > 0 && (
@@ -221,36 +224,45 @@ function RouteComponent() {
       </div>
 
       {/* Create form */}
-      <form onSubmit={handleCreateTodo} className="mb-8 flex gap-2">
-        <Input
-          name="content"
-          ref={inputRef}
-          type="text"
-          className="text-sm py-3"
-          placeholder="What needs to be done?"
-          disabled={isCreating}
-          required
-          autoComplete="off"
-        />
-        <Button type="submit" disabled={isCreating} className="shrink-0 self-stretch py-3 text-sm">
-          {isCreating ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <Plus size={16} />
-          )}
-          Add task
-        </Button>
+      <form onSubmit={handleCreateTodo} className="mb-10">
+        <label htmlFor="todo-content" className="sr-only">
+          New task
+        </label>
+        <div className="flex overflow-hidden rounded-lg border border-border bg-card shadow-sm ring-1 ring-foreground/5 transition-all focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+          <Input
+            id="todo-content"
+            name="content"
+            ref={inputRef}
+            type="text"
+            className="flex-1 rounded-none border-0 bg-transparent shadow-none outline-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-sm placeholder:text-muted-foreground/50"
+            placeholder="What needs to be done?"
+            disabled={isCreating}
+            required
+            autoComplete="off"
+          />
+          <Button
+            type="submit"
+            disabled={isCreating}
+            className="rounded-l-none shrink-0 gap-1.5 text-sm"
+          >
+            {isCreating ? (
+              <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Plus size={15} aria-hidden="true" />
+            )}
+            Add task
+          </Button>
+        </div>
       </form>
 
       {/* Empty state */}
       {todos.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="mb-4 rounded-full bg-muted p-6">
-            <CheckCircle2 size={40} className="text-muted-foreground" />
-          </div>
-          <h2 className="text-xl font-semibold">All clear!</h2>
-          <p className="mt-2 max-w-sm text-muted-foreground">
-            You have no todos yet. Add your first task above to get started.
+          <p className="font-display text-7xl font-bold italic text-primary/20 leading-none mb-5 select-none">
+            All clear.
+          </p>
+          <p className="text-sm text-muted-foreground/70 max-w-xs leading-relaxed">
+            Add your first task above to get started.
           </p>
         </div>
       )}

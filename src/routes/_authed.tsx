@@ -32,7 +32,7 @@ function AuthedLayout() {
     >
       <Navbar user={user} />
 
-      <main className="py-6">
+      <main id="main" className="py-6">
         <Outlet />
       </main>
     </div>
