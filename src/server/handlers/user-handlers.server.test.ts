@@ -3,12 +3,12 @@ import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
-import { mockLoggedIn, mockLoggedOut } from "~/test/node-utils";
+import { mockLoggedIn, mockLoggedOut } from "~/test/server-utils";
 import type { User } from "~/server/db/schema";
 import { AppError } from "~/errors";
 
 import { hashPassword, verifyPassword } from "../services/password-service";
-import { signupFn, updateUserFn } from "../handlers/user-handlers";
+import { signupFn, updateUserFn } from "./user-handlers";
 import { sessions, users } from "../db/schema";
 import { db } from "../db";
 

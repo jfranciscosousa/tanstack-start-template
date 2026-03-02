@@ -58,7 +58,7 @@ export const Route = createRootRoute({
       },
       ...seo({
         description: "TODO",
-        title: "Tanstack start drizzle template",
+        title: "my-tanstack-starter",
       }),
     ],
   }),

@@ -23,6 +23,6 @@ fi
 echo "🎭 Building end-to-end test dependencies"
 pnpm exec playwright install chromium
 
-pnpm drizzle-kit migrate
+migrate_output=$(pnpm drizzle-kit migrate 2>&1) || { echo "$migrate_output" >&2; exit 1; }
 
 echo "✅ End-to-end dependencies built successfully!"

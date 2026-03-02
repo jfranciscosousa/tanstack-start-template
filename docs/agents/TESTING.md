@@ -16,17 +16,17 @@ bin/test-vitest path/to/file.test.ts         # Single unit test file
 
 ## Test Environments
 
-| File suffix                | Environment | Use for                              |
-| -------------------------- | ----------- | ------------------------------------ |
-| `*.test.ts` / `*.test.tsx` | jsdom       | Components, hooks, browser behavior  |
-| `*.node.test.ts`           | Node        | Server functions, services, handlers |
+| File suffix                  | Environment | Use for                              |
+| ---------------------------- | ----------- | ------------------------------------ |
+| `*.test.ts` / `*.test.tsx`   | happy-dom   | Components, hooks, browser behavior  |
+| `*.server.test.ts`           | Node        | Server functions, services, handlers |
 
-## Component Test (jsdom)
+## Component Test (happy-dom)
 
 ```typescript
-// src/components/__tests__/MyComponent.test.tsx
-import { render, screen } from '../../../test/utils';
-import { MyComponent } from '../MyComponent';
+// src/components/MyComponent.test.tsx
+import { render, screen } from '~/test/utils';
+import { MyComponent } from './MyComponent';
 
 test('renders label', () => {
   render(<MyComponent label="Hello" />);
@@ -39,23 +39,19 @@ Use `~/test/utils` (not `@testing-library/react` directly) — it wraps with nec
 ## Server/Handler Test (node)
 
 ```typescript
-// src/server/__tests__/myHandler.node.test.ts
+// src/server/services/my-service.server.test.ts
 import { describe, test, expect, beforeEach } from "vitest";
-import { createTestUser } from "../../test/node-utils";
+import { createTestUser } from "~/test/server-utils";
 
-describe("myHandler", () => {
-  beforeEach(async () => {
-    /* reset test DB state */
-  });
-
+describe("myService", () => {
   test("creates record", async () => {
     const user = await createTestUser();
-    // call handler, assert result
+    // call service/handler, assert result
   });
 });
 ```
 
-Use `~/test/node-utils` for server-side test helpers. Use `@faker-js/faker` for generating test data.
+Use `~/test/server-utils` for server-side test helpers (`createTestUser`, `mockLoggedIn`, `mockLoggedOut`). Use `@faker-js/faker` for generating test data.
 
 ## E2E Test (Playwright)
 
@@ -75,10 +71,10 @@ Use `~/test/e2e/utils` for shared helpers like `loginAs`. E2E tests run against 
 
 ## Test Files Location
 
-Co-locate tests with source files in a `__tests__/` subdirectory:
+Co-locate tests next to their implementation files:
 
 ```
-src/components/__tests__/TextInput.test.tsx
-src/server/__tests__/userHandlers.node.test.ts
+src/components/MyComponent.test.tsx
+src/server/services/my-service.server.test.ts
 src/test/e2e/authentication.test.ts
 ```

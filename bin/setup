@@ -2,9 +2,30 @@
 
 set -e
 
+TEMPLATE_NAME="my-tanstack-starter"
+
 echo "🚀 Setting up TanStack Start project..."
 
+# Prompt for app name
+echo ""
+read -p "App name [${TEMPLATE_NAME}]: " app_name
+app_name=${app_name:-$TEMPLATE_NAME}
+
+# Rename app in all relevant files if a new name was given
+if [ "$app_name" != "$TEMPLATE_NAME" ]; then
+  echo "✏️  Renaming app to '${app_name}'..."
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" README.md
+    sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" src/routes/__root.tsx
+  else
+    sed -i "s|${TEMPLATE_NAME}|${app_name}|g" README.md
+    sed -i "s|${TEMPLATE_NAME}|${app_name}|g" src/routes/__root.tsx
+  fi
+  echo "✅ App renamed"
+fi
+
 # Copy environment files
+echo ""
 echo "📄 Copying environment files..."
 cp .env.sample .env
 cp .env.test.sample .env.test
@@ -22,7 +43,8 @@ read -p "PostgreSQL host [localhost]: " db_host
 db_host=${db_host:-localhost}
 read -p "PostgreSQL port [5432]: " db_port
 db_port=${db_port:-5432}
-read -p "Database name (without _dev/_test suffix): " db_name
+read -p "Database name [${app_name}]: " db_name
+db_name=${db_name:-$app_name}
 
 if [ -z "$db_user" ] || [ -z "$db_name" ]; then
   echo "❌ Username and database name are required"
@@ -75,7 +97,7 @@ echo "Applying schema to test database..."
 DATABASE_URL="${test_db_url}" npx drizzle-kit migrate
 
 echo ""
-echo "🎉 Setup complete! Your TanStack Start project is ready to go:"
+echo "🎉 Setup complete! Your project '${app_name}' is ready to go:"
 echo "   ✅ Dependencies installed"
 echo "   ✅ Environment files configured"
 echo "   ✅ Development database created: ${dev_db_name}"

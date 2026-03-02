@@ -22,8 +22,6 @@ fi
 
 echo "🧪 Running all tests..."
 
-pnpm drizzle-kit migrate
-
 echo "📋 Running unit tests with Vitest..."
 ./bin/test-vitest
 

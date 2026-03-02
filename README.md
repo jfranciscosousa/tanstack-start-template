@@ -1,25 +1,22 @@
-# TanStack Start Template
+# my-tanstack-starter
 
-A modern full-stack React application built with TanStack Start, featuring complete authentication functionality and a clean, responsive design.
+A modern full-stack React application template built with TanStack Start, featuring simple authentication functionality and a clean, responsive design.
 
 ## Features
 
-- 🔐 **Complete Authentication System** - User registration, login, logout with session management
-- 🛡️ **Route Protection** - Automatic redirects for protected routes
-- 🎨 **Modern UI** - Tailwind CSS + DaisyUI component library
-- 📱 **Responsive Design** - Mobile-first approach with clean navigation
+- 🔐 **Simple Authentication System** - User registration, login, logout with session management
+- 🛡️ **Route Protection** - Automatic redirects for protected and unprotected routes
+- 🎨 **Modern UI** - Tailwind CSS + shadcn/Base UI components
 - 🗄️ **Database Integration** - Drizzle ORM with PostgreSQL
-- 🔒 **Secure Password Handling** - bcrypt encryption for password security
-- 🧩 **Type Safety** - Full TypeScript support throughout the stack
 
 ## Technology Stack
 
-- **Frontend**: React 19.2.0 + TypeScript + TanStack Router
+- **Frontend**: React 19 + TypeScript + TanStack Router
 - **Backend**: TanStack Start server functions
-- **Database**: Drizzle ORM 0.44.6 + PostgreSQL
-- **Styling**: Tailwind CSS 4.1.14 + DaisyUI 5.3.2
-- **Testing**: Vitest 3.2.4 + React Testing Library + Playwright
-- **Build Tool**: Vite 7.1.10
+- **Database**: Drizzle ORM 0.45+ + PostgreSQL
+- **Styling**: Tailwind CSS 4 + Base UI + shadcn components
+- **Testing**: Vitest 4 + React Testing Library + Playwright
+- **Build Tool**: Vite 7
 - **Package Manager**: pnpm
 
 ## Quick Start
@@ -35,7 +32,7 @@ A modern full-stack React application built with TanStack Start, featuring compl
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd tanstack-start-template
+cd my-tanstack-starter
 
 # Run setup script (installs dependencies, sets up database)
 bin/setup
@@ -63,64 +60,31 @@ bin/setup          # Initial project setup
 bin/test           # Run all tests (unit + e2e)
 bin/test-vitest    # Run unit tests with Vitest
 bin/test-vitest-watch  # Run unit tests in watch mode
+bin/test-e2e       # Run e2e tests with Playwright
+bin/test-e2e-ui    # Run e2e tests with Playwright UI
 ```
 
 ### Code Quality
 
 ```bash
 bin/lint           # Run linter
+bin/format         # Format code
 bin/ts-check       # Run TypeScript compiler check
-```
-
-### Database
-
-```bash
-npx drizzle-kit generate    # Generate migration files
-npx drizzle-kit migrate     # Apply pending migrations
-npx drizzle-kit push        # Push schema changes directly
-npx drizzle-kit studio      # Open Drizzle Studio database browser
 ```
 
 ## Project Structure
 
 ```
 src/
-├── routes/                 # File-based routing
-│   ├── __root.tsx         # Root layout with navigation
-│   ├── _authed.tsx        # Protected route layout
-│   ├── _authed/           # Protected pages
-│   ├── login.tsx          # Login page
-│   ├── signup.tsx         # Registration page
-│   └── logout.tsx         # Logout functionality
-├── components/            # Reusable components
-│   └── __tests__/         # Component tests
-├── server/               # Server-side functions (layered architecture)
-│   ├── db/               # Database layer
-│   │   ├── index.ts      # Drizzle database client
-│   │   └── schema.ts     # Database schema with relations
-│   ├── services/         # Business logic layer
-│   │   ├── userServices.ts     # User operations
-│   │   ├── sessionService.ts   # Session management
-│   │   ├── passwordService.ts  # Password utilities
-│   │   └── todoService.ts      # Todo operations
-│   ├── handlers/         # API endpoint layer
-│   │   ├── userHandlers.ts     # User endpoints
-│   │   ├── sessionHandlers.ts  # Auth endpoints
-│   │   └── todoHandlers.ts     # Todo endpoints
-│   ├── websession.ts     # Session utilities
-│   ├── request-info.ts   # Request metadata
-│   ├── seo.ts           # SEO utilities
-│   └── __tests__/       # Server function tests
-├── test/                 # Test utilities and setup
-│   ├── setup.ts          # Test configuration
-│   └── utils.tsx         # Testing utilities
-└── errors.ts             # Custom error handling
-bin/                      # Development scripts
-├── dev                   # Start development server
-├── build                 # Build for production
-├── test                  # Run all tests
-├── test-vitest          # Run unit tests
-└── ...                  # Other utility scripts
+├── routes/        # File-based routing (protected, public, and root layouts)
+├── components/    # Reusable UI components and their tests
+├── server/
+│   ├── db/        # Drizzle database client and schema
+│   ├── services/  # Business logic layer
+│   ├── handlers/  # Server function endpoints
+│   └── __tests__/ # Server function tests
+└── test/          # Test setup and utilities
+bin/               # Development, test, and build scripts
 ```
 
 ## Authentication Flow
@@ -132,94 +96,18 @@ bin/                      # Development scripts
 
 ## Environment Variables
 
-Create a `.env` file in the root directory:
+The setup script (`bin/setup`) will help you configure your environment automatically. It sets up two files, `.env` and `.env.test` that are using on development and testing environments for you.
 
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
-SECRET_KEY_BASE="your-secret-key-for-session-encryption"
-```
+It will also help you rename the app to suit your needs.
 
-The setup script (`bin/setup`) will help you configure these variables interactively.
+## Database
 
-## Database Schema
+The application uses PostgreSQL with Drizzle ORM. The schema is defined in `src/server/db/schema.ts`. Use `drizzle-kit` to manage migrations:
 
-The application uses a PostgreSQL database with Drizzle ORM, featuring optimized schemas with relations and performance indexes:
-
-### Users
-
-```typescript
-export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(), // bcrypt hashed
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
-```
-
-### Sessions
-
-```typescript
-export const sessions = pgTable(
-  "sessions",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    location: text("location"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .notNull()
-      .$onUpdate(() => new Date()),
-  },
-  table => [
-    index("sessions_user_id_idx").on(table.userId), // Performance optimization
-  ]
-);
-```
-
-### Todos
-
-```typescript
-export const todos = pgTable(
-  "todos",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    content: text("content").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  table => [
-    index("todos_user_id_idx").on(table.userId), // Performance optimization
-  ]
-);
-```
-
-### Relations & Types
-
-The schema includes Drizzle relations for type-safe queries and comprehensive TypeScript types:
-
-```typescript
-// Relations enable type-safe joins
-export const usersRelations = relations(users, ({ many }) => ({
-  sessions: many(sessions),
-  todos: many(todos),
-}));
-
-// Exported types for full type safety
-export type User = typeof users.$inferSelect;
-export type UserWithoutPassword = Omit<User, "password">;
-// ... and more
+```bash
+bin/db generate    # Generate migration files from schema changes
+bin/db migrate     # Apply pending migrations
+bin/db studio      # Open Drizzle Studio database browser
 ```
 
 ## Contributing
@@ -234,7 +122,7 @@ export type UserWithoutPassword = Omit<User, "password">;
 
 - [TanStack Start](https://tanstack.com/start)
 - [TanStack Router](https://tanstack.com/router)
-- [DaisyUI Components](https://daisyui.com/docs/v5/)
+- [Base UI Components](https://base-ui.com/react/overview)
 - [Drizzle ORM](https://orm.drizzle.team/docs/overview)
 
 ## License

@@ -92,15 +92,21 @@ export function Navbar({ user }: NavbarProps) {
       <div className="flex flex-1 items-center">
         <Link
           to="/"
-          aria-label="TanStack — home"
+          aria-label="My TanStack Starter — home"
           className="group flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors hover:bg-accent/50"
         >
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary" aria-hidden="true">
+          <div
+            className="flex h-7 w-7 items-center justify-center rounded-md bg-primary"
+            aria-hidden="true"
+          >
             <span className="font-display text-sm font-bold italic text-primary-foreground leading-none">
               T
             </span>
           </div>
-          <span className="hidden font-display text-sm font-semibold italic text-foreground/90 group-hover:text-foreground transition-colors sm:inline" aria-hidden="true">
+          <span
+            className="hidden font-display text-sm font-semibold italic text-foreground/90 group-hover:text-foreground transition-colors sm:inline"
+            aria-hidden="true"
+          >
             TanStack
           </span>
         </Link>
@@ -117,7 +123,11 @@ export function Navbar({ user }: NavbarProps) {
           }
           className="rounded-full text-muted-foreground hover:text-foreground"
         >
-          {theme === "dark" ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
+          {theme === "dark" ? (
+            <Sun size={16} aria-hidden="true" />
+          ) : (
+            <Moon size={16} aria-hidden="true" />
+          )}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger render={accountTrigger} />

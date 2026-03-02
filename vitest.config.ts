@@ -16,15 +16,15 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          environment: "jsdom",
+          environment: "happy-dom",
           exclude: [
             "**/node_modules/**",
-            "**/*.node.test.{ts,js}",
+            "**/*.server.test.{ts,js}",
             "./src/test/e2e",
           ],
           include: ["**/*.test.{ts,js,tsx,jsx}"],
-          name: "jsdom",
-          setupFiles: "./src/test/setup-jsdom.ts",
+          name: "happy-dom",
+          setupFiles: "./src/test/setup-happy-dom.ts",
         },
       },
       {
@@ -32,9 +32,9 @@ export default defineConfig({
         test: {
           environment: "node",
           exclude: ["**/node_modules/**", "./src/test/e2e"],
-          include: ["**/*.node.test.{ts,js}"],
-          name: { color: "green", label: "node" },
-          setupFiles: "./src/test/setup-node.ts",
+          include: ["**/*.server.test.{ts,js}"],
+          name: { color: "green", label: "server" },
+          setupFiles: "./src/test/setup-server.ts",
         },
       },
     ],
