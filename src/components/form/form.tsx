@@ -1,9 +1,9 @@
-import type { ZodType } from "zod";
 // oxlint-disable typescript/no-explicit-any
+import type { ZodType } from "zod";
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import type { ReactFormExtendedApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
+import type { ReactFormExtendedApi } from "@tanstack/react-form";
 
 import { isParamsError, renderError } from "~/errors";
 import { Separator } from "~/components/ui/separator";
@@ -353,7 +353,6 @@ export function Form<TValues extends Record<string, string>>({
                         value={field.state.value as string}
                         onBlur={field.handleBlur}
                         onChange={event =>
-                          // oxlint-disable-next-line typescript/no-explicit-any
                           field.handleChange(event.target.value as any)
                         }
                         placeholder={fieldConfig.placeholder}

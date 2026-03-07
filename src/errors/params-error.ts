@@ -1,6 +1,4 @@
-/* oxlint-disable @typescript-eslint/no-explicit-any */
-/* oxlint-disable @typescript-eslint/no-unsafe-member-access */
-
+// oxlint-disable typescript/no-explicit-any
 export type ParamsErrorMeta = Record<string, string[]>;
 
 /**
