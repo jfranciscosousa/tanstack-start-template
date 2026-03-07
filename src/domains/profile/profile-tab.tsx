@@ -6,7 +6,7 @@ import { useRouter } from "@tanstack/react-router";
 import { updateUserFn } from "~/server/handlers/user-handlers";
 import { updateUserSchema } from "~/schemas/user-schemas";
 import { useCurrentUser } from "~/routes/__root";
-import { Form } from "~/components/form";
+import { Form } from "~/components/form/form";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 

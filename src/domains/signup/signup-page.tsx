@@ -4,7 +4,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { Route } from "~/routes/_unauthed/signup";
 import { signupFn } from "~/server/handlers/user-handlers";
 import { signUpSchema } from "~/schemas/user-schemas";
-import { Form } from "~/components/form";
+import { Form } from "~/components/form/form";
 import { Button, buttonVariants } from "~/components/ui/button";
 
 export default function SignupPage() {
@@ -15,14 +15,25 @@ export default function SignupPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
       {/* Ambient glow effects */}
-      <div className="pointer-events-none absolute right-0 top-0 h-80 w-80 translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/8 blur-3xl" aria-hidden="true" />
-      <div className="pointer-events-none absolute bottom-0 left-0 h-80 w-80 -translate-x-1/3 translate-y-1/3 rounded-full bg-primary/5 blur-3xl" aria-hidden="true" />
+      <div
+        className="pointer-events-none absolute right-0 top-0 h-80 w-80 translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/8 blur-3xl"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 h-80 w-80 -translate-x-1/3 translate-y-1/3 rounded-full bg-primary/5 blur-3xl"
+        aria-hidden="true"
+      />
 
       <div className="relative w-full max-w-sm">
         {/* Logo mark */}
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20" aria-hidden="true">
-            <span className="font-display text-xl font-bold italic text-primary-foreground leading-none">T</span>
+          <div
+            className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20"
+            aria-hidden="true"
+          >
+            <span className="font-display text-xl font-bold italic text-primary-foreground leading-none">
+              T
+            </span>
           </div>
           <h1 className="font-display text-3xl font-bold italic tracking-tight">
             Create account.
@@ -44,9 +55,27 @@ export default function SignupPage() {
               redirectUrl: redirectUrl ?? "",
             }}
             fields={[
-              { name: "name", label: "Name", type: "text", placeholder: "Your full name", required: true },
-              { name: "email", label: "Email", type: "email", placeholder: "you@example.com", required: true },
-              { name: "password", label: "Password", type: "password", placeholder: "Create a password", required: true },
+              {
+                name: "name",
+                label: "Name",
+                type: "text",
+                placeholder: "Your full name",
+                required: true,
+              },
+              {
+                name: "email",
+                label: "Email",
+                type: "email",
+                placeholder: "you@example.com",
+                required: true,
+              },
+              {
+                name: "password",
+                label: "Password",
+                type: "password",
+                placeholder: "Create a password",
+                required: true,
+              },
               {
                 name: "passwordConfirmation",
                 label: "Confirm password",
@@ -67,7 +96,11 @@ export default function SignupPage() {
             renderSubmit={(form) => (
               <form.Subscribe selector={(state) => state.isSubmitting}>
                 {(isSubmitting) => (
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Creating account..." : "Create account"}
                   </Button>
                 )}
@@ -82,7 +115,10 @@ export default function SignupPage() {
           <Link
             to="/login"
             search={{ redirectUrl }}
-            className={buttonVariants({ variant: "link", className: "h-auto p-0 text-sm text-primary" })}
+            className={buttonVariants({
+              variant: "link",
+              className: "h-auto p-0 text-sm text-primary",
+            })}
           >
             Sign in
           </Link>

@@ -4,7 +4,6 @@ import { useForm, type ReactFormExtendedApi } from "@tanstack/react-form";
 import type { ZodType } from "zod";
 
 import { isParamsError, renderError } from "~/errors";
-import { PasswordField } from "~/components/password-field";
 import { Avatar } from "~/components/ui/avatar";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
@@ -15,6 +14,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
+import { PasswordField } from "./password-field";
 
 type FieldType = "text" | "email" | "password";
 type AvatarVariant =

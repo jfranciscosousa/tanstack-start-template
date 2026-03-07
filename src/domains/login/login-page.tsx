@@ -5,7 +5,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { Route } from "~/routes/_unauthed/login";
 import { loginFn } from "~/server/handlers/session-handlers";
 import { loginSchema } from "~/schemas/session-schemas";
-import { Form } from "~/components/form";
+import { Form } from "~/components/form/form";
 import { Button, buttonVariants } from "~/components/ui/button";
 
 export default function LoginPage() {
@@ -44,8 +44,20 @@ export default function LoginPage() {
               redirectUrl: redirectUrl ?? "",
             }}
             fields={[
-              { name: "email", label: "Email", type: "email", placeholder: "you@example.com", required: true },
-              { name: "password", label: "Password", type: "password", placeholder: "••••••••", required: true },
+              {
+                name: "email",
+                label: "Email",
+                type: "email",
+                placeholder: "you@example.com",
+                required: true,
+              },
+              {
+                name: "password",
+                label: "Password",
+                type: "password",
+                placeholder: "••••••••",
+                required: true,
+              },
             ]}
             onSubmit={async (values) => {
               await login({ data: values });
@@ -54,7 +66,11 @@ export default function LoginPage() {
             renderSubmit={(form) => (
               <form.Subscribe selector={(state) => state.isSubmitting}>
                 {(isSubmitting) => (
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? (
                       <>Signing in&hellip;</>
                     ) : (

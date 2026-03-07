@@ -1,17 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { render, screen, waitFor } from "~/test/utils";
 import { toast } from "sonner";
-import { useServerFn } from "@tanstack/react-start";
-import { useRouter } from "@tanstack/react-router";
-import { useCurrentUser } from "~/routes/__root";
-import { ProfileTab } from "./profile-tab";
 
-vi.mock("sonner", () => ({ toast: vi.fn() }));
-vi.mock("~/routes/__root", () => ({ useCurrentUser: vi.fn() }));
-vi.mock("@tanstack/react-start", () => ({ useServerFn: vi.fn() }));
-vi.mock("@tanstack/react-router", () => ({ useRouter: vi.fn() }));
-vi.mock("~/server/handlers/user-handlers", () => ({ updateUserFn: {} }));
+import { ProfileTab } from "./profile-tab";
 
 const mockUser = {
   id: "user-1",
@@ -21,22 +13,22 @@ const mockUser = {
   updatedAt: new Date("2024-06-01T00:00:00.000Z"),
   theme: "light" as const,
 };
+const mockUpdateFn = vi.fn();
+const mockNavigate = vi.fn();
+const mockInvalidate = vi.fn();
+
+vi.mock("sonner", () => ({ toast: vi.fn() }));
+vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mockUpdateFn }));
+vi.mock("@tanstack/react-router", () => ({
+  useRouter: () => ({
+    navigate: mockNavigate,
+    invalidate: mockInvalidate.mockResolvedValue(undefined),
+  }),
+}));
+vi.mock("~/routes/__root", () => ({ useCurrentUser: () => mockUser }));
+vi.mock("~/server/handlers/user-handlers", () => ({ updateUserFn: {} }));
 
 describe("ProfileTab", () => {
-  const mockUpdateFn = vi.fn();
-  const mockNavigate = vi.fn();
-  const mockInvalidate = vi.fn();
-
-  beforeEach(() => {
-    vi.mocked(useCurrentUser).mockReturnValue(mockUser as any);
-    vi.mocked(useServerFn).mockReturnValue(mockUpdateFn as any);
-    vi.mocked(useRouter).mockReturnValue({
-      navigate: mockNavigate,
-      invalidate: mockInvalidate.mockResolvedValue(undefined),
-    } as any);
-    mockUpdateFn.mockResolvedValue(undefined);
-  });
-
   it("pre-fills the form with the current user's name and email", () => {
     render(<ProfileTab />);
 
@@ -114,7 +106,7 @@ describe("ProfileTab", () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: "/" });
   });
 
-  it("shows a field-level error when passwords do not match", async () => {
+  it("blocks submission and shows an error when passwords do not match", async () => {
     const user = userEvent.setup();
     render(<ProfileTab />);
 
