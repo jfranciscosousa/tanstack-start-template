@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "module": "ESNext",
@@ -9,6 +10,7 @@
     "strictNullChecks": true,
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "noImplicitAny": true
   }
 }

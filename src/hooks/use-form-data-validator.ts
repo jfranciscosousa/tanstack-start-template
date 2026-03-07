@@ -1,7 +1,7 @@
 import { z, type ZodError, type ZodSchema } from "zod";
 import { useMemo, useState } from "react";
 
-type FieldMessage = { message: string };
+interface FieldMessage { message: string }
 
 type FieldErrors<T extends ZodSchema> = {
   [Key in keyof z.infer<T>]?: FieldMessage[];

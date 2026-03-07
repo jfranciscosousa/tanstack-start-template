@@ -60,11 +60,8 @@ describe("Todo service", () => {
 
       const todo = await createTodo(testUser, content);
 
-      expect(todo).toBeDefined();
       expect(todo.content).toBe(content);
       expect(todo.userId).toBe(testUser.id);
-      expect(todo.id).toBeDefined();
-      expect(todo.createdAt).toBeInstanceOf(Date);
     });
 
     it("should persist the todo in the database", async () => {
@@ -76,9 +73,9 @@ describe("Todo service", () => {
         where: eq(todos.id, todo.id),
       });
 
-      expect(fromDb).toBeDefined();
-      expect(fromDb!.content).toBe(content);
-      expect(fromDb!.userId).toBe(testUser.id);
+      if (!fromDb) throw new Error("fromDb should exist");
+      expect(fromDb.content).toBe(content);
+      expect(fromDb.userId).toBe(testUser.id);
     });
   });
 

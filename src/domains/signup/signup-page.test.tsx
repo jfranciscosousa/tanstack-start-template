@@ -70,12 +70,13 @@ describe("SignupPage", () => {
 
     await waitFor(() => {
       expect(mockSignupFn).toHaveBeenCalledWith({
-        data: expect.objectContaining({
+        data: {
           name: "Jane Doe",
           email: "jane@example.com",
           password: "password123",
           passwordConfirmation: "password123",
-        }),
+          redirectUrl: "",
+        },
       });
     });
     expect(mockInvalidate).toHaveBeenCalled();

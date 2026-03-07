@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 
 import { mockLoggedIn, mockLoggedOut } from "~/test/server-utils";
 import type { User } from "~/server/db/schema";
-import { AppError } from "~/errors";
+import type { AppError } from "~/errors";
 
 import { hashPassword, verifyPassword } from "../services/password-service";
 import { signupFn, updateUserFn } from "./user-handlers";
@@ -44,17 +44,17 @@ describe("User schemas integration tests", () => {
         where: eq(users.email, testData.email),
       });
 
-      expect(createdUser).not.toBe(null);
-      expect(createdUser!.name).toBe(testData.name);
-      expect(createdUser!.email).toBe(testData.email);
-      expect(createdUser!.id).toBeDefined();
-      expect(createdUser!.createdAt).toBeInstanceOf(Date);
-      expect(createdUser!.updatedAt).toBeInstanceOf(Date);
+      if (!createdUser) throw new Error("created user should exist");
+      expect(createdUser.name).toBe(testData.name);
+      expect(createdUser.email).toBe(testData.email);
+      expect(createdUser.id).toBeDefined();
+      expect(createdUser.createdAt).toBeInstanceOf(Date);
+      expect(createdUser.updatedAt).toBeInstanceOf(Date);
 
       const userSessions = await db
         .select()
         .from(sessions)
-        .where(eq(sessions.userId, createdUser!.id));
+        .where(eq(sessions.userId, createdUser.id));
 
       expect(updateSession).toBeCalledWith({
         id: userSessions[0].id,
@@ -63,7 +63,7 @@ describe("User schemas integration tests", () => {
       // Verify password was hashed correctly
       const isPasswordValid = await verifyPassword(
         testData.password,
-        createdUser!.password,
+        createdUser.password,
       );
       expect(isPasswordValid).toBe(true);
     });

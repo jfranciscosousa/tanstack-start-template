@@ -62,11 +62,13 @@ describe("ProfileTab", () => {
 
     await waitFor(() => {
       expect(mockUpdateFn).toHaveBeenCalledWith({
-        data: expect.objectContaining({
+        data: {
           name: "Jane Doe",
           email: "john@example.com",
           currentPassword: "mypassword",
-        }),
+          password: "",
+          passwordConfirmation: "",
+        },
       });
     });
     expect(mockInvalidate).toHaveBeenCalled();
@@ -88,11 +90,13 @@ describe("ProfileTab", () => {
 
     await waitFor(() => {
       expect(mockUpdateFn).toHaveBeenCalledWith({
-        data: expect.objectContaining({
+        data: {
+          name: "John Doe",
+          email: "john@example.com",
           currentPassword: "oldpass",
           password: "newpass123",
           passwordConfirmation: "newpass123",
-        }),
+        },
       });
     });
   });

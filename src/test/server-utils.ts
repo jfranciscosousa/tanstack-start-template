@@ -1,5 +1,3 @@
-/* oxlint-disable @typescript-eslint/no-unsafe-argument */
-/* oxlint-disable @typescript-eslint/no-explicit-any */
 import { vi } from "vitest";
 import { faker } from "@faker-js/faker";
 
@@ -24,31 +22,33 @@ export async function createTestUser(): Promise<UserWithoutPassword> {
   return userWithoutPassword;
 }
 
-
 export function mockLoggedIn(user: User) {
   const mock = {
+    id: "mock",
     clear: vi.fn(),
     sessionId: "test-session-id",
     update: vi.fn(),
     user,
+    data: {},
   };
 
-  vi.mocked(useWebSession).mockResolvedValue(mock as any);
-  vi.mocked(useLoggedInAppSession).mockResolvedValue(mock as any);
+  vi.mocked(useWebSession).mockResolvedValue(mock);
+  vi.mocked(useLoggedInAppSession).mockResolvedValue(mock);
 
   return mock;
 }
 
 export function mockLoggedOut() {
   const mock = {
+    id: "mock",
     clear: vi.fn(),
     sessionId: "test-session-id",
     update: vi.fn(),
-    user: null,
+    user: undefined,
+    data: {},
   };
 
-  vi.mocked(useWebSession).mockResolvedValue(mock as any);
-  vi.mocked(useLoggedInAppSession).mockResolvedValue(mock as any);
+  vi.mocked(useWebSession).mockResolvedValue(mock);
   vi.mocked(useLoggedInAppSession).mockRejectedValue(new AppError("NOT_FOUND"));
 
   return mock;

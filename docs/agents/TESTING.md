@@ -2,7 +2,7 @@
 
 **Unit:** Vitest | **E2E:** Playwright (Chromium only) | **Helpers:** Testing Library, Faker
 
-Do not test what typescript already guarantees
+Do not test things guaranteed by typescript.
 
 ## Commands
 
@@ -16,10 +16,10 @@ bin/test-vitest path/to/file.test.ts         # Single unit test file
 
 ## Test Environments
 
-| File suffix                  | Environment | Use for                              |
-| ---------------------------- | ----------- | ------------------------------------ |
-| `*.test.ts` / `*.test.tsx`   | happy-dom   | Components, hooks, browser behavior  |
-| `*.server.test.ts`           | Node        | Server functions, services, handlers |
+| File suffix                | Environment | Use for                              |
+| -------------------------- | ----------- | ------------------------------------ |
+| `*.test.ts` / `*.test.tsx` | happy-dom   | Components, hooks, browser behavior  |
+| `*.server.test.ts`         | Node        | Server functions, services, handlers |
 
 ## Component Test (happy-dom)
 

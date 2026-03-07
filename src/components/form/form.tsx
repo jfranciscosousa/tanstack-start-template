@@ -1,5 +1,6 @@
+// oxlint-disable typescript/no-explicit-any
 import { useState } from "react";
-import { type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useForm, type ReactFormExtendedApi } from "@tanstack/react-form";
 import type { ZodType } from "zod";
 
@@ -119,7 +120,7 @@ interface FormProps<TValues extends Record<string, string>> {
    * inline errors (e.g. from cross-field `refine` rules) use
    * {@link FieldConfig.validate} instead.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   schema: ZodType<TValues, any, any>;
   /** Initial values for every field. Must include a key for each field in `fields`. */
   defaultValues: TValues;
@@ -132,7 +133,7 @@ interface FormProps<TValues extends Record<string, string>> {
   /** Called with the validated form values when the user submits. Must return a Promise. */
   onSubmit: (values: TValues) => Promise<void>;
   /** Renders the submit button area. Receives the full `formApi` instance. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   renderSubmit: (
     form: ReactFormExtendedApi<
       TValues,
@@ -288,22 +289,16 @@ export function Form<TValues extends Record<string, string>>({
             )}
 
             {group.fields.map((fieldConfig) => (
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               <form.Field
                 key={fieldConfig.name}
-                name={fieldConfig.name as any}
-                validators={
-                  fieldConfig.validate
-                    ? {
-                        onSubmit: ({ value }) =>
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          fieldConfig.validate!(
-                            value as string,
-                            form.state.values as TValues,
-                          ),
-                      }
-                    : undefined
-                }
+                name={fieldConfig.name}
+                validators={{
+                  onSubmit: ({ value }) => {
+                    if (!fieldConfig.validate) return;
+
+                    fieldConfig.validate(value as string, form.state.values);
+                  },
+                }}
               >
                 {(field) => {
                   const wasSubmitted = field.form.state.submissionAttempts > 0;
@@ -332,9 +327,8 @@ export function Form<TValues extends Record<string, string>>({
                         placeholder={fieldConfig.placeholder}
                         required={fieldConfig.required}
                         errors={errors}
-                        value={field.state.value as string}
+                        value={field.state.value as any}
                         onChange={(event) =>
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           field.handleChange(event.target.value as any)
                         }
                         onBlur={field.handleBlur}
@@ -354,7 +348,7 @@ export function Form<TValues extends Record<string, string>>({
                         value={field.state.value as string}
                         onBlur={field.handleBlur}
                         onChange={(event) =>
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          // oxlint-disable-next-line typescript/no-explicit-any
                           field.handleChange(event.target.value as any)
                         }
                         placeholder={fieldConfig.placeholder}

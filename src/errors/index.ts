@@ -1,8 +1,4 @@
-/* oxlint-disable @typescript-eslint/no-unsafe-argument */
-/* oxlint-disable @typescript-eslint/no-explicit-any */
-/* oxlint-disable @typescript-eslint/no-unsafe-return */
-/* oxlint-disable @typescript-eslint/no-unsafe-member-access */
-
+// oxlint-disable typescript/no-explicit-any
 export { ParamsError, isParamsError } from "./params-error";
 export type { ParamsErrorMeta } from "./params-error";
 

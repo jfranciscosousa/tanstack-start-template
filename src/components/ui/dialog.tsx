@@ -1,5 +1,5 @@
 import { Dialog } from '@base-ui/react/dialog';
-import { type ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 import { cn } from '~/lib/utils';
 
 export const DialogRoot = Dialog.Root;

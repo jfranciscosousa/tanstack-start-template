@@ -1,8 +1,12 @@
 import { defineConfig } from "drizzle-kit";
 
+const { DATABASE_URL } = process.env;
+
+if (!DATABASE_URL) throw new Error("process.env.DATABASE_URL should exist");
+
 export default defineConfig({
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: DATABASE_URL,
   },
   dialect: "postgresql",
   out: "./drizzle",

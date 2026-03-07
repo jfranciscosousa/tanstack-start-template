@@ -34,7 +34,10 @@ describe("User services", () => {
       expect(user.createdAt).toBeInstanceOf(Date);
       expect(user.updatedAt).toBeInstanceOf(Date);
 
-      const isPasswordValid = await verifyPassword(data.password, user.password);
+      const isPasswordValid = await verifyPassword(
+        data.password,
+        user.password,
+      );
       expect(isPasswordValid).toBe(true);
     });
 
@@ -52,9 +55,9 @@ describe("User services", () => {
         where: eq(users.id, user.id),
       });
 
-      expect(fromDb).toBeDefined();
-      expect(fromDb!.email).toBe(data.email);
-      expect(fromDb!.name).toBe(data.name);
+      if (!fromDb) throw new Error("fromDb should exist");
+      expect(fromDb.email).toBe(data.email);
+      expect(fromDb.name).toBe(data.name);
     });
 
     it("should throw ParamsError when email already exists", async () => {
@@ -77,7 +80,9 @@ describe("User services", () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ParamsError);
         const paramsError = error as ParamsError;
-        expect(paramsError.meta.email).toEqual(["This email is already registered."]);
+        expect(paramsError.meta.email).toEqual([
+          "This email is already registered.",
+        ]);
       }
     });
 
@@ -93,7 +98,9 @@ describe("User services", () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ParamsError);
         const paramsError = error as ParamsError;
-        expect(paramsError.meta.passwordConfirmation).toEqual(["Passwords must match"]);
+        expect(paramsError.meta.passwordConfirmation).toEqual([
+          "Passwords must match",
+        ]);
       }
     });
   });
@@ -103,14 +110,18 @@ describe("User services", () => {
       const email = faker.internet.email();
       const [created] = await db
         .insert(users)
-        .values({ email, name: faker.person.fullName(), password: await hashPassword("pass") })
+        .values({
+          email,
+          name: faker.person.fullName(),
+          password: await hashPassword("pass"),
+        })
         .returning();
 
       const found = await getUserByEmail(email);
 
-      expect(found).toBeDefined();
-      expect(found!.id).toBe(created.id);
-      expect(found!.email).toBe(email);
+      if (!found) throw new Error("found should exist");
+      expect(found.id).toBe(created.id);
+      expect(found.email).toBe(email);
     });
 
     it("should return undefined for an unknown email", async () => {
@@ -156,11 +167,15 @@ describe("User services", () => {
       const updated = await db.query.users.findFirst({
         where: eq(users.id, testUser.id),
       });
+      if (!updated) throw new Error("updated should exist");
 
-      expect(updated!.name).toBe("Updated Name");
-      expect(updated!.email).toBe(newEmail);
+      expect(updated.name).toBe("Updated Name");
+      expect(updated.email).toBe(newEmail);
 
-      const isOriginalPasswordValid = await verifyPassword("originalpass123", updated!.password);
+      const isOriginalPasswordValid = await verifyPassword(
+        "originalpass123",
+        updated.password,
+      );
       expect(isOriginalPasswordValid).toBe(true);
     });
 
@@ -204,11 +219,18 @@ describe("User services", () => {
       const updated = await db.query.users.findFirst({
         where: eq(users.id, testUser.id),
       });
+      if (!updated) throw new Error("updated should exist");
 
-      const isNewPasswordValid = await verifyPassword("newpassword123", updated!.password);
+      const isNewPasswordValid = await verifyPassword(
+        "newpassword123",
+        updated.password,
+      );
       expect(isNewPasswordValid).toBe(true);
 
-      const isOldPasswordValid = await verifyPassword("originalpass123", updated!.password);
+      const isOldPasswordValid = await verifyPassword(
+        "originalpass123",
+        updated.password,
+      );
       expect(isOldPasswordValid).toBe(false);
 
       const remainingSessions = await db
@@ -232,7 +254,9 @@ describe("User services", () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ParamsError);
         const paramsError = error as ParamsError;
-        expect(paramsError.meta.currentPassword).toEqual(["The current password is wrong"]);
+        expect(paramsError.meta.currentPassword).toEqual([
+          "The current password is wrong",
+        ]);
       }
     });
 
@@ -249,7 +273,9 @@ describe("User services", () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ParamsError);
         const paramsError = error as ParamsError;
-        expect(paramsError.meta.passwordConfirmation).toEqual(["Passwords must match"]);
+        expect(paramsError.meta.passwordConfirmation).toEqual([
+          "Passwords must match",
+        ]);
       }
     });
   });
@@ -272,7 +298,8 @@ describe("User services", () => {
         where: eq(users.id, user.id),
       });
 
-      expect(updated!.theme).toBe("dark");
+      if (!updated) throw new Error("updated should exist");
+      expect(updated.theme).toBe("dark");
     });
   });
 });

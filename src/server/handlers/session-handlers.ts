@@ -16,7 +16,7 @@ import {
 } from "../services/session-service";
 import { verifyPassword } from "../services/password-service";
 import { getRequestInfo } from "../request-info";
-import { type User } from "../db/schema";
+import type { User } from "../db/schema";
 
 export { loginSchema };
 

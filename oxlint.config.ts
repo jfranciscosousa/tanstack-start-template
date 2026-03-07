@@ -1,6 +1,7 @@
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
+  options: {},
   categories: {
     correctness: "warn",
     nursery: "warn",
@@ -23,7 +24,7 @@ export default defineConfig({
       },
     },
   ],
-  plugins: ["react", "react-perf"],
+  plugins: ["react", "react-perf", "typescript", "eslint"],
   rules: {
     complexity: "off",
     "eslint/no-unused-vars": [
@@ -34,6 +35,7 @@ export default defineConfig({
         varsIgnorePattern: "^_",
       },
     ],
+    "eslint/curly": ["error", "multi-line"],
     "func-style": ["error", "declaration"],
     "id-length": ["warn", { exceptions: ["T", "z"] }],
     "jsx-max-depth": "off",
@@ -58,5 +60,8 @@ export default defineConfig({
     "react/react-in-jsx-scope": "off",
     "sort-imports": "off",
     "sort-keys": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
   },
 });

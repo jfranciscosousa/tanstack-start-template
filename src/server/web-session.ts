@@ -4,11 +4,11 @@ import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { AppError } from "~/errors";
 
 import { getUserBySessionId } from "./services/user-services";
-import { type Session } from "./db/schema";
+import type { Session } from "./db/schema";
 
-type SessionUser = {
+interface SessionUser {
   id: Session["id"];
-};
+}
 
 export const useWebSession = createServerOnlyFn(async () => {
   if (!process.env.SECRET_KEY_BASE) {

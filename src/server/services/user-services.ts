@@ -87,9 +87,10 @@ export const updateUser = createServerOnlyFn(
   ) => {
     const userPassword = await db.query.users.findFirst({
       where: eq(users.id, user.id),
+      columns: { password: true },
     });
 
-    if (!(await verifyPassword(data.currentPassword, userPassword!.password))) {
+    if (!(await verifyPassword(data.currentPassword, userPassword?.password))) {
       throw new ParamsError({
         currentPassword: ["The current password is wrong"],
       });

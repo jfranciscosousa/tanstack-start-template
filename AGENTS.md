@@ -13,7 +13,7 @@ Load these when working on the relevant area:
 - [Architecture & Patterns](docs/agents/ARCHITECTURE.md) — layered server architecture, server functions, routing, session utilities, error handling
 - [Database](docs/agents/DATABASE.md) — schema, Drizzle ORM patterns, migrations
 - [UI](docs/agents/UI.md) — DaisyUI components, Tailwind utilities, Lucide icons
-- [Testing](docs/agents/TESTING.md) — Vitest environments, Playwright e2e, test utilities
+- [Testing](docs/agents/TESTING.md) — Vitest environments, Playwright e2e, test utilities, testing guidelines
 - [Bin Scripts](docs/agents/BIN.md) — all available bin/ scripts and their args
 
 ## Code guidelines

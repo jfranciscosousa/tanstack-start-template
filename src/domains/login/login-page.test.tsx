@@ -48,10 +48,11 @@ describe("LoginPage", () => {
 
     await waitFor(() => {
       expect(mockLoginFn).toHaveBeenCalledWith({
-        data: expect.objectContaining({
+        data: {
           email: "john@example.com",
           password: "secret123",
-        }),
+          redirectUrl: "",
+        },
       });
     });
     expect(mockInvalidate).toHaveBeenCalled();
@@ -68,7 +69,11 @@ describe("LoginPage", () => {
 
     await waitFor(() => {
       expect(mockLoginFn).toHaveBeenCalledWith({
-        data: expect.objectContaining({ redirectUrl: "/dashboard" }),
+        data: {
+          email: "john@example.com",
+          password: "secret123",
+          redirectUrl: "/dashboard",
+        },
       });
     });
   });
