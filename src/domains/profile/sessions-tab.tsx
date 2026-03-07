@@ -13,14 +13,14 @@ import { useRouter } from "@tanstack/react-router";
 
 import { revokeSession } from "~/server/handlers/session-handlers";
 import type { Session } from "~/server/db/schema";
+import { cn } from "~/lib/utils";
 import { useMutation } from "~/hooks/use-mutation";
 import { renderError } from "~/errors";
-import { Avatar } from "~/components/ui/avatar";
+import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { Card, CardContent } from "~/components/ui/card";
+import { Avatar } from "~/components/ui/avatar";
 import { Alert, AlertDescription } from "~/components/ui/alert";
-import { cn } from "~/lib/utils";
 
 interface SessionsTabProps {
   sessions: Session[];
@@ -192,7 +192,7 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            {sessions.map((session) => (
+            {sessions.map(session => (
               <SessionCard
                 key={session.id}
                 session={session}

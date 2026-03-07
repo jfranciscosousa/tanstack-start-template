@@ -7,15 +7,15 @@ import { useWebSession } from "~/server/web-session";
 import type { User } from "~/server/db/schema";
 import type { AppError } from "~/errors";
 
-import { hashPassword } from "../services/password-service";
-import { sessions, users } from "../db/schema";
-import { db } from "../db";
 import {
   fetchUserSessions,
   invalidateCurrentSession,
   loginFn,
   revokeSession,
 } from "./session-handlers";
+import { hashPassword } from "../services/password-service";
+import { sessions, users } from "../db/schema";
+import { db } from "../db";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
@@ -95,7 +95,7 @@ describe("Session handlers", () => {
         const appError = error as AppError;
         expect(appError.code).toBe("NOT_FOUND");
         expect(appError.message).toBe(
-          "The combination of email and password is incorrect.",
+          "The combination of email and password is incorrect."
         );
       }
     });

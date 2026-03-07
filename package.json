@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
+  "scripts": {
+    "prepare": "husky"
+  },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
     "@fontsource-variable/figtree": "^5.2.10",
@@ -43,6 +46,8 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "^0.31.9",
     "happy-dom": "^20.8.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.2",
     "oxfmt": "^0.36.0",
     "oxlint": "^1.51.0",
     "playwright": "^1.58.2",
@@ -55,5 +60,14 @@
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.0.18",
     "vitest-mock-extended": "^3.1.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "pnpm oxfmt",
+      "pnpm oxlint --fix"
+    ],
+    "*.{json,md,css}": [
+      "pnpm oxfmt"
+    ]
   }
 }

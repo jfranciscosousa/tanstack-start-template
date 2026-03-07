@@ -5,8 +5,8 @@ import { ParamsError } from "~/errors";
 
 import { deleteAllSessions } from "./session-service";
 import { hashPassword, verifyPassword } from "./password-service";
-import { users } from '../db/schema';
-import type { User } from '../db/schema';
+import type { User } from "../db/schema";
+import { users } from "../db/schema";
 import { db } from "../db";
 
 export const getUserBySessionId = createServerOnlyFn(
@@ -16,12 +16,12 @@ export const getUserBySessionId = createServerOnlyFn(
     }
 
     const session = await db.query.sessions.findFirst({
-      where: (sessionsQuery) => eq(sessionsQuery.id, sessionId),
+      where: sessionsQuery => eq(sessionsQuery.id, sessionId),
       with: { user: true },
     });
 
     return session?.user;
-  },
+  }
 );
 
 export const getUserByEmail = createServerOnlyFn((email?: string) => {
@@ -30,7 +30,7 @@ export const getUserByEmail = createServerOnlyFn((email?: string) => {
   }
 
   return db.query.users.findFirst({
-    where: (usersQuery) => eq(usersQuery.email, email),
+    where: usersQuery => eq(usersQuery.email, email),
   });
 });
 
@@ -69,13 +69,13 @@ export const createUser = createServerOnlyFn(
       .returning();
 
     return newUser;
-  },
+  }
 );
 
 export const updateUserTheme = createServerOnlyFn(
   async (userId: string, theme: "dark" | "light") => {
     await db.update(users).set({ theme }).where(eq(users.id, userId));
-  },
+  }
 );
 
 export const updateUser = createServerOnlyFn(
@@ -84,7 +84,7 @@ export const updateUser = createServerOnlyFn(
     data: Partial<User> & {
       currentPassword: string;
       passwordConfirmation?: string;
-    },
+    }
   ) => {
     const userPassword = await db.query.users.findFirst({
       where: eq(users.id, user.id),
@@ -115,5 +115,5 @@ export const updateUser = createServerOnlyFn(
     }
 
     await db.update(users).set(updateData).where(eq(users.id, user.id));
-  },
+  }
 );

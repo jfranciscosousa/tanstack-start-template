@@ -1,14 +1,14 @@
-import { Eye, EyeOff } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
-import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "~/components/ui/input-group";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 
 export interface PasswordFieldProps {
   id: string;
@@ -42,13 +42,19 @@ export function PasswordField({
   const [showPassword, setShowPassword] = useState(false);
 
   function handleToggle() {
-    setShowPassword((prev) => !prev);
+    setShowPassword(prev => !prev);
   }
 
   return (
     <Field data-invalid={errors?.length ? true : undefined}>
       <FieldLabel htmlFor={id}>
-        {Icon && <Icon size={14} className="text-muted-foreground" aria-hidden="true" />}
+        {Icon && (
+          <Icon
+            size={14}
+            className="text-muted-foreground"
+            aria-hidden="true"
+          />
+        )}
         {label}
       </FieldLabel>
       <InputGroup>
@@ -71,7 +77,11 @@ export function PasswordField({
             onClick={handleToggle}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}
+            {showPassword ? (
+              <EyeOff size={14} aria-hidden="true" />
+            ) : (
+              <Eye size={14} aria-hidden="true" />
+            )}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>

@@ -2,11 +2,11 @@ import { vi } from "vitest";
 import { faker } from "@faker-js/faker";
 
 import { useLoggedInAppSession, useWebSession } from "~/server/web-session";
-import { users } from "~/server/db/schema";
+import { hashPassword } from "~/server/services/password-service";
 import type { User, UserWithoutPassword } from "~/server/db/schema";
+import { users } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { AppError } from "~/errors";
-import { hashPassword } from "~/server/services/password-service";
 
 export async function createTestUser(): Promise<UserWithoutPassword> {
   const [created] = await db

@@ -1,8 +1,10 @@
-import { z } from 'zod';
-import type { ZodError, ZodSchema } from 'zod';
+import type { ZodError, ZodSchema } from "zod";
+import { z } from "zod";
 import { useMemo, useState } from "react";
 
-interface FieldMessage { message: string }
+interface FieldMessage {
+  message: string;
+}
 
 type FieldErrors<T extends ZodSchema> = {
   [Key in keyof z.infer<T>]?: FieldMessage[];
@@ -28,7 +30,7 @@ export function useFormDataValidator<T extends ZodSchema>(schema: T) {
 
     for (const [key, value] of Object.entries(tree.properties)) {
       if (value?.errors?.length) {
-        result[key] = value.errors.map((error) => ({ message: error }));
+        result[key] = value.errors.map(error => ({ message: error }));
       }
     }
 

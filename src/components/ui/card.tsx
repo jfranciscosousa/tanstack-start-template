@@ -1,6 +1,6 @@
-import type { ComponentProps } from "react"
+import type { ComponentProps } from "react";
 
-import { cn } from "~/lib/utils"
+import { cn } from "~/lib/utils";
 
 function Card({
   className,
@@ -17,7 +17,7 @@ function Card({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardHeader({ className, ...props }: ComponentProps<"div">) {
@@ -30,7 +30,7 @@ function CardHeader({ className, ...props }: ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardTitle({ className, ...props }: ComponentProps<"div">) {
@@ -43,7 +43,7 @@ function CardTitle({ className, ...props }: ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardDescription({ className, ...props }: ComponentProps<"div">) {
@@ -53,7 +53,7 @@ function CardDescription({ className, ...props }: ComponentProps<"div">) {
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
-  )
+  );
 }
 
 function CardAction({ className, ...props }: ComponentProps<"div">) {
@@ -66,7 +66,7 @@ function CardAction({ className, ...props }: ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardContent({ className, ...props }: ComponentProps<"div">) {
@@ -76,7 +76,7 @@ function CardContent({ className, ...props }: ComponentProps<"div">) {
       className={cn("px-6 group-data-[size=sm]/card:px-4", className)}
       {...props}
     />
-  )
+  );
 }
 
 function CardFooter({ className, ...props }: ComponentProps<"div">) {
@@ -89,7 +89,7 @@ function CardFooter({ className, ...props }: ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -100,4 +100,4 @@ export {
   CardAction,
   CardDescription,
   CardContent,
-}
+};

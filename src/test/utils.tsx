@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
-import { render } from '@testing-library/react';
-import type { RenderOptions } from '@testing-library/react';
+import type { RenderOptions } from "@testing-library/react";
+import { render } from "@testing-library/react";
 
 // Custom render function for testing React components
 // Add providers here as needed (e.g., theme providers, query clients, etc.)

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+
 import { render, screen, waitFor } from "~/test/utils";
 
 import LoginPage from "./login-page";
@@ -34,7 +35,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     expect(
-      screen.getByRole("link", { name: /create one/i }),
+      screen.getByRole("link", { name: /create one/i })
     ).toBeInTheDocument();
   });
 

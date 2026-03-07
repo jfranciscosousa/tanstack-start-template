@@ -1,21 +1,22 @@
+import type { ZodType } from "zod";
 // oxlint-disable typescript/no-explicit-any
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { useForm } from "@tanstack/react-form";
 import type { ReactFormExtendedApi } from "@tanstack/react-form";
-import type { ZodType } from "zod";
+import { useForm } from "@tanstack/react-form";
 
 import { isParamsError, renderError } from "~/errors";
-import { Avatar } from "~/components/ui/avatar";
-import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Input } from "~/components/ui/input";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
+import { Avatar } from "~/components/ui/avatar";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+
 import { PasswordField } from "./password-field";
 
 type FieldType = "text" | "email" | "password";
@@ -149,12 +150,12 @@ interface FormProps<TValues extends Record<string, string>> {
       any,
       any,
       any
-    >,
+    >
   ) => React.ReactNode;
 }
 
 function isGroupConfig<TValues extends Record<string, string>>(
-  fields: FieldConfig<TValues>[] | FormGroupConfig<TValues>[],
+  fields: FieldConfig<TValues>[] | FormGroupConfig<TValues>[]
 ): fields is FormGroupConfig<TValues>[] {
   return fields.length > 0 && "fields" in fields[0];
 }
@@ -268,7 +269,7 @@ export function Form<TValues extends Record<string, string>>({
 
   return (
     <form
-      onSubmit={(event) => {
+      onSubmit={event => {
         event.preventDefault();
         form.handleSubmit();
       }}
@@ -289,7 +290,7 @@ export function Form<TValues extends Record<string, string>>({
               </h2>
             )}
 
-            {group.fields.map((fieldConfig) => (
+            {group.fields.map(fieldConfig => (
               <form.Field
                 key={fieldConfig.name}
                 name={fieldConfig.name}
@@ -299,12 +300,12 @@ export function Form<TValues extends Record<string, string>>({
 
                     return fieldConfig.validate(
                       value as string,
-                      form.state.values,
+                      form.state.values
                     );
                   },
                 }}
               >
-                {(field) => {
+                {field => {
                   const wasSubmitted = field.form.state.submissionAttempts > 0;
                   const tanstackInvalid =
                     (field.state.meta.isTouched || wasSubmitted) &&
@@ -315,9 +316,9 @@ export function Form<TValues extends Record<string, string>>({
                     ...(tanstackInvalid
                       ? field.state.meta.errors
                           .filter(Boolean)
-                          .map((msg) => ({ message: String(msg) }))
+                          .map(msg => ({ message: String(msg) }))
                       : []),
-                    ...fieldServerErrors.map((msg) => ({ message: msg })),
+                    ...fieldServerErrors.map(msg => ({ message: msg })),
                   ];
                   const isInvalid = allErrors.length > 0;
                   const errors = isInvalid ? allErrors : undefined;
@@ -332,7 +333,7 @@ export function Form<TValues extends Record<string, string>>({
                         required={fieldConfig.required}
                         errors={errors}
                         value={field.state.value as any}
-                        onChange={(event) =>
+                        onChange={event =>
                           field.handleChange(event.target.value as any)
                         }
                         onBlur={field.handleBlur}
@@ -351,7 +352,7 @@ export function Form<TValues extends Record<string, string>>({
                         type={fieldConfig.type ?? "text"}
                         value={field.state.value as string}
                         onBlur={field.handleBlur}
-                        onChange={(event) =>
+                        onChange={event =>
                           // oxlint-disable-next-line typescript/no-explicit-any
                           field.handleChange(event.target.value as any)
                         }
@@ -368,8 +369,8 @@ export function Form<TValues extends Record<string, string>>({
           </div>
         ))}
 
-        <form.Subscribe selector={(state) => state.errors}>
-          {(errors) => {
+        <form.Subscribe selector={state => state.errors}>
+          {errors => {
             const message =
               serverError ??
               (errors.length > 0 ? renderError(errors[0]) : undefined);

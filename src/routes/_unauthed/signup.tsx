@@ -9,5 +9,5 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_unauthed/signup")({
   component: SignupPage,
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: search => searchSchema.parse(search),
 });

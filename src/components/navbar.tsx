@@ -1,11 +1,11 @@
+import { toast } from "sonner";
 import { useCallback } from "react";
-import { Link } from "@tanstack/react-router";
 import { LogOut, Moon, Settings, Sun } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 
 import { updateThemeFn } from "~/server/handlers/user-handlers";
 import { useTheme } from "~/hooks/use-theme";
-import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 
 const profileLink = (
   <Link to="/profile" className="flex w-full items-center gap-2">
@@ -45,7 +45,7 @@ function UserMonogram({
   const initials = name
     ? name
         .split(" ")
-        .map((char) => char[0])
+        .map(char => char[0])
         .slice(0, 2)
         .join("")
         .toUpperCase()
@@ -67,10 +67,10 @@ export function Navbar({ user }: NavbarProps) {
   const onUpdate = useCallback(
     (theme: "dark" | "light") => {
       updateTheme({ data: { theme } }).catch(() =>
-        toast.error("Something very weird is going on. Try again later!"),
+        toast.error("Something very weird is going on. Try again later!")
       );
     },
-    [updateTheme],
+    [updateTheme]
   );
 
   const { theme, toggle } = useTheme(user.theme, onUpdate);

@@ -20,7 +20,7 @@ export const Route = createRootRoute({
     user: await fetchCurrentUser(),
   }),
   component: RootComponent,
-  errorComponent: (props) => (
+  errorComponent: props => (
     <RootDocument>
       <DefaultCatchBoundary {...props} />
     </RootDocument>
@@ -62,7 +62,7 @@ export const Route = createRootRoute({
       }),
     ],
   }),
-  loader: (ctx) => ({
+  loader: ctx => ({
     user: ctx.context.user,
   }),
   notFoundComponent: () => <NotFound />,

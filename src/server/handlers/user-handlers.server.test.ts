@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Mock } from 'vitest';
+import type { Mock } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
@@ -7,8 +7,8 @@ import { mockLoggedIn, mockLoggedOut } from "~/test/server-utils";
 import type { User } from "~/server/db/schema";
 import type { AppError } from "~/errors";
 
-import { hashPassword, verifyPassword } from "../services/password-service";
 import { signupFn, updateUserFn } from "./user-handlers";
+import { hashPassword, verifyPassword } from "../services/password-service";
 import { sessions, users } from "../db/schema";
 import { db } from "../db";
 
@@ -64,7 +64,7 @@ describe("User schemas integration tests", () => {
       // Verify password was hashed correctly
       const isPasswordValid = await verifyPassword(
         testData.password,
-        createdUser.password,
+        createdUser.password
       );
       expect(isPasswordValid).toBeTruthy();
     });
@@ -115,8 +115,8 @@ describe("User schemas integration tests", () => {
         .from(sessions)
         .where(eq(sessions.userId, testUser.id));
       expect(remainingSessions).toHaveLength(3);
-      expect(remainingSessions.map((session) => session.id).sort()).toEqual(
-        initialSessions.map((session) => session.id).sort(),
+      expect(remainingSessions.map(session => session.id).sort()).toEqual(
+        initialSessions.map(session => session.id).sort()
       );
     });
 

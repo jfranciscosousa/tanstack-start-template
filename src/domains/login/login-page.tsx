@@ -2,11 +2,11 @@ import { LogIn, UserPlus } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { Route } from "~/routes/_unauthed/login";
 import { loginFn } from "~/server/handlers/session-handlers";
 import { loginSchema } from "~/schemas/session-schemas";
-import { Form } from "~/components/form/form";
+import { Route } from "~/routes/_unauthed/login";
 import { Button, buttonVariants } from "~/components/ui/button";
+import { Form } from "~/components/form/form";
 
 export default function LoginPage() {
   const { redirectUrl } = Route.useSearch();
@@ -59,13 +59,13 @@ export default function LoginPage() {
                 required: true,
               },
             ]}
-            onSubmit={async (values) => {
+            onSubmit={async values => {
               await login({ data: values });
               await router.invalidate();
             }}
-            renderSubmit={(form) => (
-              <form.Subscribe selector={(state) => state.isSubmitting}>
-                {(isSubmitting) => (
+            renderSubmit={form => (
+              <form.Subscribe selector={state => state.isSubmitting}>
+                {isSubmitting => (
                   <Button
                     type="submit"
                     className="w-full"

@@ -3,8 +3,8 @@ import { getRequest } from "@tanstack/react-start/server";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
 
-import { AppError } from "~/errors";
 import { loginSchema } from "~/schemas/session-schemas";
+import { AppError } from "~/errors";
 
 import { useWebSession } from "../web-session";
 import { getUserByEmail } from "../services/user-services";
@@ -21,7 +21,7 @@ import type { User } from "../db/schema";
 export { loginSchema };
 
 export const loginFn = createServerFn({ method: "POST" })
-  .inputValidator((data) => loginSchema.parse(data))
+  .inputValidator(data => loginSchema.parse(data))
   .handler(async ({ data }) => {
     const user = await getUserByEmail(data.email);
 

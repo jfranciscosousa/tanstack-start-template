@@ -1,6 +1,6 @@
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useRef } from "react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
@@ -11,7 +11,6 @@ import {
   getTodosFn,
 } from "~/server/handlers/todo-handlers";
 import { useMutation } from "~/hooks/use-mutation";
-import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
   DialogRoot,
@@ -21,6 +20,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/_authed/")({
   component: RouteComponent,
@@ -90,7 +90,11 @@ const deleteAllTrigger = (
   </Button>
 );
 
-const cancelButton = <Button variant="outline" size="sm">Cancel</Button>;
+const cancelButton = (
+  <Button variant="outline" size="sm">
+    Cancel
+  </Button>
+);
 
 interface DeleteAllDialogProps {
   count: number;
@@ -269,7 +273,7 @@ function RouteComponent() {
 
       {/* Todo grid */}
       <div className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
-        {todos.map((todo) => (
+        {todos.map(todo => (
           <TodoCard
             key={todo.id}
             todo={todo}

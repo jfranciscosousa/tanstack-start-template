@@ -7,7 +7,9 @@ export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   password: text("password").notNull(),
-  theme: text("theme", { enum: ["dark", "light"] }).notNull().default("dark"),
+  theme: text("theme", { enum: ["dark", "light"] })
+    .notNull()
+    .default("dark"),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()

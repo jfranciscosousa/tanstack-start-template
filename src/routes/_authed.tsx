@@ -26,10 +26,7 @@ function AuthedLayout() {
   const user = useCurrentUser();
 
   return (
-    <div
-      className="min-h-screen"
-      data-testid={`Welcome ${user.name}`}
-    >
+    <div className="min-h-screen" data-testid={`Welcome ${user.name}`}>
       <Navbar user={user} />
 
       <main id="main" className="py-6">

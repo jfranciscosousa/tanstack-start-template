@@ -1,6 +1,5 @@
-import { faker } from "@faker-js/faker";
-
 import { waitFor } from "@playwright-testing-library/test";
+import { faker } from "@faker-js/faker";
 
 import {
   createUserAndLogin,

@@ -1,17 +1,18 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { faker } from "@faker-js/faker";
 import { eq } from "drizzle-orm";
+import { faker } from "@faker-js/faker";
 
-import type { UserWithoutPassword } from "~/server/db/schema";
-import { todos } from "../db/schema";
-import { db } from "../db";
 import { createTestUser } from "~/test/server-utils";
+import type { UserWithoutPassword } from "~/server/db/schema";
+
 import {
   createTodo,
   deleteAllTodos,
   deleteTodo,
   getTodos,
 } from "./todo-service";
+import { todos } from "../db/schema";
+import { db } from "../db";
 
 describe("Todo service", () => {
   let testUser: UserWithoutPassword;

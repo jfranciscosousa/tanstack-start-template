@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 
-import type { UserWithoutPassword } from "~/server/db/schema";
-import { sessions } from "../db/schema";
-import { db } from "../db";
 import { createTestUser } from "~/test/server-utils";
+import type { UserWithoutPassword } from "~/server/db/schema";
+
 import {
   createSession,
   deleteAllSessions,
@@ -12,6 +11,8 @@ import {
   getUserSessions,
   verifyUserSession,
 } from "./session-service";
+import { sessions } from "../db/schema";
+import { db } from "../db";
 
 const requestInfo = {
   ipAddress: "192.168.1.1",

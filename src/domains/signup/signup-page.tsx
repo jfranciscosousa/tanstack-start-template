@@ -1,11 +1,11 @@
 import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { Route } from "~/routes/_unauthed/signup";
 import { signupFn } from "~/server/handlers/user-handlers";
 import { signUpSchema } from "~/schemas/user-schemas";
-import { Form } from "~/components/form/form";
+import { Route } from "~/routes/_unauthed/signup";
 import { Button, buttonVariants } from "~/components/ui/button";
+import { Form } from "~/components/form/form";
 
 export default function SignupPage() {
   const { redirectUrl } = Route.useSearch();
@@ -89,13 +89,13 @@ export default function SignupPage() {
                 },
               },
             ]}
-            onSubmit={async (values) => {
+            onSubmit={async values => {
               await signup({ data: values });
               await router.invalidate();
             }}
-            renderSubmit={(form) => (
-              <form.Subscribe selector={(state) => state.isSubmitting}>
-                {(isSubmitting) => (
+            renderSubmit={form => (
+              <form.Subscribe selector={state => state.isSubmitting}>
+                {isSubmitting => (
                   <Button
                     type="submit"
                     className="w-full"

@@ -1,11 +1,11 @@
-import type { ComponentProps } from "react"
-import { cva } from 'class-variance-authority';
-import type { VariantProps } from 'class-variance-authority';
+import type { ComponentProps } from "react";
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
-import { cn } from "~/lib/utils"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
+import { cn } from "~/lib/utils";
+import { Textarea } from "~/components/ui/textarea";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 
 function InputGroup({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -18,7 +18,7 @@ function InputGroup({ className, ...props }: ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 const inputGroupAddonVariants = cva(
@@ -40,7 +40,7 @@ const inputGroupAddonVariants = cva(
       align: "inline-start",
     },
   }
-)
+);
 
 function InputGroupAddon({
   className,
@@ -53,15 +53,15 @@ function InputGroupAddon({
       data-slot="input-group-addon"
       data-align={align}
       className={cn(inputGroupAddonVariants({ align }), className)}
-      onClick={(event) => {
+      onClick={event => {
         if ((event.target as HTMLElement).closest("button")) {
-          return
+          return;
         }
-        event.currentTarget.parentElement?.querySelector("input")?.focus()
+        event.currentTarget.parentElement?.querySelector("input")?.focus();
       }}
       {...props}
     />
-  )
+  );
 }
 
 const inputGroupButtonVariants = cva(
@@ -80,7 +80,7 @@ const inputGroupButtonVariants = cva(
       size: "xs",
     },
   }
-)
+);
 
 function InputGroupButton({
   className,
@@ -90,7 +90,7 @@ function InputGroupButton({
   ...props
 }: Omit<ComponentProps<typeof Button>, "size" | "type"> &
   VariantProps<typeof inputGroupButtonVariants> & {
-    type?: "button" | "submit" | "reset"
+    type?: "button" | "submit" | "reset";
   }) {
   return (
     <Button
@@ -100,7 +100,7 @@ function InputGroupButton({
       className={cn(inputGroupButtonVariants({ size }), className)}
       {...props}
     />
-  )
+  );
 }
 
 function InputGroupText({ className, ...props }: ComponentProps<"span">) {
@@ -112,13 +112,10 @@ function InputGroupText({ className, ...props }: ComponentProps<"span">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
-function InputGroupInput({
-  className,
-  ...props
-}: ComponentProps<"input">) {
+function InputGroupInput({ className, ...props }: ComponentProps<"input">) {
   return (
     <Input
       data-slot="input-group-control"
@@ -128,7 +125,7 @@ function InputGroupInput({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function InputGroupTextarea({
@@ -144,7 +141,7 @@ function InputGroupTextarea({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -154,4 +151,4 @@ export {
   InputGroupText,
   InputGroupInput,
   InputGroupTextarea,
-}
+};

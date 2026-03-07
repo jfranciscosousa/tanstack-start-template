@@ -6,9 +6,9 @@ import { useRouter } from "@tanstack/react-router";
 import { updateUserFn } from "~/server/handlers/user-handlers";
 import { updateUserSchema } from "~/schemas/user-schemas";
 import { useCurrentUser } from "~/routes/__root";
-import { Form } from "~/components/form/form";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
+import { Button } from "~/components/ui/button";
+import { Form } from "~/components/form/form";
 
 export function ProfileTab() {
   const user = useCurrentUser();
@@ -82,14 +82,14 @@ export function ProfileTab() {
                 ],
               },
             ]}
-            onSubmit={async (value) => {
+            onSubmit={async value => {
               await updateFn({ data: value });
               await router.invalidate();
               toast("Profile updated successfully!");
             }}
-            renderSubmit={(form) => (
-              <form.Subscribe selector={(state) => state.isSubmitting}>
-                {(isSubmitting) => (
+            renderSubmit={form => (
+              <form.Subscribe selector={state => state.isSubmitting}>
+                {isSubmitting => (
                   <div className="flex justify-end gap-2 pt-4">
                     <Button
                       type="button"

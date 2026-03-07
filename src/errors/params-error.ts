@@ -23,9 +23,11 @@ export class ParamsError extends Error {
 }
 
 export function isParamsError(
-  error: unknown,
+  error: unknown
 ): error is { name: "ParamsError"; meta: ParamsErrorMeta } {
-  if (typeof error !== "object" || error === null) { return false; }
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
 
   // Server-side: class instance still has meta directly
   if (

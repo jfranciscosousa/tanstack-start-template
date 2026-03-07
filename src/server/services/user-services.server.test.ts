@@ -2,17 +2,18 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
-import { ParamsError } from "~/errors";
 import type { User } from "~/server/db/schema";
-import { sessions, users } from "../db/schema";
-import { db } from "../db";
-import { hashPassword, verifyPassword } from "./password-service";
+import { ParamsError } from "~/errors";
+
 import {
   createUser,
   getUserByEmail,
   updateUser,
   updateUserTheme,
 } from "./user-services";
+import { hashPassword, verifyPassword } from "./password-service";
+import { sessions, users } from "../db/schema";
+import { db } from "../db";
 
 describe("User services", () => {
   describe("createUser", () => {
@@ -36,7 +37,7 @@ describe("User services", () => {
 
       const isPasswordValid = await verifyPassword(
         data.password,
-        user.password,
+        user.password
       );
       expect(isPasswordValid).toBeTruthy();
     });
@@ -174,7 +175,7 @@ describe("User services", () => {
 
       const isOriginalPasswordValid = await verifyPassword(
         "originalpass123",
-        updated.password,
+        updated.password
       );
       expect(isOriginalPasswordValid).toBeTruthy();
     });
@@ -223,13 +224,13 @@ describe("User services", () => {
 
       const isNewPasswordValid = await verifyPassword(
         "newpassword123",
-        updated.password,
+        updated.password
       );
       expect(isNewPasswordValid).toBeTruthy();
 
       const isOldPasswordValid = await verifyPassword(
         "originalpass123",
-        updated.password,
+        updated.password
       );
       expect(isOldPasswordValid).toBeFalsy();
 

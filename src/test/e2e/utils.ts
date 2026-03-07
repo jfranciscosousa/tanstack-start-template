@@ -1,7 +1,7 @@
-import { test as base } from '@playwright/test';
-import type { Page } from '@playwright/test';
-import { locatorFixtures as fixtures } from '@playwright-testing-library/test/fixture.js';
-import type { LocatorFixtures as TestingLibraryFixtures } from '@playwright-testing-library/test/fixture.js';
+import type { Page } from "@playwright/test";
+import { test as base } from "@playwright/test";
+import type { LocatorFixtures as TestingLibraryFixtures } from "@playwright-testing-library/test/fixture.js";
+import { locatorFixtures as fixtures } from "@playwright-testing-library/test/fixture.js";
 import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
@@ -16,7 +16,7 @@ export const { expect } = test;
 export async function createUserAndLogin(
   page: Page,
   screen: Screen,
-  originalPage?: string,
+  originalPage?: string
 ) {
   const password = USER_TEST_PASSWORD;
   const user = await createUser({

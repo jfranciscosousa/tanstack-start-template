@@ -54,7 +54,7 @@ export const createUser = createServerOnlyFn(
   async (data: { name: string; email: string; password: string }) => {
     const [user] = await db.insert(users).values(data).returning();
     return user;
-  },
+  }
 );
 ```
 

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import userEvent from "@testing-library/user-event";
-import { render, screen, waitFor } from "~/test/utils";
 import { toast } from "sonner";
+import userEvent from "@testing-library/user-event";
+
+import { render, screen, waitFor } from "~/test/utils";
 
 import { ProfileTab } from "./profile-tab";
 
@@ -83,7 +84,7 @@ describe("ProfileTab", () => {
     await user.type(screen.getByLabelText("New Password"), "newpass123");
     await user.type(
       screen.getByLabelText("Confirm New Password"),
-      "newpass123",
+      "newpass123"
     );
 
     await user.click(screen.getByRole("button", { name: /save changes/i }));
@@ -118,7 +119,7 @@ describe("ProfileTab", () => {
     await user.type(screen.getByLabelText("New Password"), "newpass123");
     await user.type(
       screen.getByLabelText("Confirm New Password"),
-      "differentpass",
+      "differentpass"
     );
 
     await user.click(screen.getByRole("button", { name: /save changes/i }));

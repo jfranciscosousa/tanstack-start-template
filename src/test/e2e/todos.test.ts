@@ -1,5 +1,5 @@
-import { expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
@@ -36,7 +36,7 @@ test("deletes todos", async ({ page, screen }) => {
   await page.locator(".break-inside-avoid button").first().click();
 
   await waitFor(async () =>
-    expect(await getNotesLength(page)).toBe(notesCountBefore - 1),
+    expect(await getNotesLength(page)).toBe(notesCountBefore - 1)
   );
 });
 

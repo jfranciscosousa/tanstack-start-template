@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+
 import { render, screen, waitFor } from "~/test/utils";
 
 import SignupPage from "./signup-page";
@@ -9,7 +10,9 @@ const mockInvalidate = vi.fn();
 
 vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mockSignupFn }));
 vi.mock("@tanstack/react-router", () => ({
-  useRouter: () => ({ invalidate: mockInvalidate.mockResolvedValue(undefined) }),
+  useRouter: () => ({
+    invalidate: mockInvalidate.mockResolvedValue(undefined),
+  }),
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
     <a href={to}>{children}</a>
   ),
@@ -26,7 +29,7 @@ async function fillAndSubmit(
     email: string;
     password: string;
     passwordConfirmation: string;
-  }> = {},
+  }> = {}
 ) {
   const values = {
     name: "Jane Doe",
@@ -41,7 +44,7 @@ async function fillAndSubmit(
   await user.type(screen.getByLabelText("Password"), values.password);
   await user.type(
     screen.getByLabelText("Confirm password"),
-    values.passwordConfirmation,
+    values.passwordConfirmation
   );
   await user.click(screen.getByRole("button", { name: /create account/i }));
 }

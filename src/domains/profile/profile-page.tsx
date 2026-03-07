@@ -1,9 +1,9 @@
 import { Shield, User } from "lucide-react";
-import { Route } from "~/routes/_authed/profile";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { ProfileTab } from "~/domains/profile/profile-tab";
+import { Route } from "~/routes/_authed/profile";
 import { SessionsTab } from "~/domains/profile/sessions-tab";
+import { ProfileTab } from "~/domains/profile/profile-tab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export default function ProfilePage() {
   const { sessions, currentSessionId } = Route.useLoaderData();
