@@ -5,7 +5,7 @@ export const signUpSchema = z.object({
   name: z.string().min(1),
   password: z.string().min(1),
   passwordConfirmation: z.string().min(1),
-  redirectUrl: z.string().optional(),
+  redirectUrl: z.string().default(""),
 });
 
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;

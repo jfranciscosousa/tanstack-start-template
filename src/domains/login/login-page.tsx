@@ -1,41 +1,17 @@
-import React from "react";
-import { Loader2, LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 
 import { Route } from "~/routes/_unauthed/login";
-import { loginFn, loginSchema } from "~/server/handlers/session-handlers";
-import { useMutation } from "~/hooks/use-mutation";
-import { useFormDataValidator } from "~/hooks/use-form-data-validator";
-import { renderError } from "~/errors";
-import { PasswordField } from "~/components/password-field";
+import { loginFn } from "~/server/handlers/session-handlers";
+import { loginSchema } from "~/schemas/session-schemas";
+import { Form } from "~/components/form";
 import { Button, buttonVariants } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 
 export default function LoginPage() {
   const { redirectUrl } = Route.useSearch();
   const router = useRouter();
-  const fn = useServerFn(loginFn);
-  const loginMutation = useMutation({
-    fn,
-    onSuccess: async () => {
-      await router.invalidate();
-    },
-  });
-  const validator = useFormDataValidator(loginSchema);
-
-  function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const data = validator.validate(formData);
-
-    if (data) {
-      loginMutation.mutate({ data });
-    }
-  }
+  const login = useServerFn(loginFn);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
@@ -60,78 +36,38 @@ export default function LoginPage() {
 
         {/* Form card */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-xl shadow-black/20 ring-1 ring-foreground/5">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Field
-              data-invalid={
-                Boolean(validator.errors?.email?.length) || undefined
-              }
-            >
-              <FieldLabel
-                htmlFor="email"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
-                Email
-              </FieldLabel>
-              <Input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                spellCheck={false}
-                aria-invalid={Boolean(validator.errors?.email?.length)}
-                required
-              />
-              <FieldError errors={validator.errors?.email} />
-            </Field>
-
-            <PasswordField
-              id="password"
-              name="password"
-              label="Password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              errors={validator.errors?.password}
-              required
-              minLength={6}
-            />
-
-            <input
-              type="hidden"
-              name="redirectUrl"
-              defaultValue={redirectUrl}
-            />
-
-            <Button
-              type="submit"
-              className="mt-2 h-10 w-full gap-2"
-              disabled={loginMutation.status === "pending"}
-            >
-              {loginMutation.status === "pending" ? (
-                <>
-                  <Loader2
-                    size={16}
-                    className="animate-spin"
-                    aria-hidden="true"
-                  />
-                  Signing in&hellip;
-                </>
-              ) : (
-                <>
-                  <LogIn size={16} aria-hidden="true" />
-                  Sign in
-                </>
-              )}
-            </Button>
-
-            {Boolean(loginMutation.error) && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {renderError(loginMutation.error)}
-                </AlertDescription>
-              </Alert>
+          <Form
+            schema={loginSchema}
+            defaultValues={{
+              email: "",
+              password: "",
+              redirectUrl: redirectUrl ?? "",
+            }}
+            fields={[
+              { name: "email", label: "Email", type: "email", placeholder: "you@example.com", required: true },
+              { name: "password", label: "Password", type: "password", placeholder: "••••••••", required: true },
+            ]}
+            onSubmit={async (values) => {
+              await login({ data: values });
+              await router.invalidate();
+            }}
+            renderSubmit={(form) => (
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(isSubmitting) => (
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>Signing in&hellip;</>
+                    ) : (
+                      <>
+                        <LogIn size={16} aria-hidden="true" />
+                        Sign in
+                      </>
+                    )}
+                  </Button>
+                )}
+              </form.Subscribe>
             )}
-          </form>
+          />
         </div>
 
         {/* Sign up link */}

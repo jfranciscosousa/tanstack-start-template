@@ -7,6 +7,7 @@ import { updateUserFn } from "~/server/handlers/user-handlers";
 import { updateUserSchema } from "~/schemas/user-schemas";
 import { useCurrentUser } from "~/routes/__root";
 import { Form } from "~/components/form";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 
 export function ProfileTab() {
@@ -17,7 +18,7 @@ export function ProfileTab() {
   return (
     <>
       <Card className="shadow-xl">
-        <CardContent className="p-6">
+        <CardContent>
           <Form
             schema={updateUserSchema}
             defaultValues={{
@@ -64,7 +65,8 @@ export function ProfileTab() {
                     name: "password",
                     label: "New Password",
                     type: "password",
-                    placeholder: "Enter new password (leave blank to keep current)",
+                    placeholder:
+                      "Enter new password (leave blank to keep current)",
                   },
                   {
                     name: "passwordConfirmation",
@@ -80,20 +82,36 @@ export function ProfileTab() {
                 ],
               },
             ]}
-            submitLabel="Save Changes"
-            onCancel={() => void router.navigate({ to: "/" })}
             onSubmit={async (value) => {
               await updateFn({ data: value });
               await router.invalidate();
               toast("Profile updated successfully!");
             }}
+            renderSubmit={(form) => (
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(isSubmitting) => (
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => void router.navigate({ to: "/" })}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </div>
+                )}
+              </form.Subscribe>
+            )}
           />
         </CardContent>
       </Card>
 
       {/* Account Info */}
       <Card className="shadow-xl mt-4">
-        <CardContent className="p-6">
+        <CardContent>
           <CardTitle className="mb-4 text-lg">Account Information</CardTitle>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-4">

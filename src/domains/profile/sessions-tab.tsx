@@ -90,7 +90,7 @@ function SessionCard({
 
   return (
     <Card className={cn(isCurrentSession && "ring-2 ring-primary")}>
-      <CardContent className="p-4">
+      <CardContent>
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-1 items-start gap-4">
             <Avatar
@@ -174,7 +174,7 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
 
   return (
     <Card className="shadow-xl">
-      <CardContent className="p-6">
+      <CardContent>
         <h2 className="mb-2 flex items-center gap-2 text-xl font-semibold">
           <Avatar size="sm" variant="info">
             <Shield size={18} />

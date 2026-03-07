@@ -109,7 +109,7 @@ test("does not update profile if password is bad", async ({ page, screen }) => {
   await page.locator("#currentPassword").fill("bad_password");
   await page.getByRole("button", { name: "Save Changes" }).click();
 
-  await screen.findByText("Your current password is wrong!");
+  await screen.findByText("The current password is wrong");
 
   const [updatedUser] = await db
     .select()

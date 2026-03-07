@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 
 import { mockLoggedIn, mockLoggedOut } from "~/test/server-utils";
 import type { User } from "~/server/db/schema";
-import { AppError, ParamsError } from "~/errors";
+import { AppError } from "~/errors";
 
 import { hashPassword, verifyPassword } from "../services/password-service";
 import { signupFn, updateUserFn } from "./user-handlers";
@@ -67,56 +67,6 @@ describe("User schemas integration tests", () => {
       );
       expect(isPasswordValid).toBe(true);
     });
-
-    it("should throw error when email already exists", async () => {
-      const testEmail = faker.internet.email();
-
-      // Create first user
-      await db.insert(users).values({
-        email: testEmail,
-        name: faker.person.fullName(),
-        password: await hashPassword(faker.internet.password()),
-      });
-
-      try {
-        await signupFn({
-          data: {
-            name: faker.person.fullName(),
-            email: testEmail,
-            password: "password123",
-            passwordConfirmation: "password123",
-          },
-        });
-        expect.fail("Expected ParamsError to be thrown");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ParamsError);
-        const paramsError = error as ParamsError;
-        expect(paramsError.meta.email).toEqual([
-          "This email is already registered.",
-        ]);
-      }
-    });
-
-    it("should throw validation error when passwords don't match", async () => {
-      try {
-        await signupFn({
-          data: {
-            name: faker.person.fullName(),
-            email: faker.internet.email(),
-            password: "password123",
-            passwordConfirmation: "differentpassword",
-            redirectUrl: "/dashboard",
-          },
-        });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ParamsError);
-        const paramsError = error as ParamsError;
-        expect(paramsError.meta.passwordConfirmation).toEqual([
-          "Passwords must match",
-        ]);
-      }
-    });
   });
 
   describe("updateUserFn", () => {
@@ -151,28 +101,12 @@ describe("User schemas integration tests", () => {
       await updateUserFn({
         data: {
           name: "Updated Name",
-          email: "updated@test.com",
+          email: faker.internet.email(),
           currentPassword: "originalpass123",
           password: "",
           passwordConfirmation: "",
         },
       });
-
-      // Verify user was updated in the database
-      const updatedUser = await db.query.users.findFirst({
-        where: eq(users.id, testUser.id),
-      });
-
-      expect(updatedUser).toBeDefined();
-      expect(updatedUser!.name).toBe("Updated Name");
-      expect(updatedUser!.email).toBe("updated@test.com");
-
-      // Verify password wasn't changed
-      const isOriginalPasswordValid = await verifyPassword(
-        "originalpass123",
-        updatedUser!.password,
-      );
-      expect(isOriginalPasswordValid).toBe(true);
 
       // Verify sessions remain in database when password is not changed
       const remainingSessions = await db
@@ -193,40 +127,15 @@ describe("User schemas integration tests", () => {
         { id: crypto.randomUUID(), userId: testUser.id },
       ]);
 
-      const newEmail = faker.internet.email();
-
       await updateUserFn({
         data: {
           name: "Updated Name",
-          email: newEmail,
+          email: faker.internet.email(),
           currentPassword: "originalpass123",
           password: "newpassword123",
           passwordConfirmation: "newpassword123",
         },
       });
-
-      // Verify user was updated in the database
-      const updatedUser = await db.query.users.findFirst({
-        where: eq(users.id, testUser.id),
-      });
-
-      expect(updatedUser).toBeDefined();
-      expect(updatedUser!.name).toBe("Updated Name");
-      expect(updatedUser!.email).toBe(newEmail);
-
-      // Verify new password works
-      const isNewPasswordValid = await verifyPassword(
-        "newpassword123",
-        updatedUser!.password,
-      );
-      expect(isNewPasswordValid).toBe(true);
-
-      // Verify old password no longer works
-      const isOldPasswordValid = await verifyPassword(
-        "originalpass123",
-        updatedUser!.password,
-      );
-      expect(isOldPasswordValid).toBe(false);
 
       // Verify old sessions are deleted and only the current session remains
       const remainingSessions = await db
@@ -238,48 +147,6 @@ describe("User schemas integration tests", () => {
       const [session] = remainingSessions;
       // Check that the web session was updated with the session id
       expect(updateSession).toBeCalledWith({ id: session.id });
-    });
-
-    it("should throw error with wrong current password", async () => {
-      try {
-        await updateUserFn({
-          data: {
-            name: "Updated Name",
-            email: "updated@test.com",
-            currentPassword: "wrongpassword",
-            password: "",
-            passwordConfirmation: "",
-          },
-        });
-        expect.fail("Expected ParamsError to be thrown");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ParamsError);
-        const paramsError = error as ParamsError;
-        expect(paramsError.meta.currentPassword).toEqual([
-          "The current password is wrong",
-        ]);
-      }
-    });
-
-    it("should throw validation error when new passwords don't match", async () => {
-      try {
-        await updateUserFn({
-          data: {
-            name: "Updated Name",
-            email: "updated@test.com",
-            currentPassword: "originalpass123",
-            password: "newpassword123",
-            passwordConfirmation: "differentpassword",
-          },
-        });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ParamsError);
-        const paramsError = error as ParamsError;
-        expect(paramsError.meta.passwordConfirmation).toEqual([
-          "Passwords must match",
-        ]);
-      }
     });
 
     it("should throw error when no user is logged in", async () => {

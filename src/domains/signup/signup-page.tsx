@@ -1,41 +1,16 @@
-import React from "react";
-import { Eye, Loader2, Mail, User, UserPlus } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 
 import { Route } from "~/routes/_unauthed/signup";
-import { signUpSchema, signupFn } from "~/server/handlers/user-handlers";
-import { useMutation } from "~/hooks/use-mutation";
-import { useFormDataValidator } from "~/hooks/use-form-data-validator";
-import { renderError } from "~/errors";
-import { PasswordField } from "~/components/password-field";
+import { signupFn } from "~/server/handlers/user-handlers";
+import { signUpSchema } from "~/schemas/user-schemas";
+import { Form } from "~/components/form";
 import { Button, buttonVariants } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 
 export default function SignupPage() {
   const { redirectUrl } = Route.useSearch();
   const router = useRouter();
-  const signupMutation = useMutation({
-    fn: useServerFn(signupFn),
-    onSuccess: async () => {
-      await router.invalidate();
-    },
-  });
-  const validator = useFormDataValidator(signUpSchema);
-  const loginSearch = { redirectUrl };
-
-  function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const data = validator.validate(formData);
-
-    if (data) {
-      signupMutation.mutate({ data });
-    }
-  }
+  const signup = useServerFn(signupFn);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
@@ -59,101 +34,46 @@ export default function SignupPage() {
 
         {/* Form card */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-xl shadow-black/20 ring-1 ring-foreground/5">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Field
-              data-invalid={Boolean(validator.errors?.name?.length) || undefined}
-            >
-              <FieldLabel htmlFor="name">
-                <User size={13} className="text-muted-foreground" aria-hidden="true" />
-                Name
-              </FieldLabel>
-              <Input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Your full name"
-                autoComplete="name"
-                aria-invalid={Boolean(validator.errors?.name?.length)}
-                required
-              />
-              <FieldError errors={validator.errors?.name} />
-            </Field>
-
-            <Field
-              data-invalid={Boolean(validator.errors?.email?.length) || undefined}
-            >
-              <FieldLabel htmlFor="email">
-                <Mail size={13} className="text-muted-foreground" aria-hidden="true" />
-                Email
-              </FieldLabel>
-              <Input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                spellCheck={false}
-                aria-invalid={Boolean(validator.errors?.email?.length)}
-                required
-              />
-              <FieldError errors={validator.errors?.email} />
-            </Field>
-
-            <PasswordField
-              id="password"
-              name="password"
-              label="Password"
-              placeholder="Create a password"
-              autoComplete="new-password"
-              errors={validator.errors?.password}
-              required
-              minLength={6}
-            />
-
-            <PasswordField
-              id="passwordConfirmation"
-              name="passwordConfirmation"
-              label="Confirm password"
-              icon={Eye}
-              placeholder="Repeat your password"
-              autoComplete="new-password"
-              errors={validator.errors?.passwordConfirmation}
-              required
-              minLength={6}
-            />
-
-            <input
-              type="hidden"
-              name="redirectUrl"
-              defaultValue={redirectUrl}
-            />
-
-            <Button
-              type="submit"
-              className="mt-2 h-10 w-full gap-2"
-              disabled={signupMutation.status === "pending"}
-            >
-              {signupMutation.status === "pending" ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                  Creating account&hellip;
-                </>
-              ) : (
-                <>
-                  <UserPlus size={16} aria-hidden="true" />
-                  Create account
-                </>
-              )}
-            </Button>
-
-            {Boolean(signupMutation.error) && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {renderError(signupMutation.error)}
-                </AlertDescription>
-              </Alert>
+          <Form
+            schema={signUpSchema}
+            defaultValues={{
+              name: "",
+              email: "",
+              password: "",
+              passwordConfirmation: "",
+              redirectUrl: redirectUrl ?? "",
+            }}
+            fields={[
+              { name: "name", label: "Name", type: "text", placeholder: "Your full name", required: true },
+              { name: "email", label: "Email", type: "email", placeholder: "you@example.com", required: true },
+              { name: "password", label: "Password", type: "password", placeholder: "Create a password", required: true },
+              {
+                name: "passwordConfirmation",
+                label: "Confirm password",
+                type: "password",
+                placeholder: "Repeat your password",
+                required: true,
+                validate: (value, values) => {
+                  if (values.password && value !== values.password) {
+                    return "Passwords must match";
+                  }
+                },
+              },
+            ]}
+            onSubmit={async (values) => {
+              await signup({ data: values });
+              await router.invalidate();
+            }}
+            renderSubmit={(form) => (
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(isSubmitting) => (
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating account..." : "Create account"}
+                  </Button>
+                )}
+              </form.Subscribe>
             )}
-          </form>
+          />
         </div>
 
         {/* Sign in link */}
@@ -161,7 +81,7 @@ export default function SignupPage() {
           Already have an account?{" "}
           <Link
             to="/login"
-            search={loginSearch}
+            search={{ redirectUrl }}
             className={buttonVariants({ variant: "link", className: "h-auto p-0 text-sm text-primary" })}
           >
             Sign in

@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Loader2, Save, type LucideIcon } from "lucide-react";
-import { useForm } from "@tanstack/react-form";
+import { type LucideIcon } from "lucide-react";
+import { useForm, type ReactFormExtendedApi } from "@tanstack/react-form";
 import type { ZodType } from "zod";
 
 import { isParamsError, renderError } from "~/errors";
 import { PasswordField } from "~/components/password-field";
 import { Avatar } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -132,10 +131,24 @@ interface FormProps<TValues extends Record<string, string>> {
   fields: FieldConfig<TValues>[] | FormGroupConfig<TValues>[];
   /** Called with the validated form values when the user submits. Must return a Promise. */
   onSubmit: (values: TValues) => Promise<void>;
-  /** Label for the submit button. Defaults to `"Submit"`. */
-  submitLabel?: string;
-  /** When provided, renders a Cancel button that calls this handler when clicked. */
-  onCancel?: () => void;
+  /** Renders the submit button area. Receives the full `formApi` instance. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderSubmit: (
+    form: ReactFormExtendedApi<
+      TValues,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >,
+  ) => React.ReactNode;
 }
 
 function isGroupConfig<TValues extends Record<string, string>>(
@@ -224,8 +237,7 @@ export function Form<TValues extends Record<string, string>>({
   defaultValues,
   fields,
   onSubmit,
-  submitLabel = "Submit",
-  onCancel,
+  renderSubmit,
 }: FormProps<TValues>) {
   const groups: FormGroupConfig<TValues>[] = isGroupConfig(fields)
     ? fields
@@ -259,7 +271,7 @@ export function Form<TValues extends Record<string, string>>({
         form.handleSubmit();
       }}
     >
-      <FieldGroup className="space-y-6">
+      <FieldGroup>
         {groups.map((group, groupIndex) => (
           <div key={group.title ?? group.fields[0]?.name} className="space-y-4">
             {groupIndex > 0 && <Separator />}
@@ -371,30 +383,7 @@ export function Form<TValues extends Record<string, string>>({
           }}
         </form.Subscribe>
 
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <div className="flex justify-end gap-2 pt-4">
-              {onCancel && (
-                <Button type="button" variant="outline" onClick={onCancel}>
-                  Cancel
-                </Button>
-              )}
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} />
-                    {submitLabel}
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </form.Subscribe>
+        {renderSubmit(form)}
       </FieldGroup>
     </form>
   );
