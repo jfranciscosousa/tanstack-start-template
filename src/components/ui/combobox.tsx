@@ -1,4 +1,5 @@
-import * as React from "react"
+import type { ComponentPropsWithRef } from "react"
+import { useRef } from "react"
 import { Combobox as ComboboxPrimitive } from "@base-ui/react"
 
 import { cn } from "~/lib/utils"
@@ -213,7 +214,7 @@ function ComboboxSeparator({
 function ComboboxChips({
   className,
   ...props
-}: React.ComponentPropsWithRef<typeof ComboboxPrimitive.Chips> &
+}: ComponentPropsWithRef<typeof ComboboxPrimitive.Chips> &
   ComboboxPrimitive.Chips.Props) {
   return (
     <ComboboxPrimitive.Chips
@@ -272,7 +273,7 @@ function ComboboxChipsInput({
 }
 
 function useComboboxAnchor() {
-  return React.useRef<HTMLDivElement | null>(null)
+  return useRef<HTMLDivElement | null>(null)
 }
 
 export {

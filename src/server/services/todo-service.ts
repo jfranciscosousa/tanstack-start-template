@@ -3,7 +3,8 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";
 
-import { type UserWithoutPassword, todos } from "../db/schema";
+import { todos } from '../db/schema';
+import type { UserWithoutPassword } from '../db/schema';
 import { db } from "../db";
 
 export const getTodos = createServerOnlyFn(

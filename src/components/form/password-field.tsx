@@ -1,4 +1,5 @@
-import { Eye, EyeOff, type LucideIcon } from "lucide-react";
+import { Eye, EyeOff } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useState } from "react";
 
 import { Field, FieldError, FieldLabel } from "~/components/ui/field";

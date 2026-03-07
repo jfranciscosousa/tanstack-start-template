@@ -28,7 +28,7 @@ describe("Password utilities", () => {
       const hashedPassword = await hashPassword(password);
 
       const isValid = await verifyPassword(password, hashedPassword);
-      expect(isValid).toBe(true);
+      expect(isValid).toBeTruthy();
     });
 
     it("should reject an incorrect password", async () => {
@@ -37,14 +37,14 @@ describe("Password utilities", () => {
       const hashedPassword = await hashPassword(password);
 
       const isValid = await verifyPassword(wrongPassword, hashedPassword);
-      expect(isValid).toBe(false);
+      expect(isValid).toBeFalsy();
     });
 
     it("should handle empty passwords", async () => {
       const hashedPassword = await hashPassword("somepassword");
 
       const isValid = await verifyPassword("", hashedPassword);
-      expect(isValid).toBe(false);
+      expect(isValid).toBeFalsy();
     });
   });
 });

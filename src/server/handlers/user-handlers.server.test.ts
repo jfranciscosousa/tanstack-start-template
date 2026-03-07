@@ -1,4 +1,5 @@
-import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
@@ -65,7 +66,7 @@ describe("User schemas integration tests", () => {
         testData.password,
         createdUser.password,
       );
-      expect(isPasswordValid).toBe(true);
+      expect(isPasswordValid).toBeTruthy();
     });
   });
 

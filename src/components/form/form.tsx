@@ -1,7 +1,8 @@
 // oxlint-disable typescript/no-explicit-any
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { useForm, type ReactFormExtendedApi } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
+import type { ReactFormExtendedApi } from "@tanstack/react-form";
 import type { ZodType } from "zod";
 
 import { isParamsError, renderError } from "~/errors";
@@ -296,7 +297,10 @@ export function Form<TValues extends Record<string, string>>({
                   onSubmit: ({ value }) => {
                     if (!fieldConfig.validate) return;
 
-                    fieldConfig.validate(value as string, form.state.values);
+                    return fieldConfig.validate(
+                      value as string,
+                      form.state.values,
+                    );
                   },
                 }}
               >

@@ -1,12 +1,16 @@
-import { beforeAll } from "vitest";
+import { afterEach, beforeEach } from "vitest";
+import { sql } from "drizzle-orm";
 
-import { sessions, todos, users } from "~/server/db/schema";
 import { db } from "~/server/db";
 
-async function cleanup() {
-  await db.delete(sessions);
-  await db.delete(todos);
-  await db.delete(users);
-}
+/*
+  Wrap each test in a transaction that rolls back, so no data persists
+  between tests. Requires the DB connection to use max: 1 (see db/index.ts).
+*/
+beforeEach(async () => {
+  await db.execute(sql`BEGIN`);
+});
 
-beforeAll(cleanup);
+afterEach(async () => {
+  await db.execute(sql`ROLLBACK`);
+});

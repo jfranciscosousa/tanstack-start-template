@@ -5,7 +5,8 @@ import { ParamsError } from "~/errors";
 
 import { deleteAllSessions } from "./session-service";
 import { hashPassword, verifyPassword } from "./password-service";
-import { type User, users } from "../db/schema";
+import { users } from '../db/schema';
+import type { User } from '../db/schema';
 import { db } from "../db";
 
 export const getUserBySessionId = createServerOnlyFn(

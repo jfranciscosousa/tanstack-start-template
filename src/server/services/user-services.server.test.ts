@@ -38,7 +38,7 @@ describe("User services", () => {
         data.password,
         user.password,
       );
-      expect(isPasswordValid).toBe(true);
+      expect(isPasswordValid).toBeTruthy();
     });
 
     it("should persist the user in the database", async () => {
@@ -176,7 +176,7 @@ describe("User services", () => {
         "originalpass123",
         updated.password,
       );
-      expect(isOriginalPasswordValid).toBe(true);
+      expect(isOriginalPasswordValid).toBeTruthy();
     });
 
     it("should not delete sessions when password is not changed", async () => {
@@ -225,13 +225,13 @@ describe("User services", () => {
         "newpassword123",
         updated.password,
       );
-      expect(isNewPasswordValid).toBe(true);
+      expect(isNewPasswordValid).toBeTruthy();
 
       const isOldPasswordValid = await verifyPassword(
         "originalpass123",
         updated.password,
       );
-      expect(isOldPasswordValid).toBe(false);
+      expect(isOldPasswordValid).toBeFalsy();
 
       const remainingSessions = await db
         .select()

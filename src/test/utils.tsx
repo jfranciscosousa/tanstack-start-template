@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
-import { type RenderOptions, render } from "@testing-library/react";
+import { render } from '@testing-library/react';
+import type { RenderOptions } from '@testing-library/react';
 
 // Custom render function for testing React components
 // Add providers here as needed (e.g., theme providers, query clients, etc.)
@@ -14,5 +15,6 @@ function customRender(
   });
 }
 
+// eslint-disable-next-line import/export -- re-exporting testing-library utilities
 export * from "@testing-library/react";
 export { customRender as render };

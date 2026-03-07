@@ -1,20 +1,20 @@
 import { flushSync } from "react-dom";
-import * as React from "react";
+import { useCallback, useState } from "react";
 
 export function useMutation<TVariables, TData, TError = unknown>(opts: {
   fn: (variables: TVariables) => Promise<TData>;
   onSuccess?: (ctx: { data: TData }) => void | Promise<void>;
   onError?: (ctx: { error: TError }) => void | Promise<void>;
 }) {
-  const [submittedAt, setSubmittedAt] = React.useState<number | null>(null);
-  const [variables, setVariables] = React.useState<TVariables | null>(null);
-  const [error, setError] = React.useState<TError | null>(null);
-  const [data, setData] = React.useState<TData | null>(null);
-  const [status, setStatus] = React.useState<
+  const [submittedAt, setSubmittedAt] = useState<number | null>(null);
+  const [variables, setVariables] = useState<TVariables | null>(null);
+  const [error, setError] = useState<TError | null>(null);
+  const [data, setData] = useState<TData | null>(null);
+  const [status, setStatus] = useState<
     "idle" | "pending" | "success" | "error"
   >("idle");
 
-  const mutateAsync = React.useCallback(
+  const mutateAsync = useCallback(
     async (newVariables: TVariables): Promise<TData | undefined> => {
       flushSync(() => {
         setStatus("pending");
@@ -44,7 +44,7 @@ export function useMutation<TVariables, TData, TError = unknown>(opts: {
     [opts]
   );
 
-  const mutate = React.useCallback(
+  const mutate = useCallback(
     (mutationVars: TVariables): void => {
       mutateAsync(mutationVars);
     },

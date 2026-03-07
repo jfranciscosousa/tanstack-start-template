@@ -23,8 +23,14 @@ export default defineConfig({
         "init-declarations": "off",
       },
     },
+    {
+      files: ["*.config.ts"],
+      rules: {
+        "import/no-nodejs-modules": "off",
+      },
+    },
   ],
-  plugins: ["react", "react-perf", "typescript", "eslint"],
+  plugins: ["react", "react-perf", "typescript", "eslint", "import", "vitest"],
   rules: {
     complexity: "off",
     "eslint/no-unused-vars": [
@@ -63,5 +69,19 @@ export default defineConfig({
     "typescript/no-explicit-any": "error",
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
+    "import/exports-last": "off",
+    "import/no-named-export": "off",
+    "import/no-default-export": "off",
+    "import/group-exports": "off",
+    "import/prefer-default-export": "off",
+    "import/no-named-as-default": "off",
+    "import/max-dependencies": "off",
+    "import/no-relative-parent-imports": "off",
+    "eslint/no-duplicate-imports": ["off", { allowSeparateTypeImports: true }],
+    "vitest/prefer-describe-function-title": "off",
+    "vitest/prefer-import-in-mock": "off",
+    "vitest/no-importing-vitest-globals": "off",
+    "vitest/require-top-level-describe": "off",
+    "vitest/no-hooks": "off",
   },
 });

@@ -1,4 +1,5 @@
-import { z, type ZodError, type ZodSchema } from "zod";
+import { z } from 'zod';
+import type { ZodError, ZodSchema } from 'zod';
 import { useMemo, useState } from "react";
 
 interface FieldMessage { message: string }
