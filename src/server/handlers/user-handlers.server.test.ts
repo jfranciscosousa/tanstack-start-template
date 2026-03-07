@@ -1,11 +1,10 @@
-import { ZodError } from "zod";
 import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
 import { mockLoggedIn, mockLoggedOut } from "~/test/server-utils";
 import type { User } from "~/server/db/schema";
-import { AppError } from "~/errors";
+import { AppError, ParamsError } from "~/errors";
 
 import { hashPassword, verifyPassword } from "../services/password-service";
 import { signupFn, updateUserFn } from "./user-handlers";
@@ -25,23 +24,14 @@ describe("User schemas integration tests", () => {
         email: faker.internet.email(),
         name: faker.person.fullName(),
         password: faker.internet.password(),
-        // Will be set to match password
         passwordConfirmation: "",
         redirectUrl: "/dashboard",
       };
       testData.passwordConfirmation = testData.password;
 
-      // Create FormData as the function expects
-      const formData = new FormData();
-      formData.append("name", testData.name);
-      formData.append("email", testData.email);
-      formData.append("password", testData.password);
-      formData.append("passwordConfirmation", testData.passwordConfirmation);
-      formData.append("redirectUrl", testData.redirectUrl);
-
       // Test that the function creates a user (it will throw a redirect, which is expected)
       try {
-        await signupFn({ data: formData });
+        await signupFn({ data: testData });
       } catch (error) {
         // The function throws a redirect, which is expected behavior
         expect(error).toBeDefined();
@@ -73,7 +63,7 @@ describe("User schemas integration tests", () => {
       // Verify password was hashed correctly
       const isPasswordValid = await verifyPassword(
         testData.password,
-        createdUser!.password
+        createdUser!.password,
       );
       expect(isPasswordValid).toBe(true);
     });
@@ -88,40 +78,43 @@ describe("User schemas integration tests", () => {
         password: await hashPassword(faker.internet.password()),
       });
 
-      // Try to create second user with same email
-      const duplicateFormData = new FormData();
-      duplicateFormData.append("name", faker.person.fullName());
-      duplicateFormData.append("email", testEmail);
-      duplicateFormData.append("password", "password123");
-      duplicateFormData.append("passwordConfirmation", "password123");
-
       try {
-        await signupFn({ data: duplicateFormData });
-        expect.fail("Expected AppError to be thrown");
+        await signupFn({
+          data: {
+            name: faker.person.fullName(),
+            email: testEmail,
+            password: "password123",
+            passwordConfirmation: "password123",
+          },
+        });
+        expect.fail("Expected ParamsError to be thrown");
       } catch (error) {
-        expect(error).toBeInstanceOf(AppError);
-        const appError = error as AppError;
-        expect(appError.code).toBe("UNPROCESSABLE_ENTITY");
-        expect(appError.message).toBe("This email is already registered.");
+        expect(error).toBeInstanceOf(ParamsError);
+        const paramsError = error as ParamsError;
+        expect(paramsError.meta.email).toEqual([
+          "This email is already registered.",
+        ]);
       }
     });
 
     it("should throw validation error when passwords don't match", async () => {
-      const mismatchFormData = new FormData();
-      mismatchFormData.append("name", faker.person.fullName());
-      mismatchFormData.append("email", faker.internet.email());
-      mismatchFormData.append("password", "password123");
-      mismatchFormData.append("passwordConfirmation", "differentpassword");
-      mismatchFormData.append("redirectUrl", "/dashboard");
-
       try {
-        await signupFn({ data: mismatchFormData });
-        expect.fail("Expected validation error to be thrown");
+        await signupFn({
+          data: {
+            name: faker.person.fullName(),
+            email: faker.internet.email(),
+            password: "password123",
+            passwordConfirmation: "differentpassword",
+            redirectUrl: "/dashboard",
+          },
+        });
+        expect.fail("Expected error to be thrown");
       } catch (error) {
-        expect(error).toBeInstanceOf(ZodError);
-        const zodError = error as ZodError;
-        expect(zodError).toBeDefined();
-        expect(zodError.message).toContain("Passwords must match");
+        expect(error).toBeInstanceOf(ParamsError);
+        const paramsError = error as ParamsError;
+        expect(paramsError.meta.passwordConfirmation).toEqual([
+          "Passwords must match",
+        ]);
       }
     });
   });
@@ -131,8 +124,6 @@ describe("User schemas integration tests", () => {
     let updateSession: Mock;
 
     beforeEach(async () => {
-      // Create a test user for update operations
-
       const [createdUser] = await db
         .insert(users)
         .values({
@@ -143,8 +134,6 @@ describe("User schemas integration tests", () => {
         .returning();
 
       testUser = createdUser;
-
-      // Mock the session to return our test user
       updateSession = mockLoggedIn(testUser).update;
     });
 
@@ -159,12 +148,15 @@ describe("User schemas integration tests", () => {
         ])
         .returning();
 
-      const updateFormData = new FormData();
-      updateFormData.append("name", "Updated Name");
-      updateFormData.append("email", "updated@test.com");
-      updateFormData.append("currentPassword", "originalpass123");
-
-      await updateUserFn({ data: updateFormData });
+      await updateUserFn({
+        data: {
+          name: "Updated Name",
+          email: "updated@test.com",
+          currentPassword: "originalpass123",
+          password: "",
+          passwordConfirmation: "",
+        },
+      });
 
       // Verify user was updated in the database
       const updatedUser = await db.query.users.findFirst({
@@ -178,7 +170,7 @@ describe("User schemas integration tests", () => {
       // Verify password wasn't changed
       const isOriginalPasswordValid = await verifyPassword(
         "originalpass123",
-        updatedUser!.password
+        updatedUser!.password,
       );
       expect(isOriginalPasswordValid).toBe(true);
 
@@ -188,8 +180,8 @@ describe("User schemas integration tests", () => {
         .from(sessions)
         .where(eq(sessions.userId, testUser.id));
       expect(remainingSessions).toHaveLength(3);
-      expect(remainingSessions.map(session => session.id).sort()).toEqual(
-        initialSessions.map(session => session.id).sort()
+      expect(remainingSessions.map((session) => session.id).sort()).toEqual(
+        initialSessions.map((session) => session.id).sort(),
       );
     });
 
@@ -202,14 +194,16 @@ describe("User schemas integration tests", () => {
       ]);
 
       const newEmail = faker.internet.email();
-      const updateFormData = new FormData();
-      updateFormData.append("name", "Updated Name");
-      updateFormData.append("email", newEmail);
-      updateFormData.append("currentPassword", "originalpass123");
-      updateFormData.append("password", "newpassword123");
-      updateFormData.append("passwordConfirmation", "newpassword123");
 
-      await updateUserFn({ data: updateFormData });
+      await updateUserFn({
+        data: {
+          name: "Updated Name",
+          email: newEmail,
+          currentPassword: "originalpass123",
+          password: "newpassword123",
+          passwordConfirmation: "newpassword123",
+        },
+      });
 
       // Verify user was updated in the database
       const updatedUser = await db.query.users.findFirst({
@@ -223,14 +217,14 @@ describe("User schemas integration tests", () => {
       // Verify new password works
       const isNewPasswordValid = await verifyPassword(
         "newpassword123",
-        updatedUser!.password
+        updatedUser!.password,
       );
       expect(isNewPasswordValid).toBe(true);
 
       // Verify old password no longer works
       const isOldPasswordValid = await verifyPassword(
         "originalpass123",
-        updatedUser!.password
+        updatedUser!.password,
       );
       expect(isOldPasswordValid).toBe(false);
 
@@ -247,49 +241,60 @@ describe("User schemas integration tests", () => {
     });
 
     it("should throw error with wrong current password", async () => {
-      const updateFormData = new FormData();
-      updateFormData.append("name", "Updated Name");
-      updateFormData.append("email", "updated@test.com");
-      updateFormData.append("currentPassword", "wrongpassword");
-
       try {
-        await updateUserFn({ data: updateFormData });
-        expect.fail("Expected AppError to be thrown");
+        await updateUserFn({
+          data: {
+            name: "Updated Name",
+            email: "updated@test.com",
+            currentPassword: "wrongpassword",
+            password: "",
+            passwordConfirmation: "",
+          },
+        });
+        expect.fail("Expected ParamsError to be thrown");
       } catch (error) {
-        expect(error).toBeInstanceOf(AppError);
-        const appError = error as AppError;
-        expect(appError.code).toBe("UNPROCESSABLE_ENTITY");
-        expect(appError.message).toBe("Your current password is wrong!");
+        expect(error).toBeInstanceOf(ParamsError);
+        const paramsError = error as ParamsError;
+        expect(paramsError.meta.currentPassword).toEqual([
+          "The current password is wrong",
+        ]);
       }
     });
 
     it("should throw validation error when new passwords don't match", async () => {
-      const updateFormData = new FormData();
-      updateFormData.append("name", "Updated Name");
-      updateFormData.append("email", "updated@test.com");
-      updateFormData.append("currentPassword", "originalpass123");
-      updateFormData.append("password", "newpassword123");
-      updateFormData.append("passwordConfirmation", "differentpassword");
-
       try {
-        await updateUserFn({ data: updateFormData });
-        expect.fail("Expected validation error to be thrown");
+        await updateUserFn({
+          data: {
+            name: "Updated Name",
+            email: "updated@test.com",
+            currentPassword: "originalpass123",
+            password: "newpassword123",
+            passwordConfirmation: "differentpassword",
+          },
+        });
+        expect.fail("Expected error to be thrown");
       } catch (error) {
-        expect(error).toBeInstanceOf(ZodError);
-        const zodError = error as ZodError;
-        expect(zodError.message).toContain("Passwords must match");
+        expect(error).toBeInstanceOf(ParamsError);
+        const paramsError = error as ParamsError;
+        expect(paramsError.meta.passwordConfirmation).toEqual([
+          "Passwords must match",
+        ]);
       }
     });
 
     it("should throw error when no user is logged in", async () => {
       mockLoggedOut();
-      const updateFormData = new FormData();
-      updateFormData.append("name", "Updated Name");
-      updateFormData.append("email", "updated@test.com");
-      updateFormData.append("currentPassword", "originalpass123");
 
       try {
-        await updateUserFn({ data: updateFormData });
+        await updateUserFn({
+          data: {
+            name: "Updated Name",
+            email: "updated@test.com",
+            currentPassword: "originalpass123",
+            password: "",
+            passwordConfirmation: "",
+          },
+        });
         expect.fail("Expected error to be thrown");
       } catch (error) {
         const appError = error as AppError;

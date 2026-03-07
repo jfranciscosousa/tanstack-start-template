@@ -1,32 +1,26 @@
-import { zfd } from "zod-form-data";
-import z from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
 
 import { useLoggedInAppSession } from "~/server/web-session";
+import {
+  signUpSchema,
+  updateUserSchema,
+  updateThemeSchema,
+} from "~/schemas/user-schemas";
 
 import { createAndUseSession } from "./session-handlers";
-import { createUser, updateUser, updateUserTheme } from "../services/user-services";
+import {
+  createUser,
+  updateUser,
+  updateUserTheme,
+} from "../services/user-services";
 
-export const signUpSchema = zfd
-  .formData({
-    email: zfd.text(z.email()),
-    name: zfd.text(),
-    password: zfd.text(),
-    passwordConfirmation: zfd.text(),
-    redirectUrl: zfd.text(z.string().optional()),
-  })
-  .refine(data => data.password === data.passwordConfirmation, {
-    message: "Passwords must match",
-    path: ["passwordConfirmation"],
-  });
-
-export type SignUpSchemaType = z.infer<typeof signUpSchema>;
+export { signUpSchema, updateUserSchema };
+export type { SignUpSchemaType } from "~/schemas/user-schemas";
 
 export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator(data => data)
-  .handler(async ctx => {
-    const data = signUpSchema.parse(ctx.data);
+  .inputValidator(signUpSchema)
+  .handler(async ({ data }) => {
     const user = await createUser(data);
 
     await createAndUseSession(user);
@@ -36,32 +30,9 @@ export const signupFn = createServerFn({ method: "POST" })
     });
   });
 
-export const updateUserSchema = zfd
-  .formData({
-    currentPassword: zfd.text(),
-    email: zfd.text(z.email()),
-    name: zfd.text(),
-    password: zfd.text(z.string().optional()),
-    passwordConfirmation: zfd.text(z.string().optional()),
-  })
-  .refine(
-    data => {
-      if (!data.password) {
-        return true;
-      }
-
-      return data.password === data.passwordConfirmation;
-    },
-    {
-      message: "Passwords must match",
-      path: ["passwordConfirmation"],
-    }
-  );
-
 export const updateUserFn = createServerFn({ method: "POST" })
-  .inputValidator(data => data)
-  .handler(async ctx => {
-    const data = updateUserSchema.parse(ctx.data);
+  .inputValidator(updateUserSchema)
+  .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
 
     await updateUser(user, data);
@@ -72,7 +43,7 @@ export const updateUserFn = createServerFn({ method: "POST" })
   });
 
 export const updateThemeFn = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ theme: z.enum(["dark", "light"]) }))
+  .inputValidator(updateThemeSchema)
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
     await updateUserTheme(user.id, data.theme);

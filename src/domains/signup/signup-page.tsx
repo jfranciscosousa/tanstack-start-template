@@ -30,11 +30,10 @@ export default function SignupPage() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const data = validator.validate(formData);
 
-    if (validator.validate(formData)) {
-      signupMutation.mutate({
-        data: formData,
-      });
+    if (data) {
+      signupMutation.mutate({ data });
     }
   }
 

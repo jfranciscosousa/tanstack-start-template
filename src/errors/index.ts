@@ -2,6 +2,10 @@
 /* oxlint-disable @typescript-eslint/no-explicit-any */
 /* oxlint-disable @typescript-eslint/no-unsafe-return */
 /* oxlint-disable @typescript-eslint/no-unsafe-member-access */
+
+export { ParamsError, isParamsError } from "./params-error";
+export type { ParamsErrorMeta } from "./params-error";
+
 const ERROR_CODES = {
   BAD_REQUEST: "BAD_REQUEST",
   FORBIDDEN: "FORBIDDEN",

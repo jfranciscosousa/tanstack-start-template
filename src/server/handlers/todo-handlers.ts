@@ -1,17 +1,13 @@
-import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 
 import { useLoggedInAppSession } from "../web-session";
+import { createTodoSchema, deleteTodoSchema } from "~/schemas/todo-schemas";
 import {
   createTodo,
   deleteAllTodos,
   deleteTodo,
   getTodos,
 } from "../services/todo-service";
-
-const createTodoSchema = z.object({
-  content: z.string().min(1, "Content is required"),
-});
 
 export const getTodosFn = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -30,7 +26,7 @@ export const createTodoFn = createServerFn({ method: "POST" })
   });
 
 export const deleteTodoFn = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ id: z.string() }))
+  .inputValidator(deleteTodoSchema)
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
 

@@ -30,11 +30,10 @@ export default function LoginPage() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const data = validator.validate(formData);
 
-    if (validator.validate(formData)) {
-      loginMutation.mutate({
-        data: formData,
-      });
+    if (data) {
+      loginMutation.mutate({ data });
     }
   }
 

@@ -17,7 +17,7 @@ export const { expect } = test;
 export async function createUserAndLogin(
   page: Page,
   screen: Screen,
-  originalPage?: string
+  originalPage?: string,
 ) {
   const password = USER_TEST_PASSWORD;
   const user = await createUser({
@@ -26,6 +26,7 @@ export async function createUserAndLogin(
     }),
     name: faker.person.firstName(),
     password,
+    passwordConfirmation: password,
   });
 
   await page.goto(originalPage || "/");

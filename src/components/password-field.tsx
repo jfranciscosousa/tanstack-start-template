@@ -19,6 +19,9 @@ export interface PasswordFieldProps {
   required?: boolean;
   minLength?: number;
   errors?: { message: string }[];
+  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
 }
 
 export function PasswordField({
@@ -31,6 +34,9 @@ export function PasswordField({
   required,
   minLength,
   errors,
+  value,
+  onChange,
+  onBlur,
 }: PasswordFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -54,6 +60,9 @@ export function PasswordField({
           required={required}
           minLength={minLength}
           aria-invalid={Boolean(errors?.length)}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
         />
         <InputGroupAddon align="inline-end">
           <InputGroupButton

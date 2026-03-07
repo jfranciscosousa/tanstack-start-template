@@ -1,10 +1,10 @@
-import { zfd } from "zod-form-data";
 import z from "zod";
 import { getRequest } from "@tanstack/react-start/server";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
 
 import { AppError } from "~/errors";
+import { loginSchema } from "~/schemas/session-schemas";
 
 import { useWebSession } from "../web-session";
 import { getUserByEmail } from "../services/user-services";
@@ -18,14 +18,10 @@ import { verifyPassword } from "../services/password-service";
 import { getRequestInfo } from "../request-info";
 import { type User } from "../db/schema";
 
-export const loginSchema = zfd.formData({
-  email: zfd.text(z.email()),
-  password: zfd.text(),
-  redirectUrl: zfd.text().optional(),
-});
+export { loginSchema };
 
 export const loginFn = createServerFn({ method: "POST" })
-  .inputValidator((formData: FormData) => loginSchema.parse(formData))
+  .inputValidator((data) => loginSchema.parse(data))
   .handler(async ({ data }) => {
     const user = await getUserByEmail(data.email);
 

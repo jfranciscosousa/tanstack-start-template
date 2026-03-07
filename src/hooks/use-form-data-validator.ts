@@ -34,8 +34,8 @@ export function useFormDataValidator<T extends ZodSchema>(schema: T) {
     return result as FieldErrors<T>;
   }, [zodErrors]);
 
-  function validate(formData: FormData) {
-    const validationResult = schema.safeParse(formData);
+  function validate(formData: FormData): z.infer<T> | false {
+    const validationResult = schema.safeParse(Object.fromEntries(formData));
 
     if (validationResult.error) {
       setZodErrors(validationResult.error);
@@ -43,7 +43,7 @@ export function useFormDataValidator<T extends ZodSchema>(schema: T) {
     }
 
     setZodErrors(undefined);
-    return true;
+    return validationResult.data as z.infer<T>;
   }
 
   return {

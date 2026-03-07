@@ -9,6 +9,7 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource/instrument-serif": "^5.2.8",
     "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/react-form": "^1.28.4",
     "@tanstack/react-router": "1.163.3",
     "@tanstack/react-router-devtools": "1.163.3",
     "@tanstack/react-start": "1.165.0",

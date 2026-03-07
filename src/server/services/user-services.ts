@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { createServerOnlyFn } from "@tanstack/react-start";
 
-import { AppError } from "~/errors";
+import { ParamsError } from "~/errors";
 
 import { deleteAllSessions } from "./session-service";
 import { hashPassword, verifyPassword } from "./password-service";
@@ -15,12 +15,12 @@ export const getUserBySessionId = createServerOnlyFn(
     }
 
     const session = await db.query.sessions.findFirst({
-      where: sessionsQuery => eq(sessionsQuery.id, sessionId),
+      where: (sessionsQuery) => eq(sessionsQuery.id, sessionId),
       with: { user: true },
     });
 
     return session?.user;
-  }
+  },
 );
 
 export const getUserByEmail = createServerOnlyFn((email?: string) => {
@@ -29,12 +29,17 @@ export const getUserByEmail = createServerOnlyFn((email?: string) => {
   }
 
   return db.query.users.findFirst({
-    where: usersQuery => eq(usersQuery.email, email),
+    where: (usersQuery) => eq(usersQuery.email, email),
   });
 });
 
 export const createUser = createServerOnlyFn(
-  async (data: { name: string; email: string; password: string }) => {
+  async (data: {
+    name: string;
+    email: string;
+    password: string;
+    passwordConfirmation: string;
+  }) => {
     const [found] = await db
       .select()
       .from(users)
@@ -44,10 +49,13 @@ export const createUser = createServerOnlyFn(
     const password = await hashPassword(data.password);
 
     if (found) {
-      throw new AppError(
-        "UNPROCESSABLE_ENTITY",
-        "This email is already registered."
-      );
+      throw new ParamsError({ email: ["This email is already registered."] });
+    }
+
+    if (data.password !== data.passwordConfirmation) {
+      throw new ParamsError({
+        passwordConfirmation: ["Passwords must match"],
+      });
     }
 
     const [newUser] = await db
@@ -60,29 +68,31 @@ export const createUser = createServerOnlyFn(
       .returning();
 
     return newUser;
-  }
+  },
 );
 
 export const updateUserTheme = createServerOnlyFn(
   async (userId: string, theme: "dark" | "light") => {
     await db.update(users).set({ theme }).where(eq(users.id, userId));
-  }
+  },
 );
 
 export const updateUser = createServerOnlyFn(
   async (
     user: Omit<User, "password">,
-    data: Partial<User> & { currentPassword: string }
+    data: Partial<User> & {
+      currentPassword: string;
+      passwordConfirmation?: string;
+    },
   ) => {
     const userPassword = await db.query.users.findFirst({
       where: eq(users.id, user.id),
     });
 
     if (!(await verifyPassword(data.currentPassword, userPassword!.password))) {
-      throw new AppError(
-        "UNPROCESSABLE_ENTITY",
-        "Your current password is wrong!"
-      );
+      throw new ParamsError({
+        currentPassword: ["The current password is wrong"],
+      });
     }
 
     const updateData: Partial<User> = {
@@ -92,10 +102,16 @@ export const updateUser = createServerOnlyFn(
 
     // Only update password if a new one is provided
     if (data.password) {
+      if (data.password !== data.passwordConfirmation) {
+        throw new ParamsError({
+          passwordConfirmation: ["Passwords must match"],
+        });
+      }
+
       updateData.password = await hashPassword(data.password);
       await deleteAllSessions(user);
     }
 
     await db.update(users).set(updateData).where(eq(users.id, user.id));
-  }
+  },
 );
