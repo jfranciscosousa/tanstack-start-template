@@ -89,13 +89,14 @@ describe("User schemas integration tests", () => {
     });
 
     it("should update user profile without changing password", async () => {
+      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       // Create multiple sessions for the user
       const initialSessions = await db
         .insert(sessions)
         .values([
-          { id: crypto.randomUUID(), userId: testUser.id },
-          { id: crypto.randomUUID(), userId: testUser.id },
-          { id: crypto.randomUUID(), userId: testUser.id },
+          { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
+          { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
+          { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
         ])
         .returning();
 
@@ -121,11 +122,12 @@ describe("User schemas integration tests", () => {
     });
 
     it("should update user profile with new password and invalidate all sessions (except current one)", async () => {
+      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       // Create multiple sessions for the user
       await db.insert(sessions).values([
-        { id: crypto.randomUUID(), userId: testUser.id },
-        { id: crypto.randomUUID(), userId: testUser.id },
-        { id: crypto.randomUUID(), userId: testUser.id },
+        { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
+        { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
+        { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
       ]);
 
       await updateUserFn({

@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 
 import { mockLoggedOut } from "~/test/server-utils";
 import { useWebSession } from "~/server/web-session";
-import type { User } from "~/server/db/schema";
+import type { User, UserWithoutPassword } from "~/server/db/schema";
 import type { AppError } from "~/errors";
 
 import {
@@ -22,7 +22,7 @@ vi.mock("@tanstack/react-start/server", () => ({
 }));
 vi.mock("~/server/web-session");
 
-function mockWebSession(user: User, sessionId?: string) {
+function mockWebSession(user: UserWithoutPassword, sessionId?: string) {
   const mock = {
     id: "mock",
     clear: vi.fn(),
@@ -79,6 +79,20 @@ describe("Session handlers", () => {
       expect(updateSession).toHaveBeenCalledWith({ id: userSessions[0].id });
     });
 
+    it("should reject login with absolute redirectUrl", async () => {
+      mockLoggedOut();
+
+      await expect(
+        loginFn({
+          data: {
+            email: testUser.email,
+            password: "testpassword",
+            redirectUrl: "https://evil.com",
+          },
+        })
+      ).rejects.toThrow();
+    });
+
     it("should throw when email does not exist", async () => {
       mockLoggedOut();
 
@@ -123,7 +137,7 @@ describe("Session handlers", () => {
     it("should delete the current session and clear the web session", async () => {
       const [session] = await db
         .insert(sessions)
-        .values({ userId: testUser.id })
+        .values({ userId: testUser.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) })
         .returning();
 
       const { clear } = mockWebSession(testUser, session.id);
@@ -163,9 +177,13 @@ describe("Session handlers", () => {
 
   describe("revokeSession", () => {
     it("should delete a session belonging to the user", async () => {
+      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       const [currentSession, otherSession] = await db
         .insert(sessions)
-        .values([{ userId: testUser.id }, { userId: testUser.id }])
+        .values([
+          { userId: testUser.id, expiresAt: futureExpiresAt },
+          { userId: testUser.id, expiresAt: futureExpiresAt },
+        ])
         .returning();
 
       mockWebSession(testUser, currentSession.id);
@@ -182,7 +200,7 @@ describe("Session handlers", () => {
     it("should throw when trying to revoke the current session", async () => {
       const [session] = await db
         .insert(sessions)
-        .values({ userId: testUser.id })
+        .values({ userId: testUser.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) })
         .returning();
 
       mockWebSession(testUser, session.id);
@@ -209,7 +227,7 @@ describe("Session handlers", () => {
 
       const [otherSession] = await db
         .insert(sessions)
-        .values({ userId: otherUser.id })
+        .values({ userId: otherUser.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) })
         .returning();
 
       mockWebSession(testUser);

@@ -16,7 +16,7 @@ import {
 } from "../services/session-service";
 import { verifyPassword } from "../services/password-service";
 import { getRequestInfo } from "../request-info";
-import type { User } from "../db/schema";
+import type { UserWithoutPassword } from "../db/schema";
 
 export { loginSchema };
 
@@ -42,7 +42,7 @@ export const loginFn = createServerFn({ method: "POST" })
 /**
  * Creates a session in the database and updates the web session (cookie)
  */
-export const createAndUseSession = createServerOnlyFn(async (user: User) => {
+export const createAndUseSession = createServerOnlyFn(async (user: UserWithoutPassword) => {
   const request = getRequest();
   const session = await createSession(user, await getRequestInfo(request));
   const webSession = await useWebSession();

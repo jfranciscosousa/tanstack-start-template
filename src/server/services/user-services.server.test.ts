@@ -2,12 +2,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
-import type { User } from "~/server/db/schema";
+import type { User, UserWithoutPassword } from "~/server/db/schema";
 import { ParamsError } from "~/errors";
 
 import {
   createUser,
   getUserByEmail,
+  getUserBySessionId,
   updateUser,
   updateUserTheme,
 } from "./user-services";
@@ -26,7 +27,7 @@ describe("User services", () => {
       };
       data.passwordConfirmation = data.password;
 
-      const user = await createUser(data);
+      const user: UserWithoutPassword = await createUser(data);
 
       expect(user).toBeDefined();
       expect(user.email).toBe(data.email);
@@ -34,10 +35,16 @@ describe("User services", () => {
       expect(user.id).toBeDefined();
       expect(user.createdAt).toBeInstanceOf(Date);
       expect(user.updatedAt).toBeInstanceOf(Date);
+      expect((user as User).password).toBeUndefined();
+
+      const fromDb = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+      });
+      if (!fromDb) throw new Error("fromDb should exist");
 
       const isPasswordValid = await verifyPassword(
         data.password,
-        user.password
+        fromDb.password,
       );
       expect(isPasswordValid).toBeTruthy();
     });
@@ -138,6 +145,91 @@ describe("User services", () => {
     });
   });
 
+  describe("getUserBySessionId", () => {
+    it("should return the user for a valid, non-expired session", async () => {
+      const [user] = await db
+        .insert(users)
+        .values({
+          email: faker.internet.email(),
+          name: faker.person.fullName(),
+          password: await hashPassword("pass"),
+        })
+        .returning();
+
+      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const [session] = await db
+        .insert(sessions)
+        .values({ userId: user.id, expiresAt })
+        .returning();
+
+      const result = await getUserBySessionId(session.id);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(user.id);
+      expect(result?.email).toBe(user.email);
+    });
+
+    it("should return undefined when sessionId is not provided", async () => {
+      const result = await getUserBySessionId(undefined);
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should return undefined for an unknown session id", async () => {
+      const result = await getUserBySessionId(crypto.randomUUID());
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should return undefined for an expired session", async () => {
+      const [user] = await db
+        .insert(users)
+        .values({
+          email: faker.internet.email(),
+          name: faker.person.fullName(),
+          password: await hashPassword("pass"),
+        })
+        .returning();
+
+      // 1 second in the past
+      const expiresAt = new Date(Date.now() - 1000);
+      const [session] = await db
+        .insert(sessions)
+        .values({ userId: user.id, expiresAt })
+        .returning();
+
+      const result = await getUserBySessionId(session.id);
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should delete the session from the DB when it is expired", async () => {
+      const [user] = await db
+        .insert(users)
+        .values({
+          email: faker.internet.email(),
+          name: faker.person.fullName(),
+          password: await hashPassword("pass"),
+        })
+        .returning();
+
+      // 1 second in the past
+      const expiresAt = new Date(Date.now() - 1000);
+      const [session] = await db
+        .insert(sessions)
+        .values({ userId: user.id, expiresAt })
+        .returning();
+
+      await getUserBySessionId(session.id);
+
+      const fromDb = await db.query.sessions.findFirst({
+        where: eq(sessions.id, session.id),
+      });
+
+      expect(fromDb).toBeUndefined();
+    });
+  });
+
   describe("updateUser", () => {
     let testUser: User;
 
@@ -175,15 +267,25 @@ describe("User services", () => {
 
       const isOriginalPasswordValid = await verifyPassword(
         "originalpass123",
-        updated.password
+        updated.password,
       );
       expect(isOriginalPasswordValid).toBeTruthy();
     });
 
     it("should not delete sessions when password is not changed", async () => {
+      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
       await db.insert(sessions).values([
-        { id: crypto.randomUUID(), userId: testUser.id },
-        { id: crypto.randomUUID(), userId: testUser.id },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
       ]);
 
       await updateUser(testUser, {
@@ -203,10 +305,24 @@ describe("User services", () => {
     });
 
     it("should update password and delete all sessions", async () => {
+      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
       await db.insert(sessions).values([
-        { id: crypto.randomUUID(), userId: testUser.id },
-        { id: crypto.randomUUID(), userId: testUser.id },
-        { id: crypto.randomUUID(), userId: testUser.id },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
       ]);
 
       await updateUser(testUser, {
@@ -224,13 +340,13 @@ describe("User services", () => {
 
       const isNewPasswordValid = await verifyPassword(
         "newpassword123",
-        updated.password
+        updated.password,
       );
       expect(isNewPasswordValid).toBeTruthy();
 
       const isOldPasswordValid = await verifyPassword(
         "originalpass123",
-        updated.password
+        updated.password,
       );
       expect(isOldPasswordValid).toBeFalsy();
 

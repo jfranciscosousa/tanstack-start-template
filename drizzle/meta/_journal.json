@@ -15,6 +15,13 @@
       "when": 1772291951393,
       "tag": "0001_add_user_theme",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773004088310,
+      "tag": "0002_yummy_nightmare",
+      "breakpoints": true
     }
   ]
 }

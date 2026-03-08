@@ -17,6 +17,12 @@ export const useWebSession = createServerOnlyFn(async () => {
 
   const sessionProps = await useSession<SessionUser>({
     password: process.env.SECRET_KEY_BASE,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
+      // No max age needed as expiry token is set in db session
+    },
   });
 
   return {
@@ -41,5 +47,5 @@ export const fetchCurrentUser = createServerFn({ method: "GET" }).handler(
     const session = await useWebSession();
 
     return session.user;
-  }
+  },
 );

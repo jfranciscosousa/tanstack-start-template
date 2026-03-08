@@ -13,12 +13,15 @@ export const createSession = createServerOnlyFn(
       location,
       userAgent,
     }: Pick<Session, "ipAddress" | "userAgent" | "location">
-  ) =>
-    db
+  ) => {
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    return db
       .insert(sessions)
-      .values({ ipAddress, location, userAgent, userId: user.id })
+      .values({ expiresAt, ipAddress, location, userAgent, userId: user.id })
       .returning()
-      .then(results => results[0])
+      .then(results => results[0]);
+  }
 );
 
 export const getUserSessions = createServerOnlyFn((user: UserWithoutPassword) =>

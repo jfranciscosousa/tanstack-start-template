@@ -20,6 +20,10 @@ const requestInfo = {
   userAgent: "Mozilla/5.0 (Windows NT 10.0)",
 };
 
+function futureExpiresAt() {
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+}
+
 describe("Session service", () => {
   let testUser: UserWithoutPassword;
 
@@ -43,6 +47,16 @@ describe("Session service", () => {
       if (!fromDb) throw new Error("fromDb should exist");
       expect(fromDb.userId).toBe(testUser.id);
     });
+
+    it("should set expiresAt approximately 30 days in the future", async () => {
+      const before = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 - 5000);
+      const session = await createSession(testUser, requestInfo);
+      const after = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000 + 5000);
+
+      expect(session.expiresAt).toBeInstanceOf(Date);
+      expect(session.expiresAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
+      expect(session.expiresAt.getTime()).toBeLessThanOrEqual(after.getTime());
+    });
   });
 
   describe("getUserSessions", () => {
@@ -54,8 +68,8 @@ describe("Session service", () => {
 
     it("should return all sessions for the user", async () => {
       await db.insert(sessions).values([
-        { userId: testUser.id, userAgent: "Browser 1" },
-        { userId: testUser.id, userAgent: "Browser 2" },
+        { userId: testUser.id, userAgent: "Browser 1", expiresAt: futureExpiresAt() },
+        { userId: testUser.id, userAgent: "Browser 2", expiresAt: futureExpiresAt() },
       ]);
 
       const result = await getUserSessions(testUser);
@@ -67,8 +81,8 @@ describe("Session service", () => {
       const otherUser = await createTestUser();
 
       await db.insert(sessions).values([
-        { userId: testUser.id, userAgent: "My browser" },
-        { userId: otherUser.id, userAgent: "Other browser" },
+        { userId: testUser.id, userAgent: "My browser", expiresAt: futureExpiresAt() },
+        { userId: otherUser.id, userAgent: "Other browser", expiresAt: futureExpiresAt() },
       ]);
 
       const result = await getUserSessions(testUser);
@@ -82,7 +96,7 @@ describe("Session service", () => {
     it("should return the session when it belongs to the user", async () => {
       const [created] = await db
         .insert(sessions)
-        .values({ userId: testUser.id })
+        .values({ userId: testUser.id, expiresAt: futureExpiresAt() })
         .returning();
 
       const session = await verifyUserSession(testUser, created.id);
@@ -101,7 +115,7 @@ describe("Session service", () => {
       const otherUser = await createTestUser();
       const [otherSession] = await db
         .insert(sessions)
-        .values({ userId: otherUser.id })
+        .values({ userId: otherUser.id, expiresAt: futureExpiresAt() })
         .returning();
 
       const result = await verifyUserSession(testUser, otherSession.id);
@@ -114,7 +128,7 @@ describe("Session service", () => {
     it("should delete the session from the database", async () => {
       const [created] = await db
         .insert(sessions)
-        .values({ userId: testUser.id })
+        .values({ userId: testUser.id, expiresAt: futureExpiresAt() })
         .returning();
 
       await deleteSession(created.id);
@@ -129,7 +143,10 @@ describe("Session service", () => {
     it("should not affect other sessions", async () => {
       const [toDelete, toKeep] = await db
         .insert(sessions)
-        .values([{ userId: testUser.id }, { userId: testUser.id }])
+        .values([
+          { userId: testUser.id, expiresAt: futureExpiresAt() },
+          { userId: testUser.id, expiresAt: futureExpiresAt() },
+        ])
         .returning();
 
       await deleteSession(toDelete.id);
@@ -147,9 +164,9 @@ describe("Session service", () => {
       await db
         .insert(sessions)
         .values([
-          { userId: testUser.id },
-          { userId: testUser.id },
-          { userId: testUser.id },
+          { userId: testUser.id, expiresAt: futureExpiresAt() },
+          { userId: testUser.id, expiresAt: futureExpiresAt() },
+          { userId: testUser.id, expiresAt: futureExpiresAt() },
         ]);
 
       await deleteAllSessions(testUser);
@@ -164,7 +181,10 @@ describe("Session service", () => {
 
       await db
         .insert(sessions)
-        .values([{ userId: testUser.id }, { userId: otherUser.id }]);
+        .values([
+          { userId: testUser.id, expiresAt: futureExpiresAt() },
+          { userId: otherUser.id, expiresAt: futureExpiresAt() },
+        ]);
 
       await deleteAllSessions(testUser);
 

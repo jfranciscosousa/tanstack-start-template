@@ -20,5 +20,5 @@ Load these when working on the relevant area:
 
 - Variables should have clear simple names. Don't: `e`. Do `event`
 - All source files must use hyphen-case (kebab-case) naming except specific TanstackRouter files
-- All project operations go through `bin/` scripts. Never call `pnpm vite`, `pnpm vitest`, `pnpm playwright`, or `pnpm drizzle-kit` directly. Check `docs/agents/BIN.md` for reference.
+- All project operations go through `bin/` scripts. Never call `pnpm run` commands directly unless absolutely necessary. Check `docs/agents/BIN.md` for all available commands.
 - Don't generate database migrations directly, use `bin/db generate`

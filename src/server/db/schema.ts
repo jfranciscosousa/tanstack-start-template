@@ -20,6 +20,7 @@ export const sessions = pgTable(
   "sessions",
   {
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
     id: uuid("id").defaultRandom().primaryKey(),
     ipAddress: text("ip_address"),
     location: text("location"),

@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 
 import { useLoggedInAppSession, useWebSession } from "~/server/web-session";
 import { hashPassword } from "~/server/services/password-service";
-import type { User, UserWithoutPassword } from "~/server/db/schema";
+import type { UserWithoutPassword } from "~/server/db/schema";
 import { users } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { AppError } from "~/errors";
@@ -23,7 +23,7 @@ export async function createTestUser(): Promise<UserWithoutPassword> {
   return userWithoutPassword;
 }
 
-export function mockLoggedIn(user: User) {
+export function mockLoggedIn(user: UserWithoutPassword) {
   const mock = {
     id: "mock",
     clear: vi.fn(),
