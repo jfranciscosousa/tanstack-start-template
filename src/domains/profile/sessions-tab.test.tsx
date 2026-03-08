@@ -25,6 +25,7 @@ const baseSession: Session = {
   ipAddress: "192.168.1.1",
   location: "New York, US",
   userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+  expiresAt: new Date("2024-07-01T00:00:00.000Z"),
   createdAt: new Date("2024-01-01T00:00:00.000Z"),
   updatedAt: new Date("2024-06-01T12:00:00.000Z"),
 };

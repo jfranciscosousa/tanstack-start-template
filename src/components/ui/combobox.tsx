@@ -1,5 +1,5 @@
-import { useRef } from "react";
 import type { ComponentPropsWithRef } from "react";
+import { useRef } from "react";
 import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react";
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 

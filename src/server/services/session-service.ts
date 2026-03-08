@@ -1,8 +1,8 @@
 import { and, eq } from "drizzle-orm";
 import { createServerOnlyFn } from "@tanstack/react-start";
 
-import type { Session, UserWithoutPassword } from "../db/schema";
 import { sessions } from "../db/schema";
+import type { Session, UserWithoutPassword } from "../db/schema";
 import { db } from "../db";
 
 export const createSession = createServerOnlyFn(

@@ -1,5 +1,5 @@
-import type { Mock } from "vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Mock } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
@@ -94,9 +94,21 @@ describe("User schemas integration tests", () => {
       const initialSessions = await db
         .insert(sessions)
         .values([
-          { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
-          { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
-          { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
+          {
+            id: crypto.randomUUID(),
+            userId: testUser.id,
+            expiresAt: futureExpiresAt,
+          },
+          {
+            id: crypto.randomUUID(),
+            userId: testUser.id,
+            expiresAt: futureExpiresAt,
+          },
+          {
+            id: crypto.randomUUID(),
+            userId: testUser.id,
+            expiresAt: futureExpiresAt,
+          },
         ])
         .returning();
 
@@ -125,9 +137,21 @@ describe("User schemas integration tests", () => {
       const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       // Create multiple sessions for the user
       await db.insert(sessions).values([
-        { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
-        { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
-        { id: crypto.randomUUID(), userId: testUser.id, expiresAt: futureExpiresAt },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
+        {
+          id: crypto.randomUUID(),
+          userId: testUser.id,
+          expiresAt: futureExpiresAt,
+        },
       ]);
 
       await updateUserFn({

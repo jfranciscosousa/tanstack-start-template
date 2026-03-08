@@ -14,8 +14,8 @@ test("signs up", async ({ page, screen }) => {
 
   await screen.getByLabelText("Email").fill(faker.internet.email());
   await screen.getByLabelText("Name").fill(faker.person.fullName());
-  await screen.getByLabelText("Password").fill("foobar");
-  await screen.getByLabelText("Confirm password").fill("foobar");
+  await screen.getByLabelText("Password").fill("foobar123");
+  await screen.getByLabelText("Confirm password").fill("foobar123");
   await screen.getByText("Create account", { selector: "button" }).click();
 
   await page.waitForURL("/");

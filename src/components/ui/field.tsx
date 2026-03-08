@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 
 import { cn } from "~/lib/utils";
 import { Separator } from "~/components/ui/separator";

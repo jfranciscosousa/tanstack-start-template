@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { LucideIcon } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   InputGroup,

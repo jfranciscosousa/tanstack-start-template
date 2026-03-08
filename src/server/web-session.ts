@@ -47,5 +47,5 @@ export const fetchCurrentUser = createServerFn({ method: "GET" }).handler(
     const session = await useWebSession();
 
     return session.user;
-  },
+  }
 );

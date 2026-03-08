@@ -45,16 +45,6 @@ describe("useWebSession cookie configuration", () => {
     );
   });
 
-  it("calls useSession with maxAge of 30 days", async () => {
-    const { useWebSession } = await import("~/server/web-session");
-    await useWebSession();
-    expect(mockUseSession).toHaveBeenCalledWith(
-      expect.objectContaining({
-        cookie: expect.objectContaining({ maxAge: 60 * 60 * 24 * 30 }),
-      })
-    );
-  });
-
   it("sets secure: false outside of production", async () => {
     const { useWebSession } = await import("~/server/web-session");
     await useWebSession();

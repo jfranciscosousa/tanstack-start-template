@@ -2,8 +2,8 @@
 import type { ZodType } from "zod";
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { useForm } from "@tanstack/react-form";
 import type { ReactFormExtendedApi } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 
 import { isParamsError, renderError } from "~/errors";
 import { Separator } from "~/components/ui/separator";

@@ -3,8 +3,8 @@ import { faker } from "@faker-js/faker";
 
 import { useLoggedInAppSession, useWebSession } from "~/server/web-session";
 import { hashPassword } from "~/server/services/password-service";
-import type { UserWithoutPassword } from "~/server/db/schema";
 import { users } from "~/server/db/schema";
+import type { UserWithoutPassword } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { AppError } from "~/errors";
 

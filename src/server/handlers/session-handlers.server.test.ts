@@ -137,7 +137,10 @@ describe("Session handlers", () => {
     it("should delete the current session and clear the web session", async () => {
       const [session] = await db
         .insert(sessions)
-        .values({ userId: testUser.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) })
+        .values({
+          userId: testUser.id,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        })
         .returning();
 
       const { clear } = mockWebSession(testUser, session.id);
@@ -200,7 +203,10 @@ describe("Session handlers", () => {
     it("should throw when trying to revoke the current session", async () => {
       const [session] = await db
         .insert(sessions)
-        .values({ userId: testUser.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) })
+        .values({
+          userId: testUser.id,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        })
         .returning();
 
       mockWebSession(testUser, session.id);
@@ -227,7 +233,10 @@ describe("Session handlers", () => {
 
       const [otherSession] = await db
         .insert(sessions)
-        .values({ userId: otherUser.id, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) })
+        .values({
+          userId: otherUser.id,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        })
         .returning();
 
       mockWebSession(testUser);

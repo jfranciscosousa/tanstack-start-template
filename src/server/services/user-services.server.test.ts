@@ -44,7 +44,7 @@ describe("User services", () => {
 
       const isPasswordValid = await verifyPassword(
         data.password,
-        fromDb.password,
+        fromDb.password
       );
       expect(isPasswordValid).toBeTruthy();
     });
@@ -267,7 +267,7 @@ describe("User services", () => {
 
       const isOriginalPasswordValid = await verifyPassword(
         "originalpass123",
-        updated.password,
+        updated.password
       );
       expect(isOriginalPasswordValid).toBeTruthy();
     });
@@ -340,13 +340,13 @@ describe("User services", () => {
 
       const isNewPasswordValid = await verifyPassword(
         "newpassword123",
-        updated.password,
+        updated.password
       );
       expect(isNewPasswordValid).toBeTruthy();
 
       const isOldPasswordValid = await verifyPassword(
         "originalpass123",
-        updated.password,
+        updated.password
       );
       expect(isOldPasswordValid).toBeFalsy();
 

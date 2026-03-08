@@ -42,15 +42,17 @@ export const loginFn = createServerFn({ method: "POST" })
 /**
  * Creates a session in the database and updates the web session (cookie)
  */
-export const createAndUseSession = createServerOnlyFn(async (user: UserWithoutPassword) => {
-  const request = getRequest();
-  const session = await createSession(user, await getRequestInfo(request));
-  const webSession = await useWebSession();
+export const createAndUseSession = createServerOnlyFn(
+  async (user: UserWithoutPassword) => {
+    const request = getRequest();
+    const session = await createSession(user, await getRequestInfo(request));
+    const webSession = await useWebSession();
 
-  await webSession.update({
-    id: session.id,
-  });
-});
+    await webSession.update({
+      id: session.id,
+    });
+  }
+);
 
 export const invalidateCurrentSession = createServerOnlyFn(async () => {
   const webSession = await useWebSession();
