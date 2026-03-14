@@ -1,14 +1,15 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { Resend } from "resend";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth";
 
-import { db } from "~/server/db";
 // oxlint-disable-next-line import/no-namespace
 import * as schema from "~/server/db/schema";
+import { db } from "~/server/db";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
+  baseURL: process.env.VERCEL_BRANCH_URL || process.env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
