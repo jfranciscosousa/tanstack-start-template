@@ -46,7 +46,7 @@ bin/test-e2e src/test/e2e/authentication.test.ts
 | Script            | What it does                                       |
 | ----------------- | -------------------------------------------------- |
 | `bin/db generate` | Generate migration from schema changes             |
-| `bin/db migrate`  | Apply pending migrations                           |
+| `bin/db push`     | Apply pending schema changes                       |
 | `bin/db push`     | Push schema directly (dev only, no migration file) |
 | `bin/db studio`   | Open Drizzle Studio UI                             |
 
