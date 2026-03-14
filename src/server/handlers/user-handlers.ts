@@ -38,7 +38,7 @@ export const updateUserFn = createServerFn({ method: "POST" })
       }
     }
 
-    if (data.email) {
+    if (data.email && data.email !== session.user.email) {
       await auth.api.changeEmail({
         headers: req.headers,
         body: { newEmail: data.email },

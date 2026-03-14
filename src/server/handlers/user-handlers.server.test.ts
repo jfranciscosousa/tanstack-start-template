@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createTestUser, makeSessionMock } from "~/test/server-utils";
 import type { TestUser } from "~/test/server-utils";
+import { createTestUser, makeSessionMock } from "~/test/server-utils";
 import { auth } from "~/lib/auth";
 import type { AppError } from "~/errors";
 
@@ -119,6 +119,24 @@ describe("User handlers", () => {
       await updateUserFn({
         data: {
           name: "Name",
+          currentPassword: "",
+          password: "",
+          passwordConfirmation: "",
+        },
+      });
+
+      expect(vi.mocked(auth.api.changeEmail)).not.toHaveBeenCalled();
+    });
+
+    it("should not call changeEmail when email is unchanged", async () => {
+      const mockSession = makeSessionMock(testUser);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.updateUser).mockResolvedValue({ status: true });
+
+      await updateUserFn({
+        data: {
+          name: "Name",
+          email: testUser.email,
           currentPassword: "",
           password: "",
           passwordConfirmation: "",

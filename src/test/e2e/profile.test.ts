@@ -77,6 +77,7 @@ test("updates email", async ({ page, screen }) => {
 
   await page.goto("/profile");
   await page.getByLabel("Email Address").fill(newEmail);
+  await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
   await waitFor(async () => {
@@ -95,7 +96,7 @@ test("updates email", async ({ page, screen }) => {
     throw new Error("user should exist");
   }
 
-  expect(updatedUser.email).toEqual(newEmail);
+  expect(updatedUser.email).toEqual(newEmail.toLowerCase());
 });
 
 test("does not update profile if password confirmation does not match", async ({
