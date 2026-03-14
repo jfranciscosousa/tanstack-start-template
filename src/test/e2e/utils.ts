@@ -5,8 +5,7 @@ import type { LocatorFixtures as TestingLibraryFixtures } from "@playwright-test
 import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
-
-import { createUser } from "~/server/services/user-services";
+import { auth } from "~/lib/auth";
 
 export const USER_TEST_PASSWORD = "foobar123";
 
@@ -16,26 +15,26 @@ export const { expect } = test;
 export async function createUserAndLogin(
   page: Page,
   screen: Screen,
-  originalPage?: string
+  originalPage?: string,
 ) {
   const password = USER_TEST_PASSWORD;
-  const user = await createUser({
-    email: faker.internet.email({
-      firstName: crypto.randomUUID().replaceAll("-", ""),
-    }),
-    name: faker.person.firstName(),
-    password,
-    passwordConfirmation: password,
+  const email = faker.internet.email({
+    firstName: crypto.randomUUID().replaceAll("-", ""),
+  });
+  const name = faker.person.firstName();
+
+  const { user } = await auth.api.signUpEmail({
+    body: { email, name, password },
   });
 
   await page.goto(originalPage || "/");
   await waitForLoadersToDisappear(screen);
 
-  await screen.getByLabelText("Email").fill(user.email);
+  await screen.getByLabelText("Email").fill(email);
   await screen.getByLabelText("Password").fill(password);
   await screen.getByText("Sign in", { selector: "button" }).click();
   await waitFor(async () => {
-    await expect(screen.getByTestId(`Welcome ${user.name}`)).toBeVisible();
+    await expect(screen.getByTestId(`Welcome ${name}`)).toBeVisible();
   });
 
   return user;
@@ -44,7 +43,6 @@ export async function createUserAndLogin(
 export async function waitForLoadersToDisappear(screen: Screen) {
   await waitFor(async () => {
     const loaders = await screen.findAllByTestId("loader");
-
     await expect(loaders).toHaveCount(0);
   });
 }

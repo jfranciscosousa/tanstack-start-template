@@ -141,7 +141,7 @@ function RouteComponent() {
   const router = useRouter();
   const todos = Route.useLoaderData();
   const inputRef = useRef<HTMLInputElement>(null);
-
+  console.log(todos);
   const createTodoMutation = useMutation({
     fn: useServerFn(createTodoFn),
     onError: () => {
@@ -273,7 +273,7 @@ function RouteComponent() {
 
       {/* Todo grid */}
       <div className="columns-1 gap-4 space-y-4 sm:columns-2 lg:columns-3">
-        {todos.map(todo => (
+        {todos.map((todo) => (
           <TodoCard
             key={todo.id}
             todo={todo}

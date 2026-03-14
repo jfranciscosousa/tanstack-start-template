@@ -1,264 +1,96 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { eq } from "drizzle-orm";
-import { faker } from "@faker-js/faker";
 
-import { mockLoggedOut } from "~/test/server-utils";
-import { useWebSession } from "~/server/web-session";
-import type { User, UserWithoutPassword } from "~/server/db/schema";
-import type { AppError } from "~/errors";
+import { AppError } from "~/errors";
+import { auth } from "~/lib/auth";
+import { createTestUser, makeSessionMock } from "~/test/server-utils";
+import type { TestUser } from "~/test/server-utils";
 
-import {
-  fetchUserSessions,
-  invalidateCurrentSession,
-  loginFn,
-  revokeSession,
-} from "./session-handlers";
-import { hashPassword } from "../services/password-service";
-import { sessions, users } from "../db/schema";
-import { db } from "../db";
+import { fetchUserSessions, revokeSession } from "./session-handlers";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
 }));
-vi.mock("~/server/web-session");
 
-function mockWebSession(user: UserWithoutPassword, sessionId?: string) {
-  const mock = {
-    id: "mock",
-    clear: vi.fn(),
-    data: { id: sessionId },
-    update: vi.fn(),
-    user,
-  };
-
-  vi.mocked(useWebSession).mockResolvedValue(mock);
-
-  return mock;
-}
+vi.mock("~/lib/auth", () => ({
+  auth: {
+    api: {
+      getSession: vi.fn(),
+      listSessions: vi.fn(),
+      revokeSession: vi.fn(),
+    },
+  },
+}));
 
 describe("Session handlers", () => {
-  let testUser: User;
+  let testUser: TestUser;
 
   beforeEach(async () => {
-    const [created] = await db
-      .insert(users)
-      .values({
-        email: faker.internet.email(),
-        name: faker.person.fullName(),
-        password: await hashPassword("testpassword"),
-      })
-      .returning();
-
-    testUser = created;
-  });
-
-  describe("loginFn", () => {
-    it("should create a session and redirect on valid credentials", async () => {
-      const { update: updateSession } = mockLoggedOut();
-
-      try {
-        await loginFn({
-          data: {
-            email: testUser.email,
-            password: "testpassword",
-            redirectUrl: "/dashboard",
-          },
-        });
-        expect.fail("Expected redirect to be thrown");
-      } catch (error) {
-        const response = error as Response;
-        expect(response.status).toEqual(307);
-      }
-
-      const userSessions = await db
-        .select()
-        .from(sessions)
-        .where(eq(sessions.userId, testUser.id));
-
-      expect(userSessions).toHaveLength(1);
-      expect(updateSession).toHaveBeenCalledWith({ id: userSessions[0].id });
-    });
-
-    it("should reject login with absolute redirectUrl", async () => {
-      mockLoggedOut();
-
-      await expect(
-        loginFn({
-          data: {
-            email: testUser.email,
-            password: "testpassword",
-            redirectUrl: "https://evil.com",
-          },
-        })
-      ).rejects.toThrow();
-    });
-
-    it("should throw when email does not exist", async () => {
-      mockLoggedOut();
-
-      try {
-        await loginFn({
-          data: {
-            email: "nonexistent@example.com",
-            password: "testpassword",
-            redirectUrl: "",
-          },
-        });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        const appError = error as AppError;
-        expect(appError.code).toBe("NOT_FOUND");
-        expect(appError.message).toBe(
-          "The combination of email and password is incorrect."
-        );
-      }
-    });
-
-    it("should throw when password is wrong", async () => {
-      mockLoggedOut();
-
-      try {
-        await loginFn({
-          data: {
-            email: testUser.email,
-            password: "wrongpassword",
-            redirectUrl: "",
-          },
-        });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        const appError = error as AppError;
-        expect(appError.code).toBe("NOT_FOUND");
-      }
-    });
-  });
-
-  describe("invalidateCurrentSession", () => {
-    it("should delete the current session and clear the web session", async () => {
-      const [session] = await db
-        .insert(sessions)
-        .values({
-          userId: testUser.id,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        })
-        .returning();
-
-      const { clear } = mockWebSession(testUser, session.id);
-
-      await invalidateCurrentSession();
-
-      const fromDb = await db.query.sessions.findFirst({
-        where: eq(sessions.id, session.id),
-      });
-
-      expect(fromDb).toBeUndefined();
-      expect(clear).toHaveBeenCalled();
-    });
-
-    it("should only clear the web session when there is no session id", async () => {
-      const { clear } = mockWebSession(testUser);
-
-      await invalidateCurrentSession();
-
-      expect(clear).toHaveBeenCalled();
-    });
+    testUser = await createTestUser();
+    vi.clearAllMocks();
   });
 
   describe("fetchUserSessions", () => {
-    it("should throw when no user is logged in", async () => {
-      mockLoggedOut();
+    it("should return sessions and current session token when logged in", async () => {
+      const mockSessions = [{ id: "s1", token: "tok1" }, { id: "s2", token: "tok2" }];
+      const mockSession = makeSessionMock(testUser, "current-token");
+
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
+      vi.mocked(auth.api.listSessions).mockResolvedValue(mockSessions as any);
+
+      const result = await fetchUserSessions();
+
+      expect(result.currentSessionToken).toBe("current-token");
+      expect(result.sessions).toEqual(mockSessions);
+    });
+
+    it("should throw UNAUTHORIZED when not logged in", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
       try {
         await fetchUserSessions();
         expect.fail("Expected error to be thrown");
       } catch (error) {
-        const appError = error as AppError;
-        expect(appError.code).toBe("UNAUTHORIZED");
+        expect((error as AppError).code).toBe("UNAUTHORIZED");
       }
     });
   });
 
   describe("revokeSession", () => {
-    it("should delete a session belonging to the user", async () => {
-      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      const [currentSession, otherSession] = await db
-        .insert(sessions)
-        .values([
-          { userId: testUser.id, expiresAt: futureExpiresAt },
-          { userId: testUser.id, expiresAt: futureExpiresAt },
-        ])
-        .returning();
+    it("should call auth.api.revokeSession for a different session token", async () => {
+      const mockSession = makeSessionMock(testUser, "current-token");
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
+      vi.mocked(auth.api.revokeSession).mockResolvedValue(undefined as any);
 
-      mockWebSession(testUser, currentSession.id);
+      await revokeSession({ data: "other-token" });
 
-      await revokeSession({ data: otherSession.id });
-
-      const fromDb = await db.query.sessions.findFirst({
-        where: eq(sessions.id, otherSession.id),
-      });
-
-      expect(fromDb).toBeUndefined();
+      expect(vi.mocked(auth.api.revokeSession)).toHaveBeenCalledWith(
+        expect.objectContaining({ body: { token: "other-token" } })
+      );
     });
 
-    it("should throw when trying to revoke the current session", async () => {
-      const [session] = await db
-        .insert(sessions)
-        .values({
-          userId: testUser.id,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        })
-        .returning();
-
-      mockWebSession(testUser, session.id);
+    it("should throw BAD_REQUEST when trying to revoke the current session token", async () => {
+      const mockSession = makeSessionMock(testUser, "current-token");
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
 
       try {
-        await revokeSession({ data: session.id });
+        await revokeSession({ data: "current-token" });
         expect.fail("Expected error to be thrown");
       } catch (error) {
-        const appError = error as AppError;
-        expect(appError.code).toBe("BAD_REQUEST");
-        expect(appError.message).toBe("Cannot revoke your current session");
+        expect((error as AppError).code).toBe("BAD_REQUEST");
+        expect((error as AppError).message).toBe(
+          "Cannot revoke your current session"
+        );
       }
     });
 
-    it("should throw when session does not belong to the user", async () => {
-      const [otherUser] = await db
-        .insert(users)
-        .values({
-          email: faker.internet.email(),
-          name: faker.person.fullName(),
-          password: await hashPassword("pass"),
-        })
-        .returning();
-
-      const [otherSession] = await db
-        .insert(sessions)
-        .values({
-          userId: otherUser.id,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        })
-        .returning();
-
-      mockWebSession(testUser);
+    it("should throw UNAUTHORIZED when not logged in", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
       try {
-        await revokeSession({ data: otherSession.id });
+        await revokeSession({ data: "some-token" });
         expect.fail("Expected error to be thrown");
       } catch (error) {
-        const appError = error as AppError;
-        expect(appError.code).toBe("NOT_FOUND");
-      }
-    });
-
-    it("should throw when no user is logged in", async () => {
-      mockLoggedOut();
-
-      try {
-        await revokeSession({ data: crypto.randomUUID() });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        const appError = error as AppError;
-        expect(appError.code).toBe("UNAUTHORIZED");
+        expect((error as AppError).code).toBe("UNAUTHORIZED");
       }
     });
   });

@@ -1,58 +1,41 @@
-import { vi } from "vitest";
 import { faker } from "@faker-js/faker";
 
-import { useLoggedInAppSession, useWebSession } from "~/server/web-session";
-import { hashPassword } from "~/server/services/password-service";
-import { users } from "~/server/db/schema";
-import type { UserWithoutPassword } from "~/server/db/schema";
+import { users as userTable } from "~/server/db/schema";
 import { db } from "~/server/db";
-import { AppError } from "~/errors";
 
-export async function createTestUser(): Promise<UserWithoutPassword> {
+export type TestUser = typeof userTable.$inferSelect;
+
+export async function createTestUser(): Promise<TestUser> {
   const [created] = await db
-    .insert(users)
+    .insert(userTable)
     .values({
-      email: faker.internet.email(),
+      id: crypto.randomUUID(),
       name: faker.person.fullName(),
-      password: await hashPassword(faker.internet.password()),
+      email: faker.internet.email(),
+      emailVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     })
     .returning();
 
-  const { password: _password, ...userWithoutPassword } = created;
-
-  return userWithoutPassword;
+  return created;
 }
 
-export function mockLoggedIn(user: UserWithoutPassword) {
-  const mock = {
-    id: "mock",
-    clear: vi.fn(),
-    sessionId: "test-session-id",
-    update: vi.fn(),
-    user,
-    data: {},
+export function makeSessionMock(
+  testUser: TestUser,
+  sessionToken = "test-session-token",
+) {
+  return {
+    user: testUser,
+    session: {
+      id: "test-session-id",
+      token: sessionToken,
+      userId: testUser.id,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ipAddress: null,
+      userAgent: null,
+    },
   };
-
-  vi.mocked(useWebSession).mockResolvedValue(mock);
-  vi.mocked(useLoggedInAppSession).mockResolvedValue(mock);
-
-  return mock;
-}
-
-export function mockLoggedOut() {
-  const mock = {
-    id: "mock",
-    clear: vi.fn(),
-    sessionId: "test-session-id",
-    update: vi.fn(),
-    user: undefined,
-    data: {},
-  };
-
-  vi.mocked(useWebSession).mockResolvedValue(mock);
-  // oxlint-disable-next-line typescript/no-non-null-assertion
-  vi.mocked(useLoggedInAppSession).mockResolvedValue(null!);
-  vi.mocked(useLoggedInAppSession).mockRejectedValue(new AppError("NOT_FOUND"));
-
-  return mock;
 }

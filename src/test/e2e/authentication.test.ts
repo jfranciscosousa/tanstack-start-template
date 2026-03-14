@@ -1,5 +1,5 @@
-import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
+import { waitFor } from "@playwright-testing-library/test";
 
 import {
   createUserAndLogin,
@@ -8,7 +8,7 @@ import {
   waitForLoadersToDisappear,
 } from "./utils";
 
-test("signs up", async ({ page, screen }) => {
+test("signs up and lands on verify-email page", async ({ page, screen }) => {
   await page.goto("/signup");
   await waitForLoadersToDisappear(screen);
 
@@ -18,7 +18,7 @@ test("signs up", async ({ page, screen }) => {
   await screen.getByLabelText("Confirm password").fill("foobar123");
   await screen.getByText("Create account", { selector: "button" }).click();
 
-  await page.waitForURL("/");
+  await page.waitForURL("/verify-email");
 });
 
 test("logins", async ({ page, screen }) => {

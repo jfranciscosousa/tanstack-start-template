@@ -1,51 +1,15 @@
-import { useSession } from "@tanstack/react-start/server";
-import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
-
+import { createServerOnlyFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { AppError } from "~/errors";
-
-import { getUserBySessionId } from "./services/user-services";
-import type { Session } from "./db/schema";
-
-interface SessionUser {
-  id: Session["id"];
-}
-
-export const useWebSession = createServerOnlyFn(async () => {
-  if (!process.env.SECRET_KEY_BASE) {
-    throw new Error("SECRET_KEY_BASE is not set");
-  }
-
-  const sessionProps = await useSession<SessionUser>({
-    password: process.env.SECRET_KEY_BASE,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax" as const,
-      // No max age needed as expiry token is set in db session
-    },
-  });
-
-  return {
-    ...sessionProps,
-    user: await getUserBySessionId(sessionProps.data.id),
-  };
-});
+import { auth } from "~/lib/auth";
 
 export const useLoggedInAppSession = createServerOnlyFn(async () => {
-  const session = await useWebSession();
-  const { user } = session;
+  const req = getRequest();
+  const session = await auth.api.getSession({ headers: req.headers });
 
-  if (!user) {
-    throw new AppError("NOT_FOUND");
+  if (!session) {
+    throw new AppError("UNAUTHORIZED");
   }
 
-  return { ...session, user };
+  return session;
 });
-
-export const fetchCurrentUser = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const session = await useWebSession();
-
-    return session.user;
-  }
-);

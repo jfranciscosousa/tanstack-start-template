@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./bin:*)",
-      "Bash(cat:*)",
-      "Bash(grep:*)",
+      "Bash(./bin *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
       "mcp__shadcn__get_project_registries",
       "mcp__shadcn__list_items_in_registries",
       "mcp__shadcn__get_add_command_for_items",

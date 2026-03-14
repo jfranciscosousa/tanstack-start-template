@@ -1,50 +1,49 @@
 import { createServerFn } from "@tanstack/react-start";
-import { redirect } from "@tanstack/react-router";
+import { getRequest } from "@tanstack/react-start/server";
 
-import { useLoggedInAppSession } from "~/server/web-session";
-import {
-  signUpSchema,
-  updateUserSchema,
-  updateThemeSchema,
-} from "~/schemas/user-schemas";
+import { AppError } from "~/errors";
+import { auth } from "~/lib/auth";
+import { updateUserTheme } from "~/server/services/user-services";
+import { updateUserSchema, updateThemeSchema } from "~/schemas/user-schemas";
 
-import { createAndUseSession } from "./session-handlers";
-import {
-  createUser,
-  updateUser,
-  updateUserTheme,
-} from "../services/user-services";
-
-export { signUpSchema, updateUserSchema };
-export type { SignUpSchemaType } from "~/schemas/user-schemas";
-
-export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator(signUpSchema)
-  .handler(async ({ data }) => {
-    const user = await createUser(data);
-
-    await createAndUseSession(user);
-
-    throw redirect({
-      href: data.redirectUrl || "/",
-    });
-  });
+export { updateUserSchema };
 
 export const updateUserFn = createServerFn({ method: "POST" })
   .inputValidator(updateUserSchema)
   .handler(async ({ data }) => {
-    const { user } = await useLoggedInAppSession();
+    const req = getRequest();
+    const session = await auth.api.getSession({ headers: req.headers });
 
-    await updateUser(user, data);
+    if (!session) {
+      throw new AppError("NOT_FOUND");
+    }
+
+    await auth.api.updateUser({
+      headers: req.headers,
+      body: { name: data.name },
+    });
 
     if (data.password) {
-      await createAndUseSession(user);
+      await auth.api.changePassword({
+        headers: req.headers,
+        body: {
+          currentPassword: data.currentPassword,
+          newPassword: data.password,
+          revokeOtherSessions: true,
+        },
+      });
     }
   });
 
 export const updateThemeFn = createServerFn({ method: "POST" })
   .inputValidator(updateThemeSchema)
   .handler(async ({ data }) => {
-    const { user } = await useLoggedInAppSession();
-    await updateUserTheme(user.id, data.theme);
+    const req = getRequest();
+    const session = await auth.api.getSession({ headers: req.headers });
+
+    if (!session) {
+      throw new AppError("NOT_FOUND");
+    }
+
+    await updateUserTheme(session.user.id, data.theme);
   });

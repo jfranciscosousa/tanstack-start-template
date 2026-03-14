@@ -1,7 +1,6 @@
-import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { signupFn } from "~/server/handlers/user-handlers";
+import { authClient } from "~/lib/auth-client";
 import { signUpSchema } from "~/schemas/user-schemas";
 import { Route } from "~/routes/_unauthed/signup";
 import { Button, buttonVariants } from "~/components/ui/button";
@@ -10,7 +9,6 @@ import { Form } from "~/components/form/form";
 export default function SignupPage() {
   const { redirectUrl } = Route.useSearch();
   const router = useRouter();
-  const signup = useServerFn(signupFn);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
@@ -90,8 +88,13 @@ export default function SignupPage() {
               },
             ]}
             onSubmit={async values => {
-              await signup({ data: values });
-              await router.invalidate();
+              const { error } = await authClient.signUp.email({
+                name: values.name,
+                email: values.email,
+                password: values.password,
+              });
+              if (error) throw new Error(error.message);
+              await router.navigate({ to: "/verify-email" });
             }}
             renderSubmit={form => (
               <form.Subscribe selector={state => state.isSubmitting}>
