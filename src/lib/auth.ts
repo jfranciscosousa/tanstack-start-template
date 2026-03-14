@@ -8,8 +8,16 @@ import { db } from "~/server/db";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function appUrl() {
+  const vercelUrl = process.env.VERCEL_BRANCH_URL;
+
+  if (vercelUrl) return `https://${vercelUrl}`;
+
+  return process.env.BETTER_AUTH_URL;
+}
+
 export const auth = betterAuth({
-  baseURL: process.env.VERCEL_BRANCH_URL || process.env.BETTER_AUTH_URL,
+  baseURL: appUrl(),
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
