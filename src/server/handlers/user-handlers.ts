@@ -38,6 +38,13 @@ export const updateUserFn = createServerFn({ method: "POST" })
       }
     }
 
+    if (data.email) {
+      await auth.api.changeEmail({
+        headers: req.headers,
+        body: { newEmail: data.email },
+      });
+    }
+
     await auth.api.updateUser({
       headers: req.headers,
       body: { name: data.name },
