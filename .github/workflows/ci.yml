@@ -82,6 +82,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
           DISABLE_EMAIL_VERIFICATION: true
           BETTER_AUTH_URL: http://localhost:3001
+          RESEND_API_KEY: re_your_resend_api_key
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
