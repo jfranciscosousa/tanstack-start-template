@@ -10,7 +10,8 @@ import {
   deleteTodo,
   getTodos,
 } from "./todo-service";
-import { todos, User } from "../db/schema";
+import type { User } from "../db/schema";
+import { todos } from "../db/schema";
 import { db } from "../db";
 
 describe("Todo service", () => {

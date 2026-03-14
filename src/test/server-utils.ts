@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 
 import { users as userTable } from "~/server/db/schema";
 import { db } from "~/server/db";
+import type { auth } from "~/lib/auth";
 
 export type TestUser = typeof userTable.$inferSelect;
 
@@ -23,8 +24,8 @@ export async function createTestUser(): Promise<TestUser> {
 
 export function makeSessionMock(
   testUser: TestUser,
-  sessionToken = "test-session-token",
-) {
+  sessionToken = "test-session-token"
+): typeof auth.$Infer.Session {
   return {
     user: testUser,
     session: {
@@ -38,4 +39,20 @@ export function makeSessionMock(
       userAgent: null,
     },
   };
+}
+
+export function makeSessionsMock(
+  testUser: TestUser,
+  tokens: string[]
+): (typeof auth.$Infer.Session)["session"][] {
+  return tokens.map(token => ({
+    id: `session-${token}`,
+    token,
+    userId: testUser.id,
+    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ipAddress: null,
+    userAgent: null,
+  }));
 }

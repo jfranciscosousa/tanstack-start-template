@@ -1,11 +1,11 @@
 import { and, desc, eq } from "drizzle-orm";
+import type { User } from "better-auth";
 import { createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";
 
 import { todos } from "../db/schema";
 import { db } from "../db";
-import { User } from "better-auth";
 
 export const getTodos = createServerOnlyFn(async (user: User) => {
   const userTodos = await db
@@ -28,7 +28,7 @@ export const createTodo = createServerOnlyFn(
       .returning();
 
     return todo;
-  },
+  }
 );
 
 export const deleteTodo = createServerOnlyFn(
@@ -43,7 +43,7 @@ export const deleteTodo = createServerOnlyFn(
     }
 
     return { success: true };
-  },
+  }
 );
 
 export const deleteAllTodos = createServerOnlyFn(async (user: User) => {

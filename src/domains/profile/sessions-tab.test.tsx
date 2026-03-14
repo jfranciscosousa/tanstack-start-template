@@ -34,17 +34,20 @@ const mockSessions: Session[] = [
   {
     ...baseSession,
     id: "session-1",
+    token: "tok-1",
     userAgent: "Mozilla/5.0 (Windows NT 10.0)",
   },
   {
     ...baseSession,
     id: "session-2",
+    token: "tok-2",
     userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS)",
     ipAddress: "10.0.0.2",
   },
   {
     ...baseSession,
     id: "session-3",
+    token: "tok-3",
     userAgent: "Mozilla/5.0 (iPad)",
     ipAddress: "10.0.0.3",
   },
@@ -52,9 +55,7 @@ const mockSessions: Session[] = [
 
 describe("SessionsTab", () => {
   it("renders all sessions", () => {
-    render(
-      <SessionsTab sessions={mockSessions} currentSessionToken="session-1" />,
-    );
+    render(<SessionsTab sessions={mockSessions} currentSessionToken="tok-1" />);
 
     // One Desktop, one Mobile Device, one Tablet
     expect(screen.getAllByText("Desktop")).toHaveLength(1);
@@ -63,23 +64,17 @@ describe("SessionsTab", () => {
   });
 
   it("marks the current session with a 'Current' badge and no revoke button", () => {
-    render(
-      <SessionsTab sessions={mockSessions} currentSessionToken="session-1" />,
-    );
+    render(<SessionsTab sessions={mockSessions} currentSessionToken="tok-1" />);
 
     expect(screen.getByText("Current")).toBeInTheDocument();
     // Two non-current sessions → two Revoke buttons
     expect(screen.getAllByRole("button", { name: /revoke/i })).toHaveLength(2);
   });
 
-  it("shows location and IP address for sessions that have them", () => {
-    render(
-      <SessionsTab sessions={mockSessions} currentSessionToken="session-1" />,
-    );
+  it("shows IP address for sessions that have them", () => {
+    render(<SessionsTab sessions={mockSessions} currentSessionToken="tok-1" />);
 
-    expect(screen.getByText("New York, US")).toBeInTheDocument();
     expect(screen.getByText("192.168.1.1")).toBeInTheDocument();
-    expect(screen.getByText("Los Angeles, US")).toBeInTheDocument();
     expect(screen.getByText("10.0.0.2")).toBeInTheDocument();
   });
 
@@ -88,30 +83,26 @@ describe("SessionsTab", () => {
 
     expect(screen.getByText("No active sessions")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /revoke/i }),
+      screen.queryByRole("button", { name: /revoke/i })
     ).not.toBeInTheDocument();
   });
 
   it("calls the revoke server function and shows a toast on success", async () => {
     const user = userEvent.setup();
-    render(
-      <SessionsTab sessions={mockSessions} currentSessionToken="session-1" />,
-    );
+    render(<SessionsTab sessions={mockSessions} currentSessionToken="tok-1" />);
 
     const [revokeBtn] = screen.getAllByRole("button", { name: /revoke/i });
     await user.click(revokeBtn);
 
     await waitFor(() => {
-      expect(mockRevokeFn).toHaveBeenCalledWith({ data: "session-2" });
+      expect(mockRevokeFn).toHaveBeenCalledWith({ data: "tok-2" });
     });
     expect(mockInvalidate).toHaveBeenCalled();
     expect(toast).toHaveBeenCalledWith("Session revoked successfully!");
   });
 
   it("does not render a revoke button for the current session", () => {
-    render(
-      <SessionsTab sessions={mockSessions} currentSessionToken="session-2" />,
-    );
+    render(<SessionsTab sessions={mockSessions} currentSessionToken="tok-2" />);
 
     expect(screen.getByText("Current")).toBeInTheDocument();
     // Session 1 and session 3 are non-current → two buttons

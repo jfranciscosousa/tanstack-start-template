@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AppError } from "~/errors";
-import { auth } from "~/lib/auth";
-import { createTestUser, makeSessionMock } from "~/test/server-utils";
 import type { TestUser } from "~/test/server-utils";
+import { createTestUser, makeSessionMock } from "~/test/server-utils";
+import { auth } from "~/lib/auth";
+import type { AppError } from "~/errors";
 
 import { updateUserFn, updateThemeFn } from "./user-handlers";
 
@@ -36,8 +36,12 @@ describe("User handlers", () => {
   describe("updateUserFn", () => {
     it("should call updateUser and skip changePassword when no new password", async () => {
       const mockSession = makeSessionMock(testUser);
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
-      vi.mocked(auth.api.updateUser).mockResolvedValue({} as any);
+      vi.mocked(auth.api.getSession).mockResolvedValue(
+        mockSession as Awaited<ReturnType<typeof auth.api.getSession>>
+      );
+      vi.mocked(auth.api.updateUser).mockResolvedValue(
+        {} as Awaited<ReturnType<typeof auth.api.updateUser>>
+      );
 
       await updateUserFn({
         data: {
@@ -50,17 +54,20 @@ describe("User handlers", () => {
 
       expect(vi.mocked(auth.api.updateUser)).toHaveBeenCalledWith(
         expect.objectContaining({
-          body: { name: "New Name", email: "new@example.com" },
-        }),
+          body: { name: "New Name" },
+        })
       );
       expect(vi.mocked(auth.api.changePassword)).not.toHaveBeenCalled();
     });
 
     it("should call changePassword with revokeOtherSessions when password is provided", async () => {
       const mockSession = makeSessionMock(testUser);
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
-      vi.mocked(auth.api.updateUser).mockResolvedValue({} as any);
-      vi.mocked(auth.api.changePassword).mockResolvedValue({} as any);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.updateUser).mockResolvedValue({ status: true });
+      vi.mocked(auth.api.changePassword).mockResolvedValue({
+        token: "mock",
+        user: testUser,
+      });
 
       await updateUserFn({
         data: {
@@ -71,15 +78,14 @@ describe("User handlers", () => {
         },
       });
 
-      expect(vi.mocked(auth.api.changePassword)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: {
-            currentPassword: "oldpass123",
-            newPassword: "newpass123",
-            revokeOtherSessions: true,
-          },
-        }),
-      );
+      expect(vi.mocked(auth.api.changePassword)).toHaveBeenCalledWith({
+        body: {
+          currentPassword: "oldpass123",
+          newPassword: "newpass123",
+          revokeOtherSessions: true,
+        },
+        headers: expect.anything(),
+      });
     });
 
     it("should throw NOT_FOUND when not logged in", async () => {
@@ -104,7 +110,7 @@ describe("User handlers", () => {
   describe("updateThemeFn", () => {
     it("should call updateUserTheme with the new theme", async () => {
       const mockSession = makeSessionMock(testUser);
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
 
       const { updateUserTheme } =
         await import("~/server/services/user-services");
@@ -113,7 +119,7 @@ describe("User handlers", () => {
 
       expect(vi.mocked(updateUserTheme)).toHaveBeenCalledWith(
         testUser.id,
-        "light",
+        "light"
       );
     });
   });

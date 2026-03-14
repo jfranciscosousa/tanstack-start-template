@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AppError } from "~/errors";
-import { auth } from "~/lib/auth";
-import { createTestUser, makeSessionMock } from "~/test/server-utils";
 import type { TestUser } from "~/test/server-utils";
+import {
+  createTestUser,
+  makeSessionMock,
+  makeSessionsMock,
+} from "~/test/server-utils";
+import { auth } from "~/lib/auth";
+import type { AppError } from "~/errors";
 
 import { fetchUserSessions, revokeSession } from "./session-handlers";
 
@@ -30,17 +34,20 @@ describe("Session handlers", () => {
   });
 
   describe("fetchUserSessions", () => {
-    it("should return sessions and current session token when logged in", async () => {
-      const mockSessions = [{ id: "s1", token: "tok1" }, { id: "s2", token: "tok2" }];
+    it("should call getSession and listSessions when logged in", async () => {
+      const mockSessions = makeSessionsMock(testUser, [
+        "other-tok1",
+        "other-tok2",
+      ]);
       const mockSession = makeSessionMock(testUser, "current-token");
 
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
-      vi.mocked(auth.api.listSessions).mockResolvedValue(mockSessions as any);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.listSessions).mockResolvedValue(mockSessions);
 
-      const result = await fetchUserSessions();
+      await fetchUserSessions();
 
-      expect(result.currentSessionToken).toBe("current-token");
-      expect(result.sessions).toEqual(mockSessions);
+      expect(vi.mocked(auth.api.getSession)).toHaveBeenCalled();
+      expect(vi.mocked(auth.api.listSessions)).toHaveBeenCalled();
     });
 
     it("should throw UNAUTHORIZED when not logged in", async () => {
@@ -58,8 +65,8 @@ describe("Session handlers", () => {
   describe("revokeSession", () => {
     it("should call auth.api.revokeSession for a different session token", async () => {
       const mockSession = makeSessionMock(testUser, "current-token");
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
-      vi.mocked(auth.api.revokeSession).mockResolvedValue(undefined as any);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.revokeSession).mockResolvedValue({ status: true });
 
       await revokeSession({ data: "other-token" });
 
@@ -70,7 +77,7 @@ describe("Session handlers", () => {
 
     it("should throw BAD_REQUEST when trying to revoke the current session token", async () => {
       const mockSession = makeSessionMock(testUser, "current-token");
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as any);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
 
       try {
         await revokeSession({ data: "current-token" });

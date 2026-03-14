@@ -5,15 +5,20 @@ import { render, screen, waitFor } from "~/test/utils";
 
 import LoginPage from "./login-page";
 
-const mockLoginFn = vi.fn();
-const mockInvalidate = vi.fn();
+const mockSignIn = vi.fn();
+const mockNavigate = vi.fn().mockResolvedValue(undefined);
+const mockInvalidate = vi.fn().mockResolvedValue(undefined);
 const mockUseSearch = vi.fn().mockReturnValue({ redirectUrl: undefined });
 
-vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mockLoginFn }));
+vi.mock("~/lib/auth-client", () => ({
+  authClient: {
+    signIn: {
+      email: (input: { email: string; password: string }) => mockSignIn(input),
+    },
+  },
+}));
 vi.mock("@tanstack/react-router", () => ({
-  useRouter: () => ({
-    invalidate: mockInvalidate.mockResolvedValue(undefined),
-  }),
+  useRouter: () => ({ navigate: mockNavigate, invalidate: mockInvalidate }),
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
     <a href={to}>{children}</a>
   ),
@@ -21,7 +26,6 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("~/routes/_unauthed/login", () => ({
   Route: { useSearch: () => mockUseSearch() },
 }));
-vi.mock("~/server/handlers/session-handlers", () => ({ loginFn: {} }));
 
 describe("LoginPage", () => {
   it("renders the email and password fields", () => {
@@ -39,7 +43,8 @@ describe("LoginPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("calls the login server function with email and password on submit", async () => {
+  it("calls authClient.signIn.email with email and password on submit", async () => {
+    mockSignIn.mockResolvedValueOnce({ error: null });
     const user = userEvent.setup();
     render(<LoginPage />);
 
@@ -48,19 +53,17 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockLoginFn).toHaveBeenCalledWith({
-        data: {
-          email: "john@example.com",
-          password: "secret123",
-          redirectUrl: "",
-        },
+      expect(mockSignIn).toHaveBeenCalledWith({
+        email: "john@example.com",
+        password: "secret123",
       });
     });
-    expect(mockInvalidate).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith({ to: "/" });
   });
 
-  it("includes the redirectUrl from search params in the submitted data", async () => {
+  it("navigates to redirectUrl after successful login", async () => {
     mockUseSearch.mockReturnValue({ redirectUrl: "/dashboard" });
+    mockSignIn.mockResolvedValueOnce({ error: null });
     const user = userEvent.setup();
     render(<LoginPage />);
 
@@ -69,13 +72,7 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockLoginFn).toHaveBeenCalledWith({
-        data: {
-          email: "john@example.com",
-          password: "secret123",
-          redirectUrl: "/dashboard",
-        },
-      });
+      expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
     });
   });
 
@@ -86,12 +83,14 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(mockLoginFn).not.toHaveBeenCalled();
+      expect(mockSignIn).not.toHaveBeenCalled();
     });
   });
 
   it("shows a server error alert when the login function throws", async () => {
-    mockLoginFn.mockRejectedValueOnce(new Error("Invalid credentials"));
+    mockSignIn.mockResolvedValueOnce({
+      error: { message: "Invalid credentials" },
+    });
     const user = userEvent.setup();
     render(<LoginPage />);
 

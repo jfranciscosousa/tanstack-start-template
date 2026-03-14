@@ -22,7 +22,16 @@ fi
 
 echo "🧪 Running unit tests with Vitest..."
 
-migrate_output=$(pnpm drizzle-kit migrate 2>&1) || { echo "$migrate_output" >&2; exit 1; }
+# Drop all tables so drizzle-kit push sees a clean DB (no rename prompts)
+node --input-type=module << 'EOF'
+import postgres from "postgres";
+const sql = postgres(process.env.DATABASE_URL);
+await sql`DROP SCHEMA public CASCADE`;
+await sql`CREATE SCHEMA public`;
+await sql.end();
+EOF
+
+pnpm drizzle-kit push
 
 # Run Vitest in run mode (non-watch)
 NODE_ENV=test pnpm vitest run "$@"
