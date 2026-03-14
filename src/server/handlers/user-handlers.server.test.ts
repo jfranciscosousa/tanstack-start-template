@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TestUser } from "~/test/server-utils";
 import { createTestUser, makeSessionMock } from "~/test/server-utils";
+import type { TestUser } from "~/test/server-utils";
 import { auth } from "~/lib/auth";
 import type { AppError } from "~/errors";
 
@@ -17,6 +17,7 @@ vi.mock("~/lib/auth", () => ({
       getSession: vi.fn(),
       updateUser: vi.fn(),
       changePassword: vi.fn(),
+      changeEmail: vi.fn(),
     },
   },
 }));
@@ -86,6 +87,45 @@ describe("User handlers", () => {
         },
         headers: expect.anything(),
       });
+    });
+
+    it("should call changeEmail when email is provided", async () => {
+      const mockSession = makeSessionMock(testUser);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.updateUser).mockResolvedValue({ status: true });
+      vi.mocked(auth.api.changeEmail).mockResolvedValue({ status: true });
+
+      await updateUserFn({
+        data: {
+          name: "Name",
+          email: "new@example.com",
+          currentPassword: "",
+          password: "",
+          passwordConfirmation: "",
+        },
+      });
+
+      expect(vi.mocked(auth.api.changeEmail)).toHaveBeenCalledWith({
+        headers: expect.anything(),
+        body: { newEmail: "new@example.com" },
+      });
+    });
+
+    it("should not call changeEmail when email is not provided", async () => {
+      const mockSession = makeSessionMock(testUser);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.updateUser).mockResolvedValue({ status: true });
+
+      await updateUserFn({
+        data: {
+          name: "Name",
+          currentPassword: "",
+          password: "",
+          passwordConfirmation: "",
+        },
+      });
+
+      expect(vi.mocked(auth.api.changeEmail)).not.toHaveBeenCalled();
     });
 
     it("should throw NOT_FOUND when not logged in", async () => {
