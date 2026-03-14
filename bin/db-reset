@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Reset the database by dropping and recreating the public schema, then pushing with drizzle-kit
+# WARNING: This destroys all data in the database!
+
+set -e  # Exit on error
+
+echo "⚠️  Dropping and recreating the public schema..."
+node --input-type=module << 'EOF'
+import postgres from "postgres";
+const sql = postgres(process.env.DATABASE_URL);
+await sql`DROP SCHEMA public CASCADE`;
+await sql`CREATE SCHEMA public`;
+await sql.end();
+EOF
+
+echo "🗄️  Pushing schema with drizzle-kit..."
+pnpm drizzle-kit push --force
+
+echo "✅ Database reset complete!"

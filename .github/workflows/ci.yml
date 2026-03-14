@@ -68,7 +68,7 @@ jobs:
 
       - name: Vitest
         run: |
-          pnpm drizzle-kit migrate
+          bin/db-reset
           bin/test-vitest
         env:
           SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired

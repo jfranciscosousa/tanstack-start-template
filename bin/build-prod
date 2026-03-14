@@ -14,7 +14,7 @@ echo "🔨 Building TanStack Start application..."
 pnpm vite build
 
 echo "Applying migrations"
-pnpm drizzle-kit migrate
+bin/db-reset
 
 echo "✅ Build completed successfully!"
 echo "📁 Build files are in: .output/"
