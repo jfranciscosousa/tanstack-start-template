@@ -11,7 +11,7 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_DB: react-router-starter-test
+          POSTGRES_DB: test
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
@@ -68,18 +68,20 @@ jobs:
 
       - name: Vitest
         run: |
-          bin/db-reset
           bin/test-vitest
         env:
-          SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/react-router-starter-test
+          BETTER_AUTH_SECRET: ChangeThisBeforeShippingToProdOrYouWillBeFired
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
+          DISABLE_EMAIL_VERIFICATION: true
 
       - name: E2E
         run: |
           bin/test-e2e
         env:
-          SECRET_KEY_BASE: ChangeThisBeforeShippingToProdOrYouWillBeFired
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/react-router-starter-test
+          BETTER_AUTH_SECRET: ChangeThisBeforeShippingToProdOrYouWillBeFired
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
+          DISABLE_EMAIL_VERIFICATION: true
+          BETTER_AUTH_URL: http://localhost:3001
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
