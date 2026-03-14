@@ -1,5 +1,5 @@
-import { devices } from "@playwright/test";
 import type { PlaywrightTestConfig } from "@playwright/test";
+import { devices } from "@playwright/test";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -44,9 +44,8 @@ const config: PlaywrightTestConfig = {
   },
   webServer: {
     command: "pnpm vite dev --port 3001",
-    timeout: 5000,
+    timeout: 10000,
     url: "http://localhost:3001",
-    reuseExistingServer: !process.env.CI,
   },
   workers: 1,
 };
