@@ -9,7 +9,7 @@ import { db } from "~/server/db";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 function appUrl() {
-  const vercelUrl = process.env.VERCEL_BRANCH_URL;
+  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
   if (vercelUrl) return `https://${vercelUrl}`;
 
