@@ -83,7 +83,6 @@ describe("SignupPage", () => {
         password: "password123",
       });
     });
-    expect(mockNavigate).toHaveBeenCalledWith({ to: "/verify-email" });
   });
 
   it("blocks submission and shows an error when passwords do not match", async () => {

@@ -1,8 +1,8 @@
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { authClient } from "~/lib/auth-client";
 import { signUpSchema } from "~/schemas/user-schemas";
 import { Route } from "~/routes/_unauthed/signup";
+import { authClient } from "~/lib/auth-client";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
 
@@ -94,7 +94,7 @@ export default function SignupPage() {
                 password: values.password,
               });
               if (error) throw new Error(error.message);
-              await router.navigate({ to: "/verify-email" });
+              await router.navigate({ to: "/" });
             }}
             renderSubmit={form => (
               <form.Subscribe selector={state => state.isSubmitting}>

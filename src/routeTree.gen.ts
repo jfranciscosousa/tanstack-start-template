@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnauthedRouteImport } from './routes/_unauthed'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
-import { Route as UnauthedVerifyEmailRouteImport } from './routes/_unauthed/verify-email'
 import { Route as UnauthedSignupRouteImport } from './routes/_unauthed/signup'
 import { Route as UnauthedLoginRouteImport } from './routes/_unauthed/login'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
@@ -30,11 +29,6 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthedRoute,
-} as any)
-const UnauthedVerifyEmailRoute = UnauthedVerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
-  getParentRoute: () => UnauthedRoute,
 } as any)
 const UnauthedSignupRoute = UnauthedSignupRouteImport.update({
   id: '/signup',
@@ -62,7 +56,6 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthedProfileRoute
   '/login': typeof UnauthedLoginRoute
   '/signup': typeof UnauthedSignupRoute
-  '/verify-email': typeof UnauthedVerifyEmailRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -70,7 +63,6 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthedProfileRoute
   '/login': typeof UnauthedLoginRoute
   '/signup': typeof UnauthedSignupRoute
-  '/verify-email': typeof UnauthedVerifyEmailRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -80,21 +72,14 @@ export interface FileRoutesById {
   '/_authed/profile': typeof AuthedProfileRoute
   '/_unauthed/login': typeof UnauthedLoginRoute
   '/_unauthed/signup': typeof UnauthedSignupRoute
-  '/_unauthed/verify-email': typeof UnauthedVerifyEmailRoute
   '/_authed/': typeof AuthedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/profile'
-    | '/login'
-    | '/signup'
-    | '/verify-email'
-    | '/api/auth/$'
+  fullPaths: '/' | '/profile' | '/login' | '/signup' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/login' | '/signup' | '/verify-email' | '/api/auth/$'
+  to: '/' | '/profile' | '/login' | '/signup' | '/api/auth/$'
   id:
     | '__root__'
     | '/_authed'
@@ -102,7 +87,6 @@ export interface FileRouteTypes {
     | '/_authed/profile'
     | '/_unauthed/login'
     | '/_unauthed/signup'
-    | '/_unauthed/verify-email'
     | '/_authed/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -135,13 +119,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
-    }
-    '/_unauthed/verify-email': {
-      id: '/_unauthed/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof UnauthedVerifyEmailRouteImport
-      parentRoute: typeof UnauthedRoute
     }
     '/_unauthed/signup': {
       id: '/_unauthed/signup'
@@ -190,13 +167,11 @@ const AuthedRouteWithChildren =
 interface UnauthedRouteChildren {
   UnauthedLoginRoute: typeof UnauthedLoginRoute
   UnauthedSignupRoute: typeof UnauthedSignupRoute
-  UnauthedVerifyEmailRoute: typeof UnauthedVerifyEmailRoute
 }
 
 const UnauthedRouteChildren: UnauthedRouteChildren = {
   UnauthedLoginRoute: UnauthedLoginRoute,
   UnauthedSignupRoute: UnauthedSignupRoute,
-  UnauthedVerifyEmailRoute: UnauthedVerifyEmailRoute,
 }
 
 const UnauthedRouteWithChildren = UnauthedRoute._addFileChildren(

@@ -1,12 +1,9 @@
-import { Resend } from "resend";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth";
 
 // oxlint-disable-next-line import/no-namespace
 import * as schema from "~/server/db/schema";
 import { db } from "~/server/db";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function appUrl() {
   const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
@@ -29,21 +26,6 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: process.env.DISABLE_EMAIL_VERIFICATION !== "true",
-  },
-  emailVerification: {
-    sendVerificationEmail: async ({ user, url }) => {
-      // VerifyEmailTemplate imported here to avoid circular deps
-      const { VerifyEmailTemplate } = await import("~/emails/verify-email");
-
-      await resend.emails.send({
-        from: "noreply@yourdomain.com",
-        to: user.email,
-        subject: "Verify your email address",
-        // oxlint-disable-next-line new-cap
-        react: VerifyEmailTemplate({ verificationUrl: url }),
-      });
-    },
   },
   user: {
     additionalFields: {
