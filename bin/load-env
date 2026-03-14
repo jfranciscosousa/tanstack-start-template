@@ -5,6 +5,12 @@
 # Example: . bin/load-env .env
 # Example: . bin/load-env .env.test
 
+# In CI, env vars are injected directly — skip loading
+if [ -n "${CI:-}" ]; then
+    export ENV_LOADED="ci"
+    return 0 2>/dev/null || exit 0
+fi
+
 # Check if environment is already loaded to prevent conflicts
 if [ -n "${ENV_LOADED:-}" ]; then
     echo "Already loaded env file previously"

@@ -2,24 +2,23 @@ import { eq } from "drizzle-orm";
 import { expect } from "@playwright/test";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
-
-import { verifyPassword } from "~/server/services/password-service";
 import { users } from "~/server/db/schema";
 import { db } from "~/server/db";
 
 import { USER_TEST_PASSWORD, createUserAndLogin, test } from "./utils";
+import { auth } from "~/lib/auth";
 
 function assertUserSame(user1: object, user2: object) {
   return expect(
-    JSON.parse(JSON.stringify({ ...user1, password: null, updatedAt: null }))
+    JSON.parse(JSON.stringify({ ...user1, password: null, updatedAt: null })),
   ).toEqual(
     JSON.parse(
       JSON.stringify({
         ...user2,
         password: null,
         updatedAt: null,
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -35,12 +34,10 @@ test("renders profile", async ({ page, screen }) => {
 test("updates profile", async ({ page, screen }) => {
   const user = await createUserAndLogin(page, screen);
   const newName = faker.person.firstName();
-  const newEmail = faker.internet.email();
   const newPassword = faker.internet.password();
 
   await page.goto("/profile");
   await page.getByLabel("Full Name").fill(newName);
-  await page.getByLabel("Email Address").fill(newEmail);
   await page.locator("#password").fill(newPassword);
   await page.getByLabel("Confirm New Password").fill(newPassword);
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
@@ -48,7 +45,7 @@ test("updates profile", async ({ page, screen }) => {
 
   await waitFor(async () => {
     await expect(
-      screen.getByText("Profile updated successfully!")
+      screen.getByText("Profile updated successfully!"),
     ).toBeVisible();
   });
 
@@ -63,9 +60,12 @@ test("updates profile", async ({ page, screen }) => {
   }
 
   expect(updatedUser.name).toEqual(newName);
-  expect(updatedUser.email).toEqual(newEmail);
   // Check that the new password is applied
-  expect(await verifyPassword(newPassword, updatedUser.password)).toBeTruthy();
+  expect(
+    await auth.api.signInEmail({
+      body: { email: user.email, password: newPassword },
+    }),
+  ).toBeTruthy();
 });
 
 test("does not update profile if password confirmation does not match", async ({
@@ -96,7 +96,9 @@ test("does not update profile if password confirmation does not match", async ({
   assertUserSame(updatedUser, user);
   // Check that the old password is still valid
   expect(
-    await verifyPassword(USER_TEST_PASSWORD, updatedUser.password)
+    await auth.api.signInEmail({
+      body: { email: user.email, password: USER_TEST_PASSWORD },
+    }),
   ).toBeTruthy();
 });
 

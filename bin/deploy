@@ -14,7 +14,7 @@ echo "✅ Validating configuration..."
 pnpm tsx tasks/validateConfig.ts
 
 echo "📊 Setting up database schema with Drizzle..."
-pnpm drizzle-kit migrate
+bin/db-reset
 
 echo "🔨 Building application..."
 bin/build

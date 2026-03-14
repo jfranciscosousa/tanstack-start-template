@@ -9,19 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as UnauthedRouteImport } from './routes/_unauthed'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as UnauthedVerifyEmailRouteImport } from './routes/_unauthed/verify-email'
 import { Route as UnauthedSignupRouteImport } from './routes/_unauthed/signup'
 import { Route as UnauthedLoginRouteImport } from './routes/_unauthed/login'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const LogoutRoute = LogoutRouteImport.update({
-  id: '/logout',
-  path: '/logout',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const UnauthedRoute = UnauthedRouteImport.update({
   id: '/_unauthed',
   getParentRoute: () => rootRouteImport,
@@ -34,6 +30,11 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthedRoute,
+} as any)
+const UnauthedVerifyEmailRoute = UnauthedVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => UnauthedRoute,
 } as any)
 const UnauthedSignupRoute = UnauthedSignupRouteImport.update({
   id: '/signup',
@@ -50,62 +51,70 @@ const AuthedProfileRoute = AuthedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthedRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
-  '/logout': typeof LogoutRoute
   '/profile': typeof AuthedProfileRoute
   '/login': typeof UnauthedLoginRoute
   '/signup': typeof UnauthedSignupRoute
+  '/verify-email': typeof UnauthedVerifyEmailRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthedIndexRoute
-  '/logout': typeof LogoutRoute
   '/profile': typeof AuthedProfileRoute
   '/login': typeof UnauthedLoginRoute
   '/signup': typeof UnauthedSignupRoute
+  '/verify-email': typeof UnauthedVerifyEmailRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authed': typeof AuthedRouteWithChildren
   '/_unauthed': typeof UnauthedRouteWithChildren
-  '/logout': typeof LogoutRoute
   '/_authed/profile': typeof AuthedProfileRoute
   '/_unauthed/login': typeof UnauthedLoginRoute
   '/_unauthed/signup': typeof UnauthedSignupRoute
+  '/_unauthed/verify-email': typeof UnauthedVerifyEmailRoute
   '/_authed/': typeof AuthedIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/logout' | '/profile' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/profile'
+    | '/login'
+    | '/signup'
+    | '/verify-email'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/logout' | '/profile' | '/login' | '/signup'
+  to: '/' | '/profile' | '/login' | '/signup' | '/verify-email' | '/api/auth/$'
   id:
     | '__root__'
     | '/_authed'
     | '/_unauthed'
-    | '/logout'
     | '/_authed/profile'
     | '/_unauthed/login'
     | '/_unauthed/signup'
+    | '/_unauthed/verify-email'
     | '/_authed/'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   UnauthedRoute: typeof UnauthedRouteWithChildren
-  LogoutRoute: typeof LogoutRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/logout': {
-      id: '/logout'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: typeof LogoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_unauthed': {
       id: '/_unauthed'
       path: ''
@@ -126,6 +135,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/_unauthed/verify-email': {
+      id: '/_unauthed/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof UnauthedVerifyEmailRouteImport
+      parentRoute: typeof UnauthedRoute
     }
     '/_unauthed/signup': {
       id: '/_unauthed/signup'
@@ -148,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedProfileRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -167,11 +190,13 @@ const AuthedRouteWithChildren =
 interface UnauthedRouteChildren {
   UnauthedLoginRoute: typeof UnauthedLoginRoute
   UnauthedSignupRoute: typeof UnauthedSignupRoute
+  UnauthedVerifyEmailRoute: typeof UnauthedVerifyEmailRoute
 }
 
 const UnauthedRouteChildren: UnauthedRouteChildren = {
   UnauthedLoginRoute: UnauthedLoginRoute,
   UnauthedSignupRoute: UnauthedSignupRoute,
+  UnauthedVerifyEmailRoute: UnauthedVerifyEmailRoute,
 }
 
 const UnauthedRouteWithChildren = UnauthedRoute._addFileChildren(
@@ -181,7 +206,7 @@ const UnauthedRouteWithChildren = UnauthedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   UnauthedRoute: UnauthedRouteWithChildren,
-  LogoutRoute: LogoutRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

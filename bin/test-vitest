@@ -22,7 +22,7 @@ fi
 
 echo "🧪 Running unit tests with Vitest..."
 
-migrate_output=$(pnpm drizzle-kit migrate 2>&1) || { echo "$migrate_output" >&2; exit 1; }
+bin/db-reset
 
 # Run Vitest in run mode (non-watch)
 NODE_ENV=test pnpm vitest run "$@"

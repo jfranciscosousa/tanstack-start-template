@@ -1,115 +1,47 @@
 import z from "zod";
+import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
-import { redirect } from "@tanstack/react-router";
 
-import { loginSchema } from "~/schemas/session-schemas";
 import { AppError } from "~/errors";
+import { auth } from "~/lib/auth";
 
-import { useWebSession } from "../web-session";
-import { getUserByEmail } from "../services/user-services";
-import {
-  createSession,
-  deleteSession,
-  getUserSessions,
-  verifyUserSession,
-} from "../services/session-service";
-import { verifyPassword } from "../services/password-service";
-import { getRequestInfo } from "../request-info";
-import type { UserWithoutPassword } from "../db/schema";
-
-export { loginSchema };
-
-export const loginFn = createServerFn({ method: "POST" })
-  .inputValidator(data => loginSchema.parse(data))
-  .handler(async ({ data }) => {
-    const user = await getUserByEmail(data.email);
-
-    if (!user || !(await verifyPassword(data.password, user.password))) {
-      throw new AppError(
-        "NOT_FOUND",
-        "The combination of email and password is incorrect."
-      );
-    }
-
-    await createAndUseSession(user);
-
-    throw redirect({
-      href: data.redirectUrl || "/",
-    });
-  });
-
-/**
- * Creates a session in the database and updates the web session (cookie)
- */
-export const createAndUseSession = createServerOnlyFn(
-  async (user: UserWithoutPassword) => {
-    const request = getRequest();
-    const session = await createSession(user, await getRequestInfo(request));
-    const webSession = await useWebSession();
-
-    await webSession.update({
-      id: session.id,
-    });
-  }
-);
-
-export const invalidateCurrentSession = createServerOnlyFn(async () => {
-  const webSession = await useWebSession();
-
-  if (webSession.data.id) {
-    await deleteSession(webSession.data.id);
-  }
-
-  await webSession.clear();
-});
-
-/**
- * Fetches all sessions for the current user
- */
 export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
   async () => {
-    const webSession = await useWebSession();
+    const req = getRequest();
+    const session = await auth.api.getSession({ headers: req.headers });
 
-    if (!webSession.user) {
+    if (!session) {
       throw new AppError(
         "UNAUTHORIZED",
         "You must be logged in to view sessions"
       );
     }
 
-    const userSessions = await getUserSessions(webSession.user);
+    const sessions = await auth.api.listSessions({ headers: req.headers });
 
     return {
-      currentSessionId: webSession.data.id,
-      sessions: userSessions,
+      currentSessionToken: session.session.token,
+      sessions,
     };
   }
 );
 
-/**
- * Revokes a specific session
- */
 export const revokeSession = createServerFn({ method: "POST" })
-  .inputValidator((sessionId: string) => z.uuid().parse(sessionId))
-  .handler(async ({ data: sessionId }) => {
-    const webSession = await useWebSession();
+  .inputValidator((token: unknown) => z.string().parse(token))
+  .handler(async ({ data: token }) => {
+    const req = getRequest();
+    const session = await auth.api.getSession({ headers: req.headers });
 
-    if (!webSession.user) {
+    if (!session) {
       throw new AppError("UNAUTHORIZED", "You must be logged in");
     }
 
-    // Verify the session belongs to the user
-    const session = await verifyUserSession(webSession.user, sessionId);
-
-    if (!session) {
-      throw new AppError("NOT_FOUND", "Session not found");
-    }
-
-    // Don't allow revoking the current session
-    if (sessionId === webSession.data.id) {
+    if (token === session.session.token) {
       throw new AppError("BAD_REQUEST", "Cannot revoke your current session");
     }
 
-    await deleteSession(session.id);
+    await auth.api.revokeSession({
+      headers: req.headers,
+      body: { token },
+    });
   });

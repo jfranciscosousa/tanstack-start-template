@@ -141,7 +141,6 @@ function RouteComponent() {
   const router = useRouter();
   const todos = Route.useLoaderData();
   const inputRef = useRef<HTMLInputElement>(null);
-
   const createTodoMutation = useMutation({
     fn: useServerFn(createTodoFn),
     onError: () => {

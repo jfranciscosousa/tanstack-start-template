@@ -1,26 +1,35 @@
-import { Toaster } from "sonner";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRoute,
 } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { Toaster } from "sonner";
 
-import { fetchCurrentUser } from "~/server/web-session";
-import { seo } from "~/server/seo.js";
-import { AppError } from "~/errors";
-import { NotFound } from "~/components/not-found.js";
 import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
+import { NotFound } from "~/components/not-found.js";
+import { AppError } from "~/errors";
+import { auth } from "~/lib/auth";
+import type { User } from "~/server/db/schema";
+import { seo } from "~/server/seo.js";
 
 import appCss from "~/styles/app.css?url";
+
+const fetchCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
+  const req = getRequest();
+  const session = await auth.api.getSession({ headers: req.headers });
+  return (session?.user as User) ?? null;
+});
 
 export const Route = createRootRoute({
   beforeLoad: async () => ({
     user: await fetchCurrentUser(),
   }),
   component: RootComponent,
-  errorComponent: props => (
+  errorComponent: (props) => (
     <RootDocument>
       <DefaultCatchBoundary {...props} />
     </RootDocument>
@@ -62,7 +71,7 @@ export const Route = createRootRoute({
       }),
     ],
   }),
-  loader: ctx => ({
+  loader: (ctx) => ({
     user: ctx.context.user,
   }),
   notFoundComponent: () => <NotFound />,
@@ -81,7 +90,7 @@ export function useCurrentUser() {
 
 function RootComponent() {
   const { user } = Route.useLoaderData();
-  const theme = user?.theme ?? "dark";
+  const theme = (user?.theme ?? "dark") as "dark" | "light";
 
   return (
     <RootDocument theme={theme}>

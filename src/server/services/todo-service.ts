@@ -1,26 +1,24 @@
 import { and, desc, eq } from "drizzle-orm";
+import type { User } from "better-auth";
 import { createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";
 
 import { todos } from "../db/schema";
-import type { UserWithoutPassword } from "../db/schema";
 import { db } from "../db";
 
-export const getTodos = createServerOnlyFn(
-  async (user: UserWithoutPassword) => {
-    const userTodos = await db
-      .select()
-      .from(todos)
-      .where(eq(todos.userId, user.id))
-      .orderBy(desc(todos.createdAt));
+export const getTodos = createServerOnlyFn(async (user: User) => {
+  const userTodos = await db
+    .select()
+    .from(todos)
+    .where(eq(todos.userId, user.id))
+    .orderBy(desc(todos.createdAt));
 
-    return userTodos;
-  }
-);
+  return userTodos;
+});
 
 export const createTodo = createServerOnlyFn(
-  async (user: UserWithoutPassword, content: string) => {
+  async (user: User, content: string) => {
     const [todo] = await db
       .insert(todos)
       .values({
@@ -34,7 +32,7 @@ export const createTodo = createServerOnlyFn(
 );
 
 export const deleteTodo = createServerOnlyFn(
-  async (user: UserWithoutPassword, todoId: string) => {
+  async (user: User, todoId: string) => {
     const todo = await db
       .delete(todos)
       .where(and(eq(todos.id, todoId), eq(todos.userId, user.id)))
@@ -48,10 +46,8 @@ export const deleteTodo = createServerOnlyFn(
   }
 );
 
-export const deleteAllTodos = createServerOnlyFn(
-  async (user: UserWithoutPassword) => {
-    await db.delete(todos).where(eq(todos.userId, user.id));
+export const deleteAllTodos = createServerOnlyFn(async (user: User) => {
+  await db.delete(todos).where(eq(todos.userId, user.id));
 
-    return { success: true };
-  }
-);
+  return { success: true };
+});

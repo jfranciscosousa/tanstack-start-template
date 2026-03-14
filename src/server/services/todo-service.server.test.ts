@@ -3,7 +3,6 @@ import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
 import { createTestUser } from "~/test/server-utils";
-import type { UserWithoutPassword } from "~/server/db/schema";
 
 import {
   createTodo,
@@ -11,11 +10,12 @@ import {
   deleteTodo,
   getTodos,
 } from "./todo-service";
+import type { User } from "../db/schema";
 import { todos } from "../db/schema";
 import { db } from "../db";
 
 describe("Todo service", () => {
-  let testUser: UserWithoutPassword;
+  let testUser: User;
 
   beforeEach(async () => {
     testUser = await createTestUser();

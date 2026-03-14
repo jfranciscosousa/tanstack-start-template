@@ -2,7 +2,9 @@ import { toast } from "sonner";
 import { useCallback } from "react";
 import { LogOut, Moon, Settings, Sun } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
+
+import { authClient } from "~/lib/auth-client";
 
 import { updateThemeFn } from "~/server/handlers/user-handlers";
 import { useTheme } from "~/hooks/use-theme";
@@ -21,13 +23,6 @@ const profileLink = (
   <Link to="/profile" className="flex w-full items-center gap-2">
     <Settings size={14} aria-hidden="true" />
     Edit Profile
-  </Link>
-);
-
-const signOutLink = (
-  <Link to="/logout" className="flex w-full items-center gap-2">
-    <LogOut size={14} aria-hidden="true" />
-    Sign out
   </Link>
 );
 
@@ -63,6 +58,13 @@ function UserMonogram({
 
 export function Navbar({ user }: NavbarProps) {
   const updateTheme = useServerFn(updateThemeFn);
+  const router = useRouter();
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    await router.navigate({ to: "/" });
+    await router.invalidate();
+  }
 
   const onUpdate = useCallback(
     (theme: "dark" | "light") => {
@@ -152,9 +154,12 @@ export function Navbar({ user }: NavbarProps) {
             <DropdownMenuItem render={profileLink} />
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-destructive data-highlighted:text-destructive"
-              render={signOutLink}
-            />
+              className="text-destructive data-highlighted:text-destructive cursor-pointer"
+              onClick={handleSignOut}
+            >
+              <LogOut size={14} aria-hidden="true" />
+              Sign out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

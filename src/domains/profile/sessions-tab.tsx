@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import {
   Clock,
   Loader2,
-  MapPin,
   Monitor,
   Shield,
   Smartphone,
@@ -12,7 +11,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 
 import { revokeSession } from "~/server/handlers/session-handlers";
-import type { Session } from "~/server/db/schema";
 import { cn } from "~/lib/utils";
 import { useMutation } from "~/hooks/use-mutation";
 import { renderError } from "~/errors";
@@ -23,11 +21,20 @@ import { Avatar } from "~/components/ui/avatar";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 
 interface SessionsTabProps {
-  sessions: Session[];
-  currentSessionId: string | undefined;
+  sessions: {
+    id: string;
+    token: string;
+    userId: string;
+    userAgent?: string | null | undefined;
+    ipAddress?: string | null | undefined;
+    createdAt: Date;
+    updatedAt: Date;
+    expiresAt: Date;
+  }[];
+  currentSessionToken: string | undefined;
 }
 
-function getDeviceName(userAgent: string | null) {
+function getDeviceName(userAgent: string | null | undefined) {
   if (!userAgent) {
     return "Desktop";
   }
@@ -44,7 +51,7 @@ function getDeviceName(userAgent: string | null) {
   return "Desktop";
 }
 
-function getDeviceIcon(userAgent: string | null) {
+function getDeviceIcon(userAgent: string | null | undefined) {
   if (!userAgent) {
     return Monitor;
   }
@@ -70,9 +77,9 @@ function formatDate(date: Date) {
 }
 
 interface SessionCardProps {
-  session: Session;
+  session: SessionsTabProps["sessions"][number];
   isCurrentSession: boolean;
-  onRevoke: (id: string) => void;
+  onRevoke: (token: string) => void;
   isRevoking: boolean;
 }
 
@@ -85,7 +92,7 @@ function SessionCard({
   const DeviceIcon = getDeviceIcon(session.userAgent);
 
   function handleRevoke() {
-    onRevoke(session.id);
+    onRevoke(session.token);
   }
 
   return (
@@ -113,12 +120,6 @@ function SessionCard({
               </div>
 
               <div className="space-y-1 text-sm text-muted-foreground">
-                {session.location && (
-                  <div className="flex items-center gap-2">
-                    <MapPin size={14} />
-                    <span className="truncate">{session.location}</span>
-                  </div>
-                )}
                 {session.ipAddress && (
                   <div className="flex items-center gap-2">
                     <Monitor size={14} />
@@ -156,7 +157,10 @@ function SessionCard({
   );
 }
 
-export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
+export function SessionsTab({
+  sessions,
+  currentSessionToken,
+}: SessionsTabProps) {
   const router = useRouter();
   const revokeFn = useServerFn(revokeSession);
 
@@ -168,8 +172,8 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
     },
   });
 
-  function handleRevoke(sessionId: string) {
-    revokeMutation.mutate({ data: sessionId });
+  function handleRevoke(token: string) {
+    revokeMutation.mutate({ data: token });
   }
 
   return (
@@ -192,11 +196,11 @@ export function SessionsTab({ sessions, currentSessionId }: SessionsTabProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            {sessions.map(session => (
+            {sessions.map((session) => (
               <SessionCard
                 key={session.id}
                 session={session}
-                isCurrentSession={session.id === currentSessionId}
+                isCurrentSession={session.token === currentSessionToken}
                 onRevoke={handleRevoke}
                 isRevoking={revokeMutation.status === "pending"}
               />

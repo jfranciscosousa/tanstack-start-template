@@ -3,7 +3,6 @@ import z from "zod";
 export interface RequestInfo {
   ipAddress: string;
   userAgent: string;
-  location: string;
 }
 
 /**
@@ -113,7 +112,6 @@ export async function getRequestInfo(request: Request): Promise<RequestInfo> {
 
   return {
     ipAddress,
-    location: location || "unknown",
     userAgent,
   };
 }

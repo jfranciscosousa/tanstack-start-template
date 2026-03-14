@@ -1,201 +1,126 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Mock } from "vitest";
-import { eq } from "drizzle-orm";
-import { faker } from "@faker-js/faker";
 
-import { mockLoggedIn, mockLoggedOut } from "~/test/server-utils";
-import type { User } from "~/server/db/schema";
+import type { TestUser } from "~/test/server-utils";
+import { createTestUser, makeSessionMock } from "~/test/server-utils";
+import { auth } from "~/lib/auth";
 import type { AppError } from "~/errors";
 
-import { signupFn, updateUserFn } from "./user-handlers";
-import { hashPassword, verifyPassword } from "../services/password-service";
-import { sessions, users } from "../db/schema";
-import { db } from "../db";
+import { updateUserFn, updateThemeFn } from "./user-handlers";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
 }));
-vi.mock("~/server/web-session");
 
-describe("User schemas integration tests", () => {
-  describe("signupFn", () => {
-    it("should create a user with its given params", async () => {
-      const { update: updateSession } = mockLoggedOut();
-      const testData = {
-        email: faker.internet.email(),
-        name: faker.person.fullName(),
-        password: faker.internet.password(),
-        passwordConfirmation: "",
-        redirectUrl: "/dashboard",
-      };
-      testData.passwordConfirmation = testData.password;
+vi.mock("~/lib/auth", () => ({
+  auth: {
+    api: {
+      getSession: vi.fn(),
+      updateUser: vi.fn(),
+      changePassword: vi.fn(),
+    },
+  },
+}));
 
-      // Test that the function creates a user (it will throw a redirect, which is expected)
-      try {
-        await signupFn({ data: testData });
-      } catch (error) {
-        // The function throws a redirect, which is expected behavior
-        expect(error).toBeDefined();
-        const request = error as Response;
-        expect(request.status).toEqual(307);
-      }
+vi.mock("~/server/services/user-services", () => ({
+  updateUserTheme: vi.fn(),
+}));
 
-      // Verify user was actually created in the database
-      const createdUser = await db.query.users.findFirst({
-        where: eq(users.email, testData.email),
-      });
+describe("User handlers", () => {
+  let testUser: TestUser;
 
-      if (!createdUser) throw new Error("created user should exist");
-      expect(createdUser.name).toBe(testData.name);
-      expect(createdUser.email).toBe(testData.email);
-      expect(createdUser.id).toBeDefined();
-      expect(createdUser.createdAt).toBeInstanceOf(Date);
-      expect(createdUser.updatedAt).toBeInstanceOf(Date);
-
-      const userSessions = await db
-        .select()
-        .from(sessions)
-        .where(eq(sessions.userId, createdUser.id));
-
-      expect(updateSession).toBeCalledWith({
-        id: userSessions[0].id,
-      });
-
-      // Verify password was hashed correctly
-      const isPasswordValid = await verifyPassword(
-        testData.password,
-        createdUser.password
-      );
-      expect(isPasswordValid).toBeTruthy();
-    });
+  beforeEach(async () => {
+    testUser = await createTestUser();
+    vi.clearAllMocks();
   });
 
   describe("updateUserFn", () => {
-    let testUser: User;
-    let updateSession: Mock;
-
-    beforeEach(async () => {
-      const [createdUser] = await db
-        .insert(users)
-        .values({
-          email: faker.internet.email(),
-          name: faker.person.fullName(),
-          password: await hashPassword("originalpass123"),
-        })
-        .returning();
-
-      testUser = createdUser;
-      updateSession = mockLoggedIn(testUser).update;
-    });
-
-    it("should update user profile without changing password", async () => {
-      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      // Create multiple sessions for the user
-      const initialSessions = await db
-        .insert(sessions)
-        .values([
-          {
-            id: crypto.randomUUID(),
-            userId: testUser.id,
-            expiresAt: futureExpiresAt,
-          },
-          {
-            id: crypto.randomUUID(),
-            userId: testUser.id,
-            expiresAt: futureExpiresAt,
-          },
-          {
-            id: crypto.randomUUID(),
-            userId: testUser.id,
-            expiresAt: futureExpiresAt,
-          },
-        ])
-        .returning();
+    it("should call updateUser and skip changePassword when no new password", async () => {
+      const mockSession = makeSessionMock(testUser);
+      vi.mocked(auth.api.getSession).mockResolvedValue(
+        mockSession as Awaited<ReturnType<typeof auth.api.getSession>>
+      );
+      vi.mocked(auth.api.updateUser).mockResolvedValue(
+        {} as Awaited<ReturnType<typeof auth.api.updateUser>>
+      );
 
       await updateUserFn({
         data: {
-          name: "Updated Name",
-          email: faker.internet.email(),
-          currentPassword: "originalpass123",
+          name: "New Name",
+          currentPassword: "",
           password: "",
           passwordConfirmation: "",
         },
       });
 
-      // Verify sessions remain in database when password is not changed
-      const remainingSessions = await db
-        .select()
-        .from(sessions)
-        .where(eq(sessions.userId, testUser.id));
-      expect(remainingSessions).toHaveLength(3);
-      expect(remainingSessions.map(session => session.id).sort()).toEqual(
-        initialSessions.map(session => session.id).sort()
+      expect(vi.mocked(auth.api.updateUser)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { name: "New Name" },
+        })
       );
+      expect(vi.mocked(auth.api.changePassword)).not.toHaveBeenCalled();
     });
 
-    it("should update user profile with new password and invalidate all sessions (except current one)", async () => {
-      const futureExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      // Create multiple sessions for the user
-      await db.insert(sessions).values([
-        {
-          id: crypto.randomUUID(),
-          userId: testUser.id,
-          expiresAt: futureExpiresAt,
-        },
-        {
-          id: crypto.randomUUID(),
-          userId: testUser.id,
-          expiresAt: futureExpiresAt,
-        },
-        {
-          id: crypto.randomUUID(),
-          userId: testUser.id,
-          expiresAt: futureExpiresAt,
-        },
-      ]);
+    it("should call changePassword with revokeOtherSessions when password is provided", async () => {
+      const mockSession = makeSessionMock(testUser);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.updateUser).mockResolvedValue({ status: true });
+      vi.mocked(auth.api.changePassword).mockResolvedValue({
+        token: "mock",
+        user: testUser,
+      });
 
       await updateUserFn({
         data: {
-          name: "Updated Name",
-          email: faker.internet.email(),
-          currentPassword: "originalpass123",
-          password: "newpassword123",
-          passwordConfirmation: "newpassword123",
+          name: "Name",
+          currentPassword: "oldpass123",
+          password: "newpass123",
+          passwordConfirmation: "newpass123",
         },
       });
 
-      // Verify old sessions are deleted and only the current session remains
-      const remainingSessions = await db
-        .select()
-        .from(sessions)
-        .where(eq(sessions.userId, testUser.id));
-      expect(remainingSessions).toHaveLength(1);
-
-      const [session] = remainingSessions;
-      // Check that the web session was updated with the session id
-      expect(updateSession).toBeCalledWith({ id: session.id });
+      expect(vi.mocked(auth.api.changePassword)).toHaveBeenCalledWith({
+        body: {
+          currentPassword: "oldpass123",
+          newPassword: "newpass123",
+          revokeOtherSessions: true,
+        },
+        headers: expect.anything(),
+      });
     });
 
-    it("should throw error when no user is logged in", async () => {
-      mockLoggedOut();
+    it("should throw NOT_FOUND when not logged in", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
       try {
         await updateUserFn({
           data: {
-            name: "Updated Name",
-            email: "updated@test.com",
-            currentPassword: "originalpass123",
+            name: "Name",
+            currentPassword: "",
             password: "",
             passwordConfirmation: "",
           },
         });
         expect.fail("Expected error to be thrown");
       } catch (error) {
-        const appError = error as AppError;
-
-        expect(appError.code).toBe("NOT_FOUND");
-        expect(appError.message).toBe("The requested resource was not found.");
+        expect((error as AppError).code).toBe("NOT_FOUND");
       }
+    });
+  });
+
+  describe("updateThemeFn", () => {
+    it("should call updateUserTheme with the new theme", async () => {
+      const mockSession = makeSessionMock(testUser);
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+
+      const { updateUserTheme } =
+        await import("~/server/services/user-services");
+
+      await updateThemeFn({ data: { theme: "light" } });
+
+      expect(vi.mocked(updateUserTheme)).toHaveBeenCalledWith(
+        testUser.id,
+        "light"
+      );
     });
   });
 });

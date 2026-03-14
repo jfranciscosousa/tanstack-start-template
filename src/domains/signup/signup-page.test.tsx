@@ -5,14 +5,19 @@ import { render, screen, waitFor } from "~/test/utils";
 
 import SignupPage from "./signup-page";
 
-const mockSignupFn = vi.fn();
-const mockInvalidate = vi.fn();
+const mockSignUp = vi.fn();
+const mockNavigate = vi.fn().mockResolvedValue(undefined);
 
-vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mockSignupFn }));
+vi.mock("~/lib/auth-client", () => ({
+  authClient: {
+    signUp: {
+      email: (input: { name: string; email: string; password: string }) =>
+        mockSignUp(input),
+    },
+  },
+}));
 vi.mock("@tanstack/react-router", () => ({
-  useRouter: () => ({
-    invalidate: mockInvalidate.mockResolvedValue(undefined),
-  }),
+  useRouter: () => ({ navigate: mockNavigate }),
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
     <a href={to}>{children}</a>
   ),
@@ -20,7 +25,6 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("~/routes/_unauthed/signup", () => ({
   Route: { useSearch: () => ({ redirectUrl: undefined }) },
 }));
-vi.mock("~/server/handlers/user-handlers", () => ({ signupFn: {} }));
 
 async function fillAndSubmit(
   user: ReturnType<typeof userEvent.setup>,
@@ -65,24 +69,21 @@ describe("SignupPage", () => {
     expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
   });
 
-  it("calls the signup server function with all field values on submit", async () => {
+  it("calls authClient.signUp.email with all field values on submit", async () => {
+    mockSignUp.mockResolvedValueOnce({ error: null });
     const user = userEvent.setup();
     render(<SignupPage />);
 
     await fillAndSubmit(user);
 
     await waitFor(() => {
-      expect(mockSignupFn).toHaveBeenCalledWith({
-        data: {
-          name: "Jane Doe",
-          email: "jane@example.com",
-          password: "password123",
-          passwordConfirmation: "password123",
-          redirectUrl: "",
-        },
+      expect(mockSignUp).toHaveBeenCalledWith({
+        name: "Jane Doe",
+        email: "jane@example.com",
+        password: "password123",
       });
     });
-    expect(mockInvalidate).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith({ to: "/verify-email" });
   });
 
   it("blocks submission and shows an error when passwords do not match", async () => {
@@ -94,7 +95,7 @@ describe("SignupPage", () => {
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
     });
-    expect(mockSignupFn).not.toHaveBeenCalled();
+    expect(mockSignUp).not.toHaveBeenCalled();
   });
 
   it("does not submit when required fields are empty", async () => {
@@ -104,12 +105,14 @@ describe("SignupPage", () => {
     await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockSignupFn).not.toHaveBeenCalled();
+      expect(mockSignUp).not.toHaveBeenCalled();
     });
   });
 
   it("shows a server error alert when the signup function throws", async () => {
-    mockSignupFn.mockRejectedValueOnce(new Error("Email already taken"));
+    mockSignUp.mockResolvedValueOnce({
+      error: { message: "Email already taken" },
+    });
     const user = userEvent.setup();
     render(<SignupPage />);
 

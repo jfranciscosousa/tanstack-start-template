@@ -2,20 +2,20 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { createTodoSchema, deleteTodoSchema } from "~/schemas/todo-schemas";
 
-import { useLoggedInAppSession } from "../web-session";
 import {
   createTodo,
   deleteAllTodos,
   deleteTodo,
   getTodos,
 } from "../services/todo-service";
+import { useLoggedInAppSession } from "../web-session";
 
 export const getTodosFn = createServerFn({ method: "GET" }).handler(
   async () => {
     const { user } = await useLoggedInAppSession();
 
     return getTodos(user);
-  }
+  },
 );
 
 export const createTodoFn = createServerFn({ method: "POST" })

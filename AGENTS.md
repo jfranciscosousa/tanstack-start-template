@@ -6,6 +6,10 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 **Package manager:** pnpm
 
+## CRITICAL:
+
+- To run tests and lints, use scripts on bin/ ALWAYS
+
 ## Domain Guides
 
 Load these when working on the relevant area:
