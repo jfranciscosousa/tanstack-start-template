@@ -15,8 +15,8 @@ export const signUpSchema = z.object({
     .string()
     .max(2048)
     .refine(
-      (url) => url === "" || (url.startsWith("/") && !url.startsWith("//")),
-      { message: "Invalid redirect URL" },
+      url => url === "" || (url.startsWith("/") && !url.startsWith("//")),
+      { message: "Invalid redirect URL" }
     )
     .default(""),
 });
@@ -24,19 +24,20 @@ export const signUpSchema = z.object({
 export type SignUpSchemaType = z.infer<typeof signUpSchema>;
 
 export const updateUserSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
+  name: z.string().min(1, "Name is required").max(255).optional(),
+  email: z.email().max(255).optional(),
   currentPassword: z.string().max(128),
   password: z
     .string()
     .max(128)
-    .refine((val) => val === "" || val.length >= 8, {
+    .refine(val => val === "" || val.length >= 8, {
       message: "Password must be at least 8 characters",
     })
     .default(""),
   passwordConfirmation: z
     .string()
     .max(128)
-    .refine((val) => val === "" || val.length >= 8, {
+    .refine(val => val === "" || val.length >= 8, {
       message: "Password must be at least 8 characters",
     })
     .default(""),

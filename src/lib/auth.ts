@@ -28,6 +28,10 @@ export const auth = betterAuth({
     enabled: true,
   },
   user: {
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: true,
+    },
     additionalFields: {
       theme: {
         type: "string",
