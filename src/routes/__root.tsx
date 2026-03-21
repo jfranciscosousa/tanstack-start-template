@@ -1,20 +1,20 @@
+import { Toaster } from "sonner";
+import { getRequest } from "@tanstack/react-start/server";
+import { createServerFn } from "@tanstack/react-start";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRoute,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { Toaster } from "sonner";
 
-import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
-import { NotFound } from "~/components/not-found.js";
-import { AppError } from "~/errors";
-import { auth } from "~/lib/auth";
-import type { User } from "~/server/db/schema";
 import { seo } from "~/server/seo.js";
+import type { User } from "~/server/db/schema";
+import { auth } from "~/lib/auth";
+import { AppError } from "~/errors";
+import { NotFound } from "~/components/not-found.js";
+import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
 
 import appCss from "~/styles/app.css?url";
 
@@ -29,7 +29,7 @@ export const Route = createRootRoute({
     user: await fetchCurrentUser(),
   }),
   component: RootComponent,
-  errorComponent: (props) => (
+  errorComponent: props => (
     <RootDocument>
       <DefaultCatchBoundary {...props} />
     </RootDocument>
@@ -71,7 +71,7 @@ export const Route = createRootRoute({
       }),
     ],
   }),
-  loader: (ctx) => ({
+  loader: ctx => ({
     user: ctx.context.user,
   }),
   notFoundComponent: () => <NotFound />,

@@ -1,9 +1,9 @@
 import { LogIn, UserPlus } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { authClient } from "~/lib/auth-client";
 import { loginSchema } from "~/schemas/session-schemas";
 import { Route } from "~/routes/_unauthed/login";
+import { authClient } from "~/lib/auth-client";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
 

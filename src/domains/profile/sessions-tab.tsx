@@ -196,7 +196,7 @@ export function SessionsTab({
           </div>
         ) : (
           <div className="space-y-4">
-            {sessions.map((session) => (
+            {sessions.map(session => (
               <SessionCard
                 key={session.id}
                 session={session}

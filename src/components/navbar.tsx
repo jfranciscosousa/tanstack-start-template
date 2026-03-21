@@ -4,9 +4,8 @@ import { LogOut, Moon, Settings, Sun } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { authClient } from "~/lib/auth-client";
-
 import { updateThemeFn } from "~/server/handlers/user-handlers";
+import { authClient } from "~/lib/auth-client";
 import { useTheme } from "~/hooks/use-theme";
 import {
   DropdownMenu,

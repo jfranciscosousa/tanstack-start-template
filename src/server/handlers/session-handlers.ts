@@ -1,9 +1,9 @@
 import z from "zod";
-import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { createServerFn } from "@tanstack/react-start";
 
-import { AppError } from "~/errors";
 import { auth } from "~/lib/auth";
+import { AppError } from "~/errors";
 
 export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
   async () => {

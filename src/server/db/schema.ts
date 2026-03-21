@@ -75,7 +75,7 @@ export const todos = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
   },
-  (table) => [index("todos_user_id_idx").on(table.userId)],
+  table => [index("todos_user_id_idx").on(table.userId)]
 );
 
 // ─── Relations ────────────────────────────────────────────────────────────────

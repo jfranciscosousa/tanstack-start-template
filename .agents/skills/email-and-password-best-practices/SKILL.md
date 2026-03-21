@@ -102,7 +102,7 @@ On serverless platforms, configure a background task handler:
 export const auth = betterAuth({
   advanced: {
     backgroundTasks: {
-      handler: (promise) => {
+      handler: promise => {
         // Use platform-specific methods like waitUntil
         waitUntil(promise);
       },
@@ -201,7 +201,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     password: {
-      hash: (password) => hash(password, argon2Options),
+      hash: password => hash(password, argon2Options),
       verify: ({ password, hash: storedHash }) =>
         verify(storedHash, password, argon2Options),
     },

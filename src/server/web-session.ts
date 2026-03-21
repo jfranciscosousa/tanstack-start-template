@@ -1,7 +1,8 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { AppError } from "~/errors";
+import { createServerOnlyFn } from "@tanstack/react-start";
+
 import { auth } from "~/lib/auth";
+import { AppError } from "~/errors";
 
 export const useLoggedInAppSession = createServerOnlyFn(async () => {
   const req = getRequest();

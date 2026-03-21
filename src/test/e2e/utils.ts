@@ -5,6 +5,7 @@ import type { LocatorFixtures as TestingLibraryFixtures } from "@playwright-test
 import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
+
 import { auth } from "~/lib/auth";
 
 export const USER_TEST_PASSWORD = "foobar123";
@@ -15,7 +16,7 @@ export const { expect } = test;
 export async function createUserAndLogin(
   page: Page,
   screen: Screen,
-  originalPage?: string,
+  originalPage?: string
 ) {
   const password = USER_TEST_PASSWORD;
   const email = faker.internet.email({
