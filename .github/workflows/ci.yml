@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: marocchino/tool-versions-action@v1
+      - uses: marocchino/tool-versions-action@v2
         id: versions
 
       - uses: actions/setup-node@v4
