@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: ${{ steps.versions.outputs.nodejs }}
 
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
         name: Install pnpm
         id: pnpm-install
         with:
