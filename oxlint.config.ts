@@ -81,7 +81,12 @@ export default defineConfig({
     "vitest/prefer-describe-function-title": "off",
     "vitest/prefer-import-in-mock": "off",
     "vitest/no-importing-vitest-globals": "off",
+    "vitest/prefer-importing-vitest-globals": "off",
+    "vitest/prefer-strict-boolean-matchers": "off",
+    "vitest/require-mock-type-parameters": "off",
+    "vitest/require-test-timeout": "off",
     "vitest/require-top-level-describe": "off",
     "vitest/no-hooks": "off",
+    "import/no-cycle": "off",
   },
 });
