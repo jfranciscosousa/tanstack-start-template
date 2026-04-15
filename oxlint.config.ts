@@ -87,6 +87,7 @@ export default defineConfig({
     "vitest/require-test-timeout": "off",
     "vitest/require-top-level-describe": "off",
     "vitest/no-hooks": "off",
+    // Page sub-components need to import Route modules
     "import/no-cycle": "off",
   },
 });
