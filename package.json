@@ -51,7 +51,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "oxfmt": "^0.46.0",
-    "oxlint": "^1.61.0",
+    "oxlint": "^1.60.0",
     "playwright": "^1.59.1",
     "shadcn": "^4.4.0",
     "tailwindcss": "^4.2.4",
