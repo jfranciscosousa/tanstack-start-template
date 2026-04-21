@@ -43,12 +43,11 @@ bin/test-e2e src/test/e2e/authentication.test.ts
 
 ## Database
 
-| Script            | What it does                                       |
-| ----------------- | -------------------------------------------------- |
-| `bin/db generate` | Generate migration from schema changes             |
-| `bin/db push`     | Apply pending schema changes                       |
-| `bin/db push`     | Push schema directly (dev only, no migration file) |
-| `bin/db studio`   | Open Drizzle Studio UI                             |
+| Script            | What it does                           |
+| ----------------- | -------------------------------------- |
+| `bin/db generate` | Generate migration from schema changes |
+| `bin/db migrate`  | Apply pending migrations               |
+| `bin/db studio`   | Open Drizzle Studio UI                 |
 
 All `bin/db` commands forward args to `drizzle-kit` and load `.env` automatically.
 
@@ -58,7 +57,6 @@ All `bin/db` commands forward args to `drizzle-kit` and load `.env` automaticall
 | ------------------ | ------------------------------------------------------------- |
 | `bin/ci`           | Full CI pipeline: type-check → install Playwright → all tests |
 | `bin/build-prod`   | Build + migrate (for production deploys)                      |
-| `bin/deploy`       | Validate config → migrate → build                             |
 | `bin/validate-env` | Validate environment configuration                            |
 
 ## Internals (don't call directly)

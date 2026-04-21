@@ -31,7 +31,6 @@ cat << 'EOF'
   ./bin/test-e2e-ui       Run e2e tests with Playwright UI
 
 🚀 Deployment Commands:
-  ./bin/deploy        Full deployment process
   ./bin/validate-env  Validate environment configuration
 
 🤖 CI/CD Commands:

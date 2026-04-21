@@ -14,7 +14,7 @@ echo "🔨 Building TanStack Start application..."
 pnpm vite build
 
 echo "Updating database"
-bin/db push
+bin/db migrate
 
 echo "✅ Build completed successfully!"
 echo "📁 Build files are in: .output/"
