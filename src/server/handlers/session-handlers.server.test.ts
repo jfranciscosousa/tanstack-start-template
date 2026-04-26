@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TestUser } from "~/test/server-utils";
 import {
   createTestUser,
   makeSessionMock,
   makeSessionsMock,
 } from "~/test/server-utils";
+import type { TestUser } from "~/test/server-utils";
 import { auth } from "~/lib/auth";
 import type { AppError } from "~/errors";
 
@@ -25,7 +25,7 @@ vi.mock("~/lib/auth", () => ({
   },
 }));
 
-describe("Session handlers", () => {
+describe("session handlers", () => {
   let testUser: TestUser;
 
   beforeEach(async () => {
@@ -46,8 +46,12 @@ describe("Session handlers", () => {
 
       await fetchUserSessions();
 
-      expect(vi.mocked(auth.api.getSession)).toHaveBeenCalled();
-      expect(vi.mocked(auth.api.listSessions)).toHaveBeenCalled();
+      expect(vi.mocked(auth.api.getSession)).toHaveBeenCalledWith(
+        expect.objectContaining({ headers: expect.any(Headers) })
+      );
+      expect(vi.mocked(auth.api.listSessions)).toHaveBeenCalledWith(
+        expect.objectContaining({ headers: expect.any(Headers) })
+      );
     });
 
     it("should throw UNAUTHORIZED when not logged in", async () => {

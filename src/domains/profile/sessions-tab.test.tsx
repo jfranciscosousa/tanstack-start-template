@@ -53,7 +53,7 @@ const mockSessions: Session[] = [
   },
 ];
 
-describe("SessionsTab", () => {
+describe("sessionsTab", () => {
   it("renders all sessions", () => {
     render(<SessionsTab sessions={mockSessions} currentSessionToken="tok-1" />);
 
@@ -97,7 +97,7 @@ describe("SessionsTab", () => {
     await waitFor(() => {
       expect(mockRevokeFn).toHaveBeenCalledWith({ data: "tok-2" });
     });
-    expect(mockInvalidate).toHaveBeenCalled();
+    expect(mockInvalidate).toHaveBeenCalledWith();
     expect(toast).toHaveBeenCalledWith("Session revoked successfully!");
   });
 

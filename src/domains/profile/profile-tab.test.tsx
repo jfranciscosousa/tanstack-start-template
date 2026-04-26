@@ -29,7 +29,7 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("~/routes/__root", () => ({ useCurrentUser: () => mockUser }));
 vi.mock("~/server/handlers/user-handlers", () => ({ updateUserFn: {} }));
 
-describe("ProfileTab", () => {
+describe("profileTab", () => {
   it("pre-fills the form with the current user's name and email", () => {
     render(<ProfileTab />);
 
@@ -72,7 +72,7 @@ describe("ProfileTab", () => {
         },
       });
     });
-    expect(mockInvalidate).toHaveBeenCalled();
+    expect(mockInvalidate).toHaveBeenCalledWith();
     expect(toast).toHaveBeenCalledWith("Profile updated successfully!");
   });
 

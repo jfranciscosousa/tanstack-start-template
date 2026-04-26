@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TestUser } from "~/test/server-utils";
 import { createTestUser, makeSessionMock } from "~/test/server-utils";
+import type { TestUser } from "~/test/server-utils";
 import { auth } from "~/lib/auth";
 import type { AppError } from "~/errors";
 
@@ -26,7 +26,7 @@ vi.mock("~/server/services/user-services", () => ({
   updateUserTheme: vi.fn(),
 }));
 
-describe("User handlers", () => {
+describe("user handlers", () => {
   let testUser: TestUser;
 
   beforeEach(async () => {

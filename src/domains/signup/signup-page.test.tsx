@@ -53,7 +53,7 @@ async function fillAndSubmit(
   await user.click(screen.getByRole("button", { name: /create account/i }));
 }
 
-describe("SignupPage", () => {
+describe("signupPage", () => {
   it("renders all form fields", () => {
     render(<SignupPage />);
 

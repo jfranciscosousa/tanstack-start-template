@@ -27,7 +27,7 @@ vi.mock("~/routes/_unauthed/login", () => ({
   Route: { useSearch: () => mockUseSearch() },
 }));
 
-describe("LoginPage", () => {
+describe("loginPage", () => {
   it("renders the email and password fields", () => {
     render(<LoginPage />);
 

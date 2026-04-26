@@ -21,6 +21,7 @@ export default defineConfig({
       files: ["**/*.test.ts", "**/*.test.tsx"],
       rules: {
         "init-declarations": "off",
+        "jest/no-untyped-mock-factory": "off",
       },
     },
     {
@@ -87,6 +88,10 @@ export default defineConfig({
     "vitest/require-test-timeout": "off",
     "vitest/require-top-level-describe": "off",
     "vitest/no-hooks": "off",
+    "vitest/no-test-return-statement": "off",
+    "vitest/no-conditional-in-test": "off",
+    "jest/prefer-ending-with-an-expect": "off",
+    "jest/no-conditional-expect": "off",
     // Page sub-components need to import Route modules
     "import/no-cycle": "off",
   },

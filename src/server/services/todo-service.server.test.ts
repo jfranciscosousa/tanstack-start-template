@@ -10,11 +10,11 @@ import {
   deleteTodo,
   getTodos,
 } from "./todo-service";
-import type { User } from "../db/schema";
 import { todos } from "../db/schema";
+import type { User } from "../db/schema";
 import { db } from "../db";
 
-describe("Todo service", () => {
+describe("todo service", () => {
   let testUser: User;
 
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe("Todo service", () => {
     it("should return empty array when user has no todos", async () => {
       const result = await getTodos(testUser);
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
 
     it("should return todos for the user ordered by createdAt desc", async () => {
@@ -89,7 +89,7 @@ describe("Todo service", () => {
 
       const result = await deleteTodo(testUser, todo.id);
 
-      expect(result).toEqual({ success: true });
+      expect(result).toStrictEqual({ success: true });
 
       const fromDb = await db.query.todos.findFirst({
         where: eq(todos.id, todo.id),
@@ -125,7 +125,7 @@ describe("Todo service", () => {
 
       const result = await deleteAllTodos(testUser);
 
-      expect(result).toEqual({ success: true });
+      expect(result).toStrictEqual({ success: true });
 
       const remaining = await getTodos(testUser);
 

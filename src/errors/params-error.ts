@@ -11,10 +11,10 @@ export type ParamsErrorMeta = Record<string, string[]>;
  * (TanStack Start only preserves `message` across the wire).
  */
 export class ParamsError extends Error {
-  name = "ParamsError" as const;
-  meta: ParamsErrorMeta;
+  public name = "ParamsError" as const;
+  public meta: ParamsErrorMeta;
 
-  constructor(meta: ParamsErrorMeta) {
+  public constructor(meta: ParamsErrorMeta) {
     super(JSON.stringify({ type: "ParamsError", meta }));
     this.meta = meta;
   }

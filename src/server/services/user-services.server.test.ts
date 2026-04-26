@@ -7,7 +7,7 @@ import { db } from "~/server/db";
 
 import { updateUserTheme } from "./user-services";
 
-describe("User services", () => {
+describe("user services", () => {
   describe("updateUserTheme", () => {
     it("should update the user theme in the database", async () => {
       const [created] = await db
