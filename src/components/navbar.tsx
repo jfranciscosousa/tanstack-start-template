@@ -61,8 +61,8 @@ export function Navbar({ user }: NavbarProps) {
 
   async function handleSignOut() {
     await authClient.signOut();
-    await router.navigate({ to: "/" });
     await router.invalidate();
+    await router.navigate({ to: "/" });
   }
 
   const onUpdate = useCallback(
