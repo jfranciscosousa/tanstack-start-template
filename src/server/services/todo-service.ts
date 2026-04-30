@@ -1,5 +1,6 @@
-import { and, desc, eq } from "drizzle-orm";
 import type { User } from "better-auth";
+
+import { and, desc, eq } from "drizzle-orm";
 import { createServerOnlyFn } from "@tanstack/react-start";
 
 import { AppError } from "~/errors";

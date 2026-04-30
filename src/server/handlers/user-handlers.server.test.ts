@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createTestUser, makeSessionMock } from "~/test/server-utils";
 import type { TestUser } from "~/test/server-utils";
-import { auth } from "~/lib/auth";
 import type { AppError } from "~/errors";
+
+import { createTestUser, makeSessionMock } from "~/test/server-utils";
+import { auth } from "~/lib/auth";
 
 import { updateUserFn, updateThemeFn } from "./user-handlers";
 

@@ -12,5 +12,20 @@
   "ignorePatterns": ["src/routeTree.gen.ts", "**.yaml"],
   "sortImports": {
     "order": "desc",
+    "groups": [
+      "type-import",
+      ["value-builtin", "value-external"],
+      "type-internal",
+      "value-internal",
+      ["type-parent", "type-sibling", "type-index"],
+      ["value-parent", "value-sibling", "value-index"],
+      "unknown",
+    ],
   },
+  "sortTailwindcss": {
+    "stylesheet": "./src/styles/app.css",
+    "functions": ["clsx", "cn", "cva"],
+    "preserveWhitespace": true,
+  },
+  "sortPackageJson": true,
 }

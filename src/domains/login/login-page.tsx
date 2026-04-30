@@ -20,11 +20,11 @@ export default function LoginPage() {
             className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20"
             aria-hidden="true"
           >
-            <span className="font-display text-xl font-bold italic text-primary-foreground leading-none">
+            <span className="font-display text-xl leading-none font-bold text-primary-foreground italic">
               T
             </span>
           </div>
-          <h1 className="font-display text-3xl font-bold italic tracking-tight">
+          <h1 className="font-display text-3xl font-bold tracking-tight italic">
             Welcome back.
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -33,7 +33,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form card */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-xl shadow-black/20 ring-1 ring-foreground/5">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-xl ring-1 shadow-black/20 ring-foreground/5">
           <Form
             schema={loginSchema}
             defaultValues={{

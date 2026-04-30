@@ -4,6 +4,8 @@ import { faker } from "@faker-js/faker";
 
 import { createTestUser } from "~/test/server-utils";
 
+import type { User } from "../db/schema";
+
 import {
   createTodo,
   deleteAllTodos,
@@ -11,7 +13,6 @@ import {
   getTodos,
 } from "./todo-service";
 import { todos } from "../db/schema";
-import type { User } from "../db/schema";
 import { db } from "../db";
 
 describe("todo service", () => {

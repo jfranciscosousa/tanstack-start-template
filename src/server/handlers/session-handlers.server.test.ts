@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { TestUser } from "~/test/server-utils";
+import type { AppError } from "~/errors";
+
 import {
   createTestUser,
   makeSessionMock,
   makeSessionsMock,
 } from "~/test/server-utils";
-import type { TestUser } from "~/test/server-utils";
 import { auth } from "~/lib/auth";
-import type { AppError } from "~/errors";
 
 import { fetchUserSessions, revokeSession } from "./session-handlers";
 

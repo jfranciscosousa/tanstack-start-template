@@ -1,8 +1,9 @@
 import { faker } from "@faker-js/faker";
 
+import type { auth } from "~/lib/auth";
+
 import { users as userTable } from "~/server/db/schema";
 import { db } from "~/server/db";
-import type { auth } from "~/lib/auth";
 
 export type TestUser = typeof userTable.$inferSelect;
 

@@ -1,8 +1,9 @@
-import { test as base } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { locatorFixtures as fixtures } from "@playwright-testing-library/test/fixture.js";
 import type { LocatorFixtures as TestingLibraryFixtures } from "@playwright-testing-library/test/fixture.js";
 import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
+
+import { test as base } from "@playwright/test";
+import { locatorFixtures as fixtures } from "@playwright-testing-library/test/fixture.js";
 import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
 

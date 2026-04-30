@@ -46,10 +46,10 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
 
   return (
     <div className="group break-inside-avoid">
-      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-foreground/5 ring-1 transition-all duration-200 hover:border-primary/40 hover:shadow-primary/5 hover:shadow-md">
+      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-1 ring-foreground/5 transition-all duration-200 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed text-foreground/90">
+            <p className="text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground/90">
               {todo.content}
             </p>
             <time className="mt-2.5 block font-mono text-[11px] tracking-wide text-muted-foreground/60 uppercase">
@@ -208,7 +208,7 @@ function RouteComponent() {
       {/* Header */}
       <div className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-4xl font-bold italic tracking-tight text-foreground">
+          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground italic">
             My Tasks
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
@@ -231,13 +231,13 @@ function RouteComponent() {
         <label htmlFor="todo-content" className="sr-only">
           New task
         </label>
-        <div className="flex overflow-hidden rounded-lg border border-border bg-card shadow-sm ring-1 ring-foreground/5 transition-all focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+        <div className="flex overflow-hidden rounded-lg border border-border bg-card shadow-sm ring-1 ring-foreground/5 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary">
           <Input
             id="todo-content"
             name="content"
             ref={inputRef}
             type="text"
-            className="flex-1 rounded-none border-0 bg-transparent shadow-none outline-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-sm placeholder:text-muted-foreground/50"
+            className="flex-1 rounded-none border-0 bg-transparent text-sm shadow-none ring-0 outline-none placeholder:text-muted-foreground/50 focus-visible:border-0 focus-visible:ring-0"
             placeholder="What needs to be done?"
             disabled={isCreating}
             required
@@ -246,7 +246,7 @@ function RouteComponent() {
           <Button
             type="submit"
             disabled={isCreating}
-            className="rounded-l-none shrink-0 gap-1.5 text-sm"
+            className="shrink-0 gap-1.5 rounded-l-none text-sm"
           >
             {isCreating ? (
               <Loader2 size={15} className="animate-spin" aria-hidden="true" />
@@ -261,10 +261,10 @@ function RouteComponent() {
       {/* Empty state */}
       {todos.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="font-display text-7xl font-bold italic text-primary/20 leading-none mb-5 select-none">
+          <p className="mb-5 font-display text-7xl leading-none font-bold text-primary/20 italic select-none">
             All clear.
           </p>
-          <p className="text-sm text-muted-foreground/70 max-w-xs leading-relaxed">
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground/70">
             Add your first task above to get started.
           </p>
         </div>

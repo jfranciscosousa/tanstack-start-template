@@ -50,7 +50,7 @@ function UserMonogram({
       className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30"
       aria-hidden="true"
     >
-      <span className="text-xs font-semibold leading-none">{initials}</span>
+      <span className="text-xs leading-none font-semibold">{initials}</span>
     </div>
   );
 }
@@ -88,7 +88,7 @@ export function Navbar({ user }: NavbarProps) {
   );
 
   return (
-    <header className="sticky top-0 z-50 flex h-13 items-center border-b border-border/50 bg-background/80 backdrop-blur-sm px-5">
+    <header className="sticky top-0 z-50 flex h-13 items-center border-b border-border/50 bg-background/80 px-5 backdrop-blur-sm">
       {/* Brand */}
       <div className="flex flex-1 items-center">
         <Link
@@ -100,12 +100,12 @@ export function Navbar({ user }: NavbarProps) {
             className="flex h-7 w-7 items-center justify-center rounded-md bg-primary"
             aria-hidden="true"
           >
-            <span className="font-display text-sm font-bold italic text-primary-foreground leading-none">
+            <span className="font-display text-sm leading-none font-bold text-primary-foreground italic">
               T
             </span>
           </div>
           <span
-            className="hidden font-display text-sm font-semibold italic text-foreground/90 group-hover:text-foreground transition-colors sm:inline"
+            className="hidden font-display text-sm font-semibold text-foreground/90 italic transition-colors group-hover:text-foreground sm:inline"
             aria-hidden="true"
           >
             TanStack
@@ -153,7 +153,7 @@ export function Navbar({ user }: NavbarProps) {
             <DropdownMenuItem render={profileLink} />
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-destructive data-highlighted:text-destructive cursor-pointer"
+              className="cursor-pointer text-destructive data-highlighted:text-destructive"
               onClick={handleSignOut}
             >
               <LogOut size={14} aria-hidden="true" />

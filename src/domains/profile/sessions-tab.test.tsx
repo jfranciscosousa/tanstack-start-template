@@ -2,8 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import { toast } from "sonner";
 import userEvent from "@testing-library/user-event";
 
-import { render, screen, waitFor } from "~/test/utils";
 import type { Session } from "~/server/db/schema";
+
+import { render, screen, waitFor } from "~/test/utils";
 
 import { SessionsTab } from "./sessions-tab";
 

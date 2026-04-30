@@ -14,7 +14,7 @@ export default function SignupPage() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
       {/* Ambient glow effects */}
       <div
-        className="pointer-events-none absolute right-0 top-0 h-80 w-80 translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/8 blur-3xl"
+        className="pointer-events-none absolute top-0 right-0 h-80 w-80 translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/8 blur-3xl"
         aria-hidden="true"
       />
       <div
@@ -29,11 +29,11 @@ export default function SignupPage() {
             className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20"
             aria-hidden="true"
           >
-            <span className="font-display text-xl font-bold italic text-primary-foreground leading-none">
+            <span className="font-display text-xl leading-none font-bold text-primary-foreground italic">
               T
             </span>
           </div>
-          <h1 className="font-display text-3xl font-bold italic tracking-tight">
+          <h1 className="font-display text-3xl font-bold tracking-tight italic">
             Create account.
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -42,7 +42,7 @@ export default function SignupPage() {
         </div>
 
         {/* Form card */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-xl shadow-black/20 ring-1 ring-foreground/5">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-xl ring-1 shadow-black/20 ring-foreground/5">
           <Form
             schema={signUpSchema}
             defaultValues={{

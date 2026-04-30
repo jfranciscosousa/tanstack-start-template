@@ -110,7 +110,7 @@ export function ProfileTab() {
       </Card>
 
       {/* Account Info */}
-      <Card className="shadow-xl mt-4">
+      <Card className="mt-4 shadow-xl">
         <CardContent>
           <CardTitle className="mb-4 text-lg">Account Information</CardTitle>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

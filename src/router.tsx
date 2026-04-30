@@ -10,7 +10,7 @@ export function getRouter() {
     defaultNotFoundComponent: () => <NotFound />,
     defaultPendingComponent: () => (
       <div className="h-screen w-screen" data-testid="loader">
-        <span className="absolute top-1/2 left-1/2 translate-x-1/2 -translate-y-1/2 loading loading-spinner w-[64px]" />
+        <span className="loading loading-spinner absolute top-1/2 left-1/2 w-[64px] translate-x-1/2 -translate-y-1/2" />
       </div>
     ),
     defaultPendingMinMs: 750,

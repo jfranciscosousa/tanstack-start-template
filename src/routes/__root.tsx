@@ -9,14 +9,14 @@ import {
   createRootRoute,
 } from "@tanstack/react-router";
 
-import { seo } from "~/server/seo.js";
 import type { User } from "~/server/db/schema";
+
+import appCss from "~/styles/app.css?url";
+import { seo } from "~/server/seo.js";
 import { auth } from "~/lib/auth";
 import { AppError } from "~/errors";
 import { NotFound } from "~/components/not-found.js";
 import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
-
-import appCss from "~/styles/app.css?url";
 
 const fetchCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
   const req = getRequest();
@@ -114,7 +114,7 @@ function RootDocument({
       <body className="min-h-screen">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-md"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-md"
         >
           Skip to main content
         </a>

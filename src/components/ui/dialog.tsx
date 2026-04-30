@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef } from "react";
+
 import { Dialog } from "@base-ui/react/dialog";
 
 import { cn } from "~/lib/utils";
@@ -14,7 +15,7 @@ export function DialogBackdrop({
   return (
     <Dialog.Backdrop
       className={cn(
-        "fixed inset-0 z-50 bg-black/50 transition-opacity duration-200 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0",
+        "fixed inset-0 z-50 bg-black/50 transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
         className
       )}
       {...props}
@@ -31,7 +32,7 @@ export function DialogContent({
       <DialogBackdrop />
       <Dialog.Popup
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-card p-6 shadow-xl transition-all duration-200 data-[starting-style]:opacity-0 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[ending-style]:scale-95",
+          "fixed top-1/2 left-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-card p-6 shadow-xl transition-all duration-200 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
           className
         )}
         {...props}
@@ -47,7 +48,7 @@ export function DialogTitle({
   return (
     <Dialog.Title
       className={cn(
-        "text-lg font-semibold leading-none tracking-tight",
+        "text-lg leading-none font-semibold tracking-tight",
         className
       )}
       {...props}
