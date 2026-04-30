@@ -94,6 +94,7 @@ export default function SignupPage() {
                 password: values.password,
               });
               if (error) throw new Error(error.message);
+              await router.invalidate();
               await router.navigate({ to: "/" });
             }}
             renderSubmit={form => (

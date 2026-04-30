@@ -63,8 +63,8 @@ export default function LoginPage() {
                 password: values.password,
               });
               if (error) throw new Error(error.message);
-              await router.navigate({ to: values.redirectUrl || "/" });
               await router.invalidate();
+              await router.navigate({ to: values.redirectUrl || "/" });
             }}
             renderSubmit={form => (
               <form.Subscribe selector={state => state.isSubmitting}>
