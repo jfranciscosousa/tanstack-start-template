@@ -2,8 +2,8 @@
 import type { ZodType } from "zod";
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 import type { ReactFormExtendedApi } from "@tanstack/react-form";
-import { useForm } from "@tanstack/react-form";
 
 import { isParamsError, renderError } from "~/errors";
 import { Separator } from "~/components/ui/separator";
@@ -249,12 +249,26 @@ export function Form<TValues extends Record<string, string>>({
     Record<string, string[]>
   >({});
   const [serverError, setServerError] = useState<string>();
+
+  function clearServerFieldError(name: string) {
+    setServerFieldErrors(prev => {
+      if (!prev[name]) return prev;
+      const { [name]: _omit, ...rest } = prev;
+      return rest;
+    });
+  }
   const form = useForm({
     defaultValues,
-    validators: { onSubmit: schema },
+    validationLogic: revalidateLogic(),
+    validators: { onDynamic: schema },
+    onSubmitInvalid: () => {
+      setServerFieldErrors({});
+      setServerError(undefined);
+    },
     onSubmit: async ({ value }) => {
       setServerFieldErrors({});
       setServerError(undefined);
+
       try {
         await onSubmit(value);
       } catch (error) {
@@ -295,7 +309,7 @@ export function Form<TValues extends Record<string, string>>({
                 key={fieldConfig.name}
                 name={fieldConfig.name}
                 validators={{
-                  onSubmit: ({ value }) => {
+                  onDynamic: ({ value }) => {
                     if (!fieldConfig.validate) return;
 
                     return fieldConfig.validate(
@@ -314,9 +328,13 @@ export function Form<TValues extends Record<string, string>>({
                     serverFieldErrors[fieldConfig.name] ?? [];
                   const allErrors = [
                     ...(tanstackInvalid
-                      ? field.state.meta.errors
-                          .filter(Boolean)
-                          .map(msg => ({ message: String(msg) }))
+                      ? field.state.meta.errors.filter(Boolean).map(err => ({
+                          message:
+                            typeof err === "string"
+                              ? err
+                              : ((err as { message?: string })?.message ??
+                                String(err)),
+                        }))
                       : []),
                     ...fieldServerErrors.map(msg => ({ message: msg })),
                   ];
@@ -333,9 +351,10 @@ export function Form<TValues extends Record<string, string>>({
                         required={fieldConfig.required}
                         errors={errors}
                         value={field.state.value as any}
-                        onChange={event =>
-                          field.handleChange(event.target.value as any)
-                        }
+                        onChange={event => {
+                          field.handleChange(event.target.value as any);
+                          clearServerFieldError(fieldConfig.name);
+                        }}
                         onBlur={field.handleBlur}
                       />
                     );
@@ -352,9 +371,10 @@ export function Form<TValues extends Record<string, string>>({
                         type={fieldConfig.type ?? "text"}
                         value={field.state.value as string}
                         onBlur={field.handleBlur}
-                        onChange={event =>
-                          field.handleChange(event.target.value as any)
-                        }
+                        onChange={event => {
+                          field.handleChange(event.target.value as any);
+                          clearServerFieldError(fieldConfig.name);
+                        }}
                         placeholder={fieldConfig.placeholder}
                         required={fieldConfig.required}
                         aria-invalid={isInvalid}
@@ -370,14 +390,25 @@ export function Form<TValues extends Record<string, string>>({
 
         <form.Subscribe selector={state => state.errors}>
           {errors => {
-            const message =
-              serverError ??
-              (errors.length > 0 ? renderError(errors[0]) : undefined);
-            return message ? (
-              <Alert variant="destructive">
-                <AlertDescription>{message}</AlertDescription>
-              </Alert>
-            ) : null;
+            const hasFormErrors = errors.length > 0;
+
+            return (
+              <>
+                {hasFormErrors && (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      The form has some errors, please review them.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {serverError && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{serverError}</AlertDescription>
+                  </Alert>
+                )}
+              </>
+            );
           }}
         </form.Subscribe>
 
