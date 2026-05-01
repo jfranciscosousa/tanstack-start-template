@@ -17,4 +17,9 @@ const client = postgres(process.env.DATABASE_URL, {
 });
 
 // Create the Drizzle instance
-export const db = drizzle({ client, schema });
+// @ts-expect-error drizzle types are funky during the rc
+export const db = drizzle({
+  client,
+  schema,
+  relations: schema.relations,
+});

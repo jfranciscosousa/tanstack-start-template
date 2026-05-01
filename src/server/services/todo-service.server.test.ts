@@ -72,7 +72,7 @@ describe("todo service", () => {
       const todo = await createTodo(testUser, content);
 
       const fromDb = await db.query.todos.findFirst({
-        where: eq(todos.id, todo.id),
+        where: { id: todo.id },
       });
 
       if (!fromDb) throw new Error("fromDb should exist");
@@ -93,7 +93,7 @@ describe("todo service", () => {
       expect(result).toStrictEqual({ success: true });
 
       const fromDb = await db.query.todos.findFirst({
-        where: eq(todos.id, todo.id),
+        where: { id: todo.id },
       });
 
       expect(fromDb).toBeUndefined();
@@ -109,7 +109,7 @@ describe("todo service", () => {
       await deleteTodo(testUser, otherTodo.id);
 
       const fromDb = await db.query.todos.findFirst({
-        where: eq(todos.id, otherTodo.id),
+        where: { id: otherTodo.id },
       });
 
       expect(fromDb).toBeDefined();

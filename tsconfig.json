@@ -1,11 +1,12 @@
 {
+  "include": ["src/**/*"],
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "module": "ESNext",
     "target": "ES2022",
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "skipLibCheck": true,
     "strictNullChecks": true,
     "paths": {

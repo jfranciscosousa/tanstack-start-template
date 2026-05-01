@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
 import { users as userTable } from "~/server/db/schema";
@@ -26,7 +25,7 @@ describe("user services", () => {
       await updateUserTheme(created.id, "dark");
 
       const updated = await db.query.users.findFirst({
-        where: eq(userTable.id, created.id),
+        where: { id: created.id },
       });
 
       if (!updated) throw new Error("updated should exist");

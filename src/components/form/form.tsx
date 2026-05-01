@@ -24,6 +24,8 @@ function isGroupConfig<TValues extends Record<string, string>>(
   return fields.length > 0 && "fields" in fields[0];
 }
 
+export type { FormGroupConfig, FieldConfig };
+
 export function Form<TValues extends Record<string, string>>({
   schema,
   defaultValues,

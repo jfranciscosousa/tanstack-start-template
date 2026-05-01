@@ -6,9 +6,9 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { defineRelations } from "drizzle-orm";
 
-// ─── better-auth tables ───────────────────────────────────────────────────────
+// ---- better-auth tables ----
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -63,7 +63,7 @@ export const verifications = pgTable("verifications", {
   updatedAt: timestamp("updated_at"),
 });
 
-// ─── Application tables ───────────────────────────────────────────────────────
+// ---- Application tables ----
 
 export const todos = pgTable(
   "todos",
@@ -78,27 +78,38 @@ export const todos = pgTable(
   table => [index("todos_user_id_idx").on(table.userId)]
 );
 
-// ─── Relations ────────────────────────────────────────────────────────────────
+// ---- Relations ----
 
-export const userRelations = relations(users, ({ many }) => ({
-  sessions: many(sessions),
-  accounts: many(accounts),
-  todos: many(todos),
-}));
+export const relations = defineRelations(
+  { users, sessions, accounts, verifications, todos },
+  relationBuilder => ({
+    users: {
+      sessions: relationBuilder.many.sessions(),
+      accounts: relationBuilder.many.accounts(),
+      todos: relationBuilder.many.todos(),
+    },
+    sessions: {
+      user: relationBuilder.one.users({
+        from: relationBuilder.sessions.userId,
+        to: relationBuilder.users.id,
+      }),
+    },
+    accounts: {
+      user: relationBuilder.one.users({
+        from: relationBuilder.accounts.userId,
+        to: relationBuilder.users.id,
+      }),
+    },
+    todos: {
+      user: relationBuilder.one.users({
+        from: relationBuilder.todos.userId,
+        to: relationBuilder.users.id,
+      }),
+    },
+  })
+);
 
-export const sessionRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
-}));
-
-export const accountRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
-}));
-
-export const todosRelations = relations(todos, ({ one }) => ({
-  user: one(users, { fields: [todos.userId], references: [users.id] }),
-}));
-
-// ─── Type exports ─────────────────────────────────────────────────────────────
+// ---- Type exports ----
 
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
