@@ -19,9 +19,9 @@ vi.mock("@tanstack/react-start/server", () => ({
 vi.mock("~/lib/auth", () => ({
   auth: {
     api: {
-      getSession: vi.fn(),
-      listSessions: vi.fn(),
-      revokeSession: vi.fn(),
+      getSession: vi.fn<() => Promise<unknown>>(),
+      listSessions: vi.fn<() => Promise<unknown>>(),
+      revokeSession: vi.fn<() => Promise<unknown>>(),
     },
   },
 }));

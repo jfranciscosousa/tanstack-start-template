@@ -25,3 +25,4 @@ Load these when working on the relevant area:
 - All source files must use hyphen-case (kebab-case) naming except specific TanstackRouter files
 - All project operations go through `bin/` scripts. Never call `pnpm run` commands directly unless absolutely necessary. Check `docs/agents/BIN.md` for all available commands.
 - Don't generate database migrations directly, use `bin/db generate`
+- Run `bin/lint.ts` and `bin/ts-check.ts` and `bin/format.ts` on all changes you perform ALWAYS and avoid skipping warnings and errors.

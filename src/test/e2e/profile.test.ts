@@ -10,7 +10,7 @@ import { auth } from "~/lib/auth";
 import { USER_TEST_PASSWORD, createUserAndLogin, test } from "./utils";
 
 function assertUserSame(user1: object, user2: object) {
-  return expect(
+  expect(
     JSON.parse(JSON.stringify({ ...user1, password: null, updatedAt: null }))
   ).toEqual(
     JSON.parse(

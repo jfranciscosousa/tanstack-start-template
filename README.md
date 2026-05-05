@@ -35,10 +35,10 @@ git clone <your-repo-url>
 cd my-tanstack-starter
 
 # Run setup script (installs dependencies, sets up database)
-bin/setup
+bin/setup.ts
 
 # Start development server
-bin/dev
+bin/dev.ts
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see your application.
@@ -48,28 +48,28 @@ Visit [http://localhost:3000](http://localhost:3000) to see your application.
 ### Development
 
 ```bash
-bin/dev            # Start development server
-bin/build          # Build for production
-bin/start          # Start production server
-bin/setup          # Initial project setup
+bin/dev.ts            # Start development server
+bin/build.ts          # Build for production
+bin/start.ts          # Start production server
+bin/setup.ts          # Initial project setup
 ```
 
 ### Testing
 
 ```bash
-bin/test           # Run all tests (unit + e2e)
-bin/test-vitest    # Run unit tests with Vitest
-bin/test-vitest-watch  # Run unit tests in watch mode
-bin/test-e2e       # Run e2e tests with Playwright
-bin/test-e2e-ui    # Run e2e tests with Playwright UI
+bin/test.ts           # Run all tests (unit + e2e)
+bin/test-vitest.ts    # Run unit tests with Vitest
+bin/test-vitest.ts --watch  # Run unit tests in watch mode
+bin/test-e2e.ts       # Run e2e tests with Playwright
+bin/test-e2e.ts --ui    # Run e2e tests with Playwright UI
 ```
 
 ### Code Quality
 
 ```bash
-bin/lint           # Run linter
-bin/format         # Format code
-bin/ts-check       # Run TypeScript compiler check
+bin/lint.ts           # Run linter
+bin/format.ts         # Format code
+bin/ts-check.ts       # Run TypeScript compiler check
 ```
 
 ## Project Structure
@@ -84,7 +84,7 @@ src/
 │   ├── handlers/  # Server function endpoints
 │   └── __tests__/ # Server function tests
 └── test/          # Test setup and utilities
-bin/               # Development, test, and build scripts
+bin/               # Development, test, and build scripts (.ts files)
 ```
 
 ## Authentication Flow
@@ -96,7 +96,7 @@ bin/               # Development, test, and build scripts
 
 ## Environment Variables
 
-The setup script (`bin/setup`) will help you configure your environment automatically. It sets up two files, `.env` and `.env.test` that are using on development and testing environments for you.
+The setup script (`bin/setup.ts`) will help you configure your environment automatically. It sets up two files, `.env` and `.env.test` that are using on development and testing environments for you.
 
 It will also help you rename the app to suit your needs.
 
@@ -105,9 +105,9 @@ It will also help you rename the app to suit your needs.
 The application uses PostgreSQL with Drizzle ORM. The schema is defined in `src/server/db/schema.ts`. Use `drizzle-kit` to manage migrations:
 
 ```bash
-bin/db generate    # Generate migration files from schema changes
-bin/db migrate     # Apply pending migrations
-bin/db studio      # Open Drizzle Studio database browser
+bin/db.ts generate    # Generate migration files from schema changes
+bin/db.ts migrate     # Apply pending migrations
+bin/db.ts studio      # Open Drizzle Studio database browser
 ```
 
 ## Contributing

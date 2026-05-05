@@ -5,8 +5,15 @@ import { render, screen, waitFor } from "~/test/utils";
 
 import SignupPage from "./signup-page";
 
-const mockSignUp = vi.fn();
-const mockNavigate = vi.fn().mockResolvedValue(undefined);
+const mockSignUp =
+  vi.fn<
+    (input: {
+      name: string;
+      email: string;
+      password: string;
+    }) => Promise<unknown>
+  >();
+const mockNavigate = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
 
 vi.mock("~/lib/auth-client", () => ({
   authClient: {

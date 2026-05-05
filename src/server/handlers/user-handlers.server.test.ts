@@ -15,16 +15,16 @@ vi.mock("@tanstack/react-start/server", () => ({
 vi.mock("~/lib/auth", () => ({
   auth: {
     api: {
-      getSession: vi.fn(),
-      updateUser: vi.fn(),
-      changePassword: vi.fn(),
-      changeEmail: vi.fn(),
+      getSession: vi.fn<() => Promise<unknown>>(),
+      updateUser: vi.fn<() => Promise<unknown>>(),
+      changePassword: vi.fn<() => Promise<unknown>>(),
+      changeEmail: vi.fn<() => Promise<unknown>>(),
     },
   },
 }));
 
 vi.mock("~/server/services/user-services", () => ({
-  updateUserTheme: vi.fn(),
+  updateUserTheme: vi.fn<() => Promise<unknown>>(),
 }));
 
 describe("user handlers", () => {

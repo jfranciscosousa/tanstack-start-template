@@ -1,0 +1,15 @@
+{
+  "include": ["**/*.ts", "**/*.mts"],
+  "compilerOptions": {
+    "strict": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "types": ["node", "zx/globals"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  }
+}

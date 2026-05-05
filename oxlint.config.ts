@@ -19,9 +19,36 @@ export default defineConfig({
   overrides: [
     {
       files: ["**/*.test.ts", "**/*.test.tsx"],
+      plugins: ["vitest", "jest"],
       rules: {
         "init-declarations": "off",
         "jest/no-untyped-mock-factory": "off",
+        "vitest/prefer-describe-function-title": "off",
+        "vitest/prefer-import-in-mock": "off",
+        "vitest/no-importing-vitest-globals": "off",
+        "vitest/prefer-importing-vitest-globals": "warn",
+        "vitest/prefer-strict-boolean-matchers": "warn",
+        "vitest/require-mock-type-parameters": "warn",
+        "vitest/require-test-timeout": "off",
+        "vitest/require-top-level-describe": "warn",
+        "vitest/no-hooks": "off",
+        "vitest/no-test-return-statement": "warn",
+        "vitest/no-conditional-in-test": "off",
+        "vitest/prefer-expect-assertions": "off",
+        "vitest/no-conditional-expect": "off",
+        "jest/prefer-ending-with-an-expect": "off",
+        "jest/no-conditional-expect": "off",
+        "jest/no-hooks": "off",
+        "jest/require-top-level-describe": "warn",
+        "jest/prefer-expect-assertions": "off",
+        "jest/no-conditional-in-test": "off",
+      },
+    },
+    {
+      files: ["src/test/e2e/*.test.ts"],
+      plugins: ["vitest"],
+      rules: {
+        "vitest/prefer-importing-vitest-globals": "off",
       },
     },
     {
@@ -30,8 +57,21 @@ export default defineConfig({
         "import/no-nodejs-modules": "off",
       },
     },
+    {
+      files: ["bin/**/*.ts"],
+      globals: {
+        // oxlint-disable-next-line id-length
+        $: "readonly",
+        question: "readonly",
+      },
+      rules: {
+        "no-console": "off",
+        "import/unambiguous": "off",
+        "import/no-nodejs-modules": "off",
+      },
+    },
   ],
-  plugins: ["react", "react-perf", "typescript", "eslint", "import", "vitest"],
+  plugins: ["react", "react-perf", "typescript", "eslint", "import"],
   rules: {
     complexity: "off",
     "eslint/no-unused-vars": [
@@ -80,26 +120,6 @@ export default defineConfig({
     "import/max-dependencies": "off",
     "import/no-relative-parent-imports": "off",
     "eslint/no-duplicate-imports": ["off", { allowSeparateTypeImports: true }],
-    "vitest/prefer-describe-function-title": "off",
-    "vitest/prefer-import-in-mock": "off",
-    "vitest/no-importing-vitest-globals": "off",
-    "vitest/prefer-importing-vitest-globals": "off",
-    "vitest/prefer-strict-boolean-matchers": "off",
-    "vitest/require-mock-type-parameters": "off",
-    "vitest/require-test-timeout": "off",
-    "vitest/require-top-level-describe": "off",
-    "vitest/no-hooks": "off",
-    "vitest/no-test-return-statement": "off",
-    "vitest/no-conditional-in-test": "off",
-    "vitest/prefer-expect-assertions": "off",
-    "vitest/no-conditional-expect": "off",
-    "jest/prefer-ending-with-an-expect": "off",
-    "jest/no-conditional-expect": "off",
-    "jest/no-hooks": "off",
-    "jest/require-top-level-describe": "off",
-    "jest/prefer-expect-assertions": "off",
-    "jest/no-conditional-in-test": "off",
-    // Page sub-components need to import Route modules
     "import/no-cycle": "off",
   },
 });

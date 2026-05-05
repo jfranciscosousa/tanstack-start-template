@@ -14,11 +14,11 @@ const mockUser = {
   updatedAt: new Date("2024-06-01T00:00:00.000Z"),
   theme: "light" as const,
 };
-const mockUpdateFn = vi.fn();
-const mockNavigate = vi.fn();
-const mockInvalidate = vi.fn();
+const mockUpdateFn = vi.fn<() => Promise<unknown>>();
+const mockNavigate = vi.fn<() => void>();
+const mockInvalidate = vi.fn<() => void>();
 
-vi.mock("sonner", () => ({ toast: vi.fn() }));
+vi.mock("sonner", () => ({ toast: vi.fn<() => void>() }));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mockUpdateFn }));
 vi.mock("@tanstack/react-router", () => ({
   useRouter: () => ({

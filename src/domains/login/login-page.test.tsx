@@ -5,10 +5,15 @@ import { render, screen, waitFor } from "~/test/utils";
 
 import LoginPage from "./login-page";
 
-const mockSignIn = vi.fn();
-const mockNavigate = vi.fn().mockResolvedValue(undefined);
-const mockInvalidate = vi.fn().mockResolvedValue(undefined);
-const mockUseSearch = vi.fn().mockReturnValue({ redirectUrl: undefined });
+const mockSignIn =
+  vi.fn<(input: { email: string; password: string }) => Promise<unknown>>();
+const mockNavigate = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
+const mockInvalidate = vi
+  .fn<() => Promise<void>>()
+  .mockResolvedValue(undefined);
+const mockUseSearch = vi
+  .fn<() => { redirectUrl: string | undefined }>()
+  .mockReturnValue({ redirectUrl: undefined });
 
 vi.mock("~/lib/auth-client", () => ({
   authClient: {

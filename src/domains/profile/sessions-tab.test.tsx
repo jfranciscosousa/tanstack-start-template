@@ -8,10 +8,10 @@ import { render, screen, waitFor } from "~/test/utils";
 
 import { SessionsTab } from "./sessions-tab";
 
-const mockRevokeFn = vi.fn();
-const mockInvalidate = vi.fn();
+const mockRevokeFn = vi.fn<() => Promise<unknown>>();
+const mockInvalidate = vi.fn<() => Promise<void>>();
 
-vi.mock("sonner", () => ({ toast: vi.fn() }));
+vi.mock("sonner", () => ({ toast: vi.fn<() => void>() }));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mockRevokeFn }));
 vi.mock("@tanstack/react-router", () => ({
   useRouter: () => ({

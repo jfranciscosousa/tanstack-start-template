@@ -38,7 +38,9 @@ describe("todo service", () => {
       const result = await getTodos(testUser);
 
       expect(result).toHaveLength(2);
-      expect(result[0].createdAt >= result[1].createdAt).toBeTruthy();
+      expect(result[0].createdAt.getTime()).toBeGreaterThanOrEqual(
+        result[1].createdAt.getTime()
+      );
     });
 
     it("should only return todos belonging to the requesting user", async () => {
