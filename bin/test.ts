@@ -6,6 +6,8 @@ import { loadEnv } from "./helpers/env.ts";
 
 process.env.NODE_ENV = "test";
 
+$.stdio = "inherit";
+
 if (!process.env.CI && !existsSync(".env.test")) {
   console.error(
     "❌ .env.test not found. Copy .env.test.sample to .env.test and configure it."
