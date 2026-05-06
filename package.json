@@ -4,7 +4,8 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "build-prod": "zx bin/db.ts migrate && zx bin/build.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
