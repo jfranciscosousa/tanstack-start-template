@@ -8,10 +8,10 @@ Do not test things guaranteed by typescript.
 
 ```bash
 pnpm test                                       # All tests
-pnpm test-vitest                                # Unit tests
-pnpm test-vitest --watch                        # Unit tests watch
-pnpm test-e2e                                   # E2E tests
-pnpm test-vitest path/to/file.test.ts           # Single unit test file
+pnpm test:vitest                                # Unit tests
+pnpm test:vitest --watch                        # Unit tests watch
+pnpm test:e2e                                   # E2E tests
+pnpm test:vitest path/to/file.test.ts           # Single unit test file
 ```
 
 ## Test Environments

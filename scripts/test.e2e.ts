@@ -23,5 +23,5 @@ const playwrightArgs = [useUI ? "--ui" : "", ...filteredArgs].filter(Boolean);
 console.log(`> playwright test ${playwrightArgs.join(" ")}`);
 
 $.stdio = "inherit";
-await $`scripts/test-e2e-setup.ts`;
+await $`scripts/test.e2e.setup.ts`;
 await $`pnpm exec playwright test ${playwrightArgs}`;

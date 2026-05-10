@@ -1,38 +1,45 @@
-#!/usr/scripts/env pnpm zx
+#!/usr/bin/env pnpm zx
 
 console.log(`
 📋 Available Scripts
 
 🔨 Build Commands:
-  ./scripts/build.ts         Build the application for production
-  ./scripts/clean.ts         Clean build artifacts and cache files
+  pnpm build              Build the application for production
+  pnpm build:prod         Migrate + build (production deploy)
+  pnpm clean              Clean build artifacts and cache files
 
 🚀 Development Commands:
-  ./scripts/dev.ts           Start development server with hot reloading
-  ./scripts/start.ts         Start production server (requires build first)
+  pnpm dev                Start development server with hot reloading
+  pnpm start              Start production server (requires build first)
 
 🔍 Code Quality Commands:
-  ./scripts/lint.ts          Run oxlint on the codebase
-  ./scripts/format.ts        Format code with oxfmt
-  ./scripts/ts-check.ts      Run TypeScript type checking
-  ./scripts/ts-check.ts --watch  Run TypeScript type checking in watch mode
+  pnpm lint               Run oxlint on the codebase
+  pnpm lint --fix         Run oxlint with auto-fix
+  pnpm format             Format code with oxfmt
+  pnpm format --check     Check formatting without writing
+  pnpm ts-check           Run TypeScript type checking
 
 🧪 Test Commands:
-  ./scripts/test.ts              Run all tests (unit + e2e)
-  ./scripts/test-vitest.ts       Run unit tests with Vitest
-  ./scripts/test-vitest.ts --watch  Run unit tests in watch mode
-  ./scripts/test-e2e.ts          Run e2e tests with database setup
-  ./scripts/test-e2e.ts --ui     Run e2e tests with Playwright UI
+  pnpm test               Run all tests (unit + e2e)
+  pnpm test:vitest        Run unit tests with Vitest
+  pnpm test:vitest --watch  Run unit tests in watch mode
+  pnpm test:e2e           Run e2e tests with database setup
+  pnpm test:e2e --ui      Run e2e tests with Playwright UI
+  pnpm test:e2e:setup     Install Playwright browsers and migrate test DB
 
-🚀 Deployment Commands:
-  ./scripts/validate-env.ts  Validate environment configuration
+🗄️  Database Commands:
+  pnpm db generate        Generate migration from schema changes
+  pnpm db migrate         Apply pending migrations
+  pnpm db studio          Open Drizzle Studio UI
+  pnpm db:reset           Drop and recreate DB, then migrate
 
 🤖 CI/CD Commands:
-  ./scripts/ci.ts           Run full CI pipeline (lint, type-check, test)
+  pnpm ci                 Run full CI pipeline (lint, type-check, test)
+  pnpm validate-env       Validate environment configuration
 
 💡 Usage Examples:
-  ./scripts/dev.ts                    # Start development
-  ./scripts/build.ts && ./scripts/start.ts   # Build and start production
-  ./scripts/test-vitest.ts --watch    # Develop with tests running
-  ./scripts/ci.ts                     # Run before committing
+  pnpm dev                          # Start development
+  pnpm build && pnpm start          # Build and start production
+  pnpm test:vitest --watch          # Develop with tests running
+  pnpm ci                           # Run before committing
 `);

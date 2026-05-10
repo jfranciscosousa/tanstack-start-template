@@ -58,10 +58,10 @@ pnpm setup        # Initial project setup
 
 ```bash
 pnpm test               # Run all tests (unit + e2e)
-pnpm test-vitest        # Run unit tests with Vitest
-pnpm test-vitest --watch  # Run unit tests in watch mode
-pnpm test-e2e           # Run e2e tests with Playwright
-pnpm test-e2e --ui      # Run e2e tests with Playwright UI
+pnpm test:vitest        # Run unit tests with Vitest
+pnpm test:vitest --watch  # Run unit tests in watch mode
+pnpm test:e2e           # Run e2e tests with Playwright
+pnpm test:e2e --ui      # Run e2e tests with Playwright UI
 ```
 
 ### Code Quality
@@ -110,6 +110,7 @@ The application uses PostgreSQL with Drizzle ORM. The schema is defined in `src/
 pnpm db generate    # Generate migration files from schema changes
 pnpm db migrate     # Apply pending migrations
 pnpm db studio      # Open Drizzle Studio database browser
+pnpm db:reset       # Drop and recreate DB, then migrate
 ```
 
 ## Contributing

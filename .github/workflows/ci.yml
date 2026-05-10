@@ -68,14 +68,14 @@ jobs:
 
       - name: Vitest
         run: |
-          pnpm test-vitest
+          pnpm test:vitest
         env:
           BETTER_AUTH_SECRET: ChangeThisBeforeShippingToProdOrYouWillBeFired
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
 
       - name: E2E
         run: |
-          pnpm test-e2e
+          pnpm test:e2e
         env:
           BETTER_AUTH_SECRET: ChangeThisBeforeShippingToProdOrYouWillBeFired
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
