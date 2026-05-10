@@ -1,5 +1,3 @@
-#!/usr/bin/env pnpm zx
-
 import { loadEnv } from "./helpers/env.ts";
 
 loadEnv();

@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/scripts/env pnpm zx
 
 import { existsSync } from "fs";
 
@@ -20,9 +20,9 @@ loadEnv();
 console.log("🧪 Running all tests...");
 
 console.log("📋 Running unit tests with Vitest...");
-await $`bin/test-vitest.ts`;
+await $`scripts/test-vitest.ts`;
 
 console.log("🎭 Running end-to-end tests...");
-await $`bin/test-e2e.ts`;
+await $`scripts/test-e2e.ts`;
 
 console.log("✅ All tests completed successfully!");

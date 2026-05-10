@@ -1,5 +1,3 @@
-#!/usr/bin/env pnpm zx
-
 import postgres from "postgres";
 
 import { loadEnv } from "./helpers/env.ts";

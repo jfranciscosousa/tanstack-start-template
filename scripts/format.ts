@@ -1,5 +1,3 @@
-#!/usr/bin/env pnpm zx
-
 import { loadEnv } from "./helpers/env.ts";
 
 loadEnv();
@@ -11,7 +9,7 @@ const hasPath = args.some(arg => !arg.startsWith("-"));
 const paths = hasPath ? [] : DEFAULT_PATHS;
 
 const allArgs = [...paths, ...args].filter(Boolean);
-console.log(`> oxlint ${allArgs.join(" ")}`);
+console.log(`> oxfmt ${allArgs.join(" ")}`);
 
 $.stdio = "inherit";
-await $`pnpm exec oxlint ${allArgs}`;
+await $`pnpm exec oxfmt ${allArgs}`;

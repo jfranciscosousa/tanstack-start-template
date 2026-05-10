@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/scripts/env pnpm zx
 
 import { existsSync } from "fs";
 
@@ -16,12 +16,12 @@ if (!process.env.CI && !existsSync(".env.test")) {
 loadEnv();
 
 const args = process.argv.slice(3);
-const useUI = args.includes("--ui");
-const filteredArgs = args.filter(arg => arg !== "--ui");
+const useWatch = args.includes("--watch");
+const filteredArgs = args.filter(arg => arg !== "--watch");
 
-const playwrightArgs = [useUI ? "--ui" : "", ...filteredArgs].filter(Boolean);
-console.log(`> playwright test ${playwrightArgs.join(" ")}`);
+const vitestArgs = [useWatch ? "" : "run", ...filteredArgs].filter(Boolean);
+console.log(`> vitest ${vitestArgs.join(" ")}`);
 
 $.stdio = "inherit";
-await $`bin/test-e2e-setup.ts`;
-await $`pnpm exec playwright test ${playwrightArgs}`;
+await $`scripts/db-reset.ts`;
+await $`pnpm exec vitest ${vitestArgs}`;

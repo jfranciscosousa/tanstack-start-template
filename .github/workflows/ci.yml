@@ -63,19 +63,19 @@ jobs:
 
       - name: Lint
         run: |
-          bin/lint.ts
-          bin/ts-check.ts
+          pnpm lint
+          pnpm ts-check
 
       - name: Vitest
         run: |
-          bin/test-vitest.ts
+          pnpm test-vitest
         env:
           BETTER_AUTH_SECRET: ChangeThisBeforeShippingToProdOrYouWillBeFired
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
 
       - name: E2E
         run: |
-          bin/test-e2e.ts
+          pnpm test-e2e
         env:
           BETTER_AUTH_SECRET: ChangeThisBeforeShippingToProdOrYouWillBeFired
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test

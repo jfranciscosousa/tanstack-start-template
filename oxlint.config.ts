@@ -56,7 +56,7 @@ export default defineConfig({
       },
     },
     {
-      files: ["bin/**/*.ts"],
+      files: ["scripts/**/*.ts"],
       globals: {
         // oxlint-disable-next-line id-length
         $: "readonly",

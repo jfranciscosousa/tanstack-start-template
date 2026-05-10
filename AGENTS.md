@@ -8,7 +8,8 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 ## CRITICAL:
 
-- To run tests and lints, use scripts on bin/ ALWAYS
+- All project operations go through `pnpm <script>` or `scripts/` directly — never call underlying tools (vite, drizzle-kit, vitest, playwright) directly
+- Run `pnpm lint`, `pnpm ts-check`, and `pnpm format` on all changes ALWAYS — do not skip warnings or errors
 
 ## Domain Guides
 
@@ -17,12 +18,10 @@ Load these when working on the relevant area:
 - [Architecture & Patterns](docs/agents/ARCHITECTURE.md) — layered server architecture, server functions, routing, session utilities, error handling
 - [UI](docs/agents/UI.md) — DaisyUI components, Tailwind utilities, Lucide icons
 - [Testing](docs/agents/TESTING.md) — Vitest environments, Playwright e2e, test utilities, testing guidelines
-- [Bin Scripts](docs/agents/BIN.md) — all available bin/ scripts and their args
+- [Scripts](docs/agents/SCRIPTS.md) — all available scripts and their args
 
 ## Code guidelines
 
-- Variables should have clear simple names. Don't: `e`. Do `event`
-- All source files must use hyphen-case (kebab-case) naming except specific TanstackRouter files
-- All project operations go through `bin/` scripts. Never call `pnpm run` commands directly unless absolutely necessary. Check `docs/agents/BIN.md` for all available commands.
-- Don't generate database migrations directly, use `bin/db generate`
-- Run `bin/lint.ts` and `bin/ts-check.ts` and `bin/format.ts` on all changes you perform ALWAYS and avoid skipping warnings and errors.
+- Variables should have clear simple names. Don't: `e`. Do: `event`
+- All source files must use hyphen-case (kebab-case) naming except specific TanStack Router files
+- Don't generate database migrations directly — use `pnpm db generate`

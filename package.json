@@ -5,7 +5,23 @@
   "sideEffects": false,
   "scripts": {
     "prepare": "husky",
-    "build-prod": "zx bin/db.ts migrate && zx bin/build.ts"
+    "dev": "zx scripts/dev.ts",
+    "build": "zx scripts/build.ts",
+    "build-prod": "zx scripts/db.ts migrate && zx scripts/build.ts",
+    "start": "zx scripts/start.ts",
+    "clean": "zx scripts/clean.ts",
+    "lint": "zx scripts/lint.ts",
+    "format": "zx scripts/format.ts",
+    "ts-check": "zx scripts/ts-check.ts",
+    "test": "zx scripts/test.ts",
+    "test-vitest": "zx scripts/test-vitest.ts",
+    "test-e2e": "zx scripts/test-e2e.ts",
+    "test-e2e-setup": "zx scripts/test-e2e-setup.ts",
+    "db": "zx scripts/db.ts",
+    "db-reset": "zx scripts/db-reset.ts",
+    "ci": "zx scripts/ci.ts",
+    "setup": "zx scripts/setup.ts",
+    "validate-env": "zx scripts/validate-env.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

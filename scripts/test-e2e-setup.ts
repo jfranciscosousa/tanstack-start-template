@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/scripts/env pnpm zx
 
 import { existsSync } from "fs";
 
@@ -19,5 +19,5 @@ console.log("🎭 Setting up end-to-end tests...");
 
 $.stdio = "inherit";
 await $`pnpm exec playwright install chromium`;
-await $`bin/db-reset.ts`;
+await $`scripts/db-reset.ts`;
 console.log("✅ End-to-end dependencies set up successfully!");

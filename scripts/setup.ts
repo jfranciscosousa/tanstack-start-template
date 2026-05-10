@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/scripts/env pnpm zx
 
 const TEMPLATE_NAME = "my-tanstack-starter";
 
@@ -82,5 +82,5 @@ console.log(`   ✅ Development database created: ${dev_db_name}`);
 console.log(`   ✅ Test database created: ${test_db_name}`);
 console.log("   ✅ Database schemas applied");
 console.log("\nNext steps:");
-console.log("   - Run 'bin/dev.ts' to start the development server");
-console.log("   - Run 'bin/test.ts' to run tests");
+console.log("   - Run 'scripts/dev.ts' to start the development server");
+console.log("   - Run 'scripts/test.ts' to run tests");

@@ -7,11 +7,11 @@ Do not test things guaranteed by typescript.
 ## Commands
 
 ```bash
-bin/test.ts                                     # All tests
-bin/test-vitest.ts                              # Unit tests
-bin/test-vitest.ts --watch                        # Unit tests watch
-bin/test-e2e.ts                                 # E2E tests
-bin/test-vitest path/to/file.test.ts         # Single unit test file
+pnpm test                                       # All tests
+pnpm test-vitest                                # Unit tests
+pnpm test-vitest --watch                        # Unit tests watch
+pnpm test-e2e                                   # E2E tests
+pnpm test-vitest path/to/file.test.ts           # Single unit test file
 ```
 
 ## Test Environments
