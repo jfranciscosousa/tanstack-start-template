@@ -6,7 +6,7 @@ console.log("🚀 Setting up TanStack Start project...");
 
 // Prompt for app name
 let app_name = await question(`App name [${TEMPLATE_NAME}]: `);
-app_name = app_name || TEMPLATE_NAME;
+app_name ||= TEMPLATE_NAME;
 
 // Rename app in all relevant files if a new name was given
 if (app_name !== TEMPLATE_NAME) {
@@ -33,7 +33,7 @@ const db_host =
   (await question("PostgreSQL host [localhost]: ")) || "localhost";
 const db_port = (await question("PostgreSQL port [5432]: ")) || "5432";
 let db_name = await question(`Database name [${app_name}]: `);
-db_name = db_name || app_name;
+db_name ||= app_name;
 
 if (!db_user || !db_name) {
   console.error("❌ Username and database name are required");

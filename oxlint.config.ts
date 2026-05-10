@@ -3,9 +3,7 @@ import { defineConfig } from "oxlint";
 export default defineConfig({
   options: {},
   categories: {
-    correctness: "warn",
-    nursery: "warn",
-    pedantic: "warn",
+    correctness: "error",
     perf: "error",
     restriction: "error",
     style: "warn",
