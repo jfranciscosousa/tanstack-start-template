@@ -1,4 +1,4 @@
-#!/usr/scripts/env pnpm zx
+#!/usr/bin/env pnpm zx
 
 import { existsSync } from "fs";
 
@@ -23,5 +23,5 @@ const vitestArgs = [useWatch ? "" : "run", ...filteredArgs].filter(Boolean);
 console.log(`> vitest ${vitestArgs.join(" ")}`);
 
 $.stdio = "inherit";
-await $`scripts/db.reset.ts`;
+await $`zx scripts/db.reset.ts`;
 await $`pnpm exec vitest ${vitestArgs}`;

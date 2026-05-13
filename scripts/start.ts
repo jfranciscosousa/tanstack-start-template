@@ -1,4 +1,4 @@
-#!/usr/scripts/env pnpm zx
+#!/usr/bin/env pnpm zx
 
 import { existsSync } from "fs";
 

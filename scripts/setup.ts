@@ -1,4 +1,4 @@
-#!/usr/scripts/env pnpm zx
+#!/usr/bin/env pnpm zx
 
 const TEMPLATE_NAME = "my-tanstack-starter";
 
