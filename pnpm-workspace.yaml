@@ -1,3 +1,6 @@
+autoInstallPeers: false
+minimumReleaseAge: 7200
+resolutionMode: highest
 allowBuilds:
   '@parcel/watcher': true
   core-js-pure: true
