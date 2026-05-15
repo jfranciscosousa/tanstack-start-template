@@ -1,7 +1,7 @@
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 import postgres from "postgres";
+import path from "node:path";
+import os from "node:os";
+import fs from "node:fs";
 
 const DEFAULT_PORT = 3000;
 
@@ -18,7 +18,7 @@ interface WorktreeInfo {
   isMain: boolean;
   port: number | null;
   databaseUrl: string | null;
-};
+}
 
 async function listWorktrees(): Promise<WorktreeInfo[]> {
   const { stdout } = await $`git worktree list --porcelain`.quiet();
@@ -26,9 +26,13 @@ async function listWorktrees(): Promise<WorktreeInfo[]> {
 
   return blocks.map((block, index) => {
     const lines = block.split("\n");
-    const wtPath = lines.find((line) => line.startsWith("worktree "))?.slice(9) ?? "";
+    const wtPath =
+      lines.find(line => line.startsWith("worktree "))?.slice(9) ?? "";
     const branch =
-      lines.find((line) => line.startsWith("branch "))?.slice(7).replace("refs/heads/", "") ?? "(detached)";
+      lines
+        .find(line => line.startsWith("branch "))
+        ?.slice(7)
+        .replace("refs/heads/", "") ?? "(detached)";
 
     const env = readEnv(path.join(wtPath, ".env"));
     const port = env.PORT ? Number(env.PORT) : null;
@@ -94,7 +98,7 @@ async function cmdList() {
     else if (existingDbs && !existingDbs.has(dbName)) {
       issues.push(`database '${dbName}' does not exist`);
     }
-    if ((portCounts.get(port) ?? 0) > 1){
+    if ((portCounts.get(port) ?? 0) > 1) {
       issues.push(`port ${port} conflicts with another worktree`);
     }
 
@@ -119,7 +123,7 @@ async function cmdList() {
 async function fetchExistingDbs(
   worktrees: WorktreeInfo[]
 ): Promise<Set<string> | null> {
-  const url = worktrees.find((wt) => wt.databaseUrl)?.databaseUrl;
+  const url = worktrees.find(wt => wt.databaseUrl)?.databaseUrl;
   if (!url) return null;
   try {
     const sql = postgres(replaceDbName(url, "postgres"));
@@ -127,7 +131,7 @@ async function fetchExistingDbs(
       SELECT datname FROM pg_database
     `;
     await sql.end();
-    return new Set(rows.map((row) => row.datname));
+    return new Set(rows.map(row => row.datname));
   } catch {
     return null;
   }
@@ -139,12 +143,14 @@ async function cmdCreate(name: string) {
     process.exit(1);
   }
   if (!/^[a-z0-9][a-z0-9-]*$/.test(name)) {
-    console.error("❌ Worktree name must be lowercase alphanumeric with dashes");
+    console.error(
+      "❌ Worktree name must be lowercase alphanumeric with dashes"
+    );
     process.exit(1);
   }
 
   const worktrees = await listWorktrees();
-  if (worktrees.some((wt) => !wt.isMain && wt.name === name)) {
+  if (worktrees.some(wt => !wt.isMain && wt.name === name)) {
     console.error(`❌ Worktree '${name}' already exists`);
     process.exit(1);
   }
@@ -157,7 +163,7 @@ async function cmdCreate(name: string) {
 
   const maxPort = Math.max(
     DEFAULT_PORT,
-    ...worktrees.map((wt) => wt.port ?? DEFAULT_PORT)
+    ...worktrees.map(wt => wt.port ?? DEFAULT_PORT)
   );
   const newPort = maxPort + 1;
 
@@ -197,7 +203,7 @@ async function cmdDelete(name: string) {
   }
 
   const worktrees = await listWorktrees();
-  const target = worktrees.find((wt) => !wt.isMain && wt.name === name);
+  const target = worktrees.find(wt => !wt.isMain && wt.name === name);
 
   const mainEnv = readEnv(path.join(repoRoot, ".env"));
   const expectedDb =
@@ -218,21 +224,21 @@ async function cmdDelete(name: string) {
       : expectedBranch;
   const dbName = target?.databaseUrl
     ? dbNameFromUrl(target.databaseUrl)
-    : expectedDb ?? null;
+    : (expectedDb ?? null);
   const dbUrl = target?.databaseUrl ?? mainEnv.DATABASE_URL ?? null;
 
   if (!target) {
     console.log(
       `⚠️  No matching git worktree found — proceeding with best-effort cleanup of:`
     );
-    console.log(`   path:   ${wtPath} ${fs.existsSync(wtPath) ? "" : "(missing)"}`);
+    console.log(
+      `   path:   ${wtPath} ${fs.existsSync(wtPath) ? "" : "(missing)"}`
+    );
     console.log(`   branch: ${branch}`);
     console.log(`   db:     ${dbName ?? "?"}`);
   }
 
-  const confirm = await question(
-    `Delete '${target?.name ?? name}'? [y/N]: `
-  );
+  const confirm = await question(`Delete '${target?.name ?? name}'? [y/N]: `);
   if (confirm.toLowerCase() !== "y") {
     console.log("Aborted.");
     return;
@@ -273,8 +279,8 @@ async function cmdCleanup() {
   const worktrees = await listWorktrees();
   const expectedDbs = new Set(
     worktrees
-      .filter((tree) => !tree.isMain)
-      .map((tree) => `${sourceDb}_${tree.name.replace(/-/g, "_")}`)
+      .filter(tree => !tree.isMain)
+      .map(tree => `${sourceDb}_${tree.name.replace(/-/g, "_")}`)
   );
   expectedDbs.add(sourceDb);
 
@@ -287,8 +293,8 @@ async function cmdCleanup() {
   await sql.end();
 
   const orphans = rows
-    .map((row) => row.datname)
-    .filter((db) => !expectedDbs.has(db));
+    .map(row => row.datname)
+    .filter(db => !expectedDbs.has(db));
 
   if (orphans.length === 0) {
     console.log(`\n✅ No orphan databases found.`);
@@ -305,7 +311,7 @@ async function cmdCleanup() {
   }
 
   await Promise.all(
-    orphans.map(async (db) => {
+    orphans.map(async db => {
       console.log(`🗄️  Dropping ${db}...`);
       await dropDatabase(mainEnv.DATABASE_URL, db);
     })
@@ -322,9 +328,7 @@ async function cloneDatabase(
   const adminUrl = replaceDbName(sourceUrl, "postgres");
   const sql = postgres(adminUrl);
   try {
-    await sql.unsafe(
-      `CREATE DATABASE "${newDb}" WITH TEMPLATE "${sourceDb}"`
-    );
+    await sql.unsafe(`CREATE DATABASE "${newDb}" WITH TEMPLATE "${sourceDb}"`);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("being accessed by other users")) {
