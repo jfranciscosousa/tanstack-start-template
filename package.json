@@ -21,7 +21,8 @@
     "db:reset": "zx scripts/db.reset.ts",
     "ci": "zx scripts/ci.ts",
     "setup": "zx scripts/setup.ts",
-    "validate-env": "zx scripts/validate-env.ts"
+    "validate-env": "zx scripts/validate-env.ts",
+    "worktree": "zx scripts/worktree.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
