@@ -4,15 +4,14 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
-import { APP_NAME } from "~/lib/app-config.js";
 import { seo } from "~/server/seo.js";
-
 import {
   createTodoFn,
   deleteAllTodosFn,
   deleteTodoFn,
   getTodosFn,
 } from "~/server/handlers/todo-handlers";
+import { APP_NAME } from "~/lib/app-config.js";
 import { useMutation } from "~/hooks/use-mutation";
 import { Input } from "~/components/ui/input";
 import {

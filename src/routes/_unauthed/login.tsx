@@ -1,8 +1,8 @@
 import z from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { APP_NAME } from "~/lib/app-config.js";
 import { seo } from "~/server/seo.js";
+import { APP_NAME } from "~/lib/app-config.js";
 import LoginPage from "~/domains/login/login-page";
 
 const searchSchema = z.object({

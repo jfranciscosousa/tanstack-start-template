@@ -13,8 +13,8 @@ import type { User } from "~/server/db/schema";
 
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/server/seo.js";
-import { APP_NAME } from "~/lib/app-config.js";
 import { auth } from "~/lib/auth";
+import { APP_NAME } from "~/lib/app-config.js";
 import { AppError } from "~/errors";
 import { NotFound } from "~/components/not-found.js";
 import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
