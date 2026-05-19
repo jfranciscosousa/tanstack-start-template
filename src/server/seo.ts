@@ -15,8 +15,6 @@ export function seo({
     { content: keywords, name: "keywords" },
     { content: title, name: "twitter:title" },
     { content: description, name: "twitter:description" },
-    { content: "@tannerlinsley", name: "twitter:creator" },
-    { content: "@tannerlinsley", name: "twitter:site" },
     { content: "website", name: "og:type" },
     { content: title, name: "og:title" },
     { content: description, name: "og:description" },

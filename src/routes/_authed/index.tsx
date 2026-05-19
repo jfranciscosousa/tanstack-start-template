@@ -4,6 +4,9 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 
+import { APP_NAME } from "~/lib/app-config.js";
+import { seo } from "~/server/seo.js";
+
 import {
   createTodoFn,
   deleteAllTodosFn,
@@ -25,6 +28,14 @@ import { Button } from "~/components/ui/button";
 export const Route = createFileRoute("/_authed/")({
   component: RouteComponent,
   loader: () => getTodosFn(),
+  head: () => ({
+    meta: [
+      ...seo({
+        title: `My Tasks | ${APP_NAME}`,
+        description: "Manage your tasks",
+      }),
+    ],
+  }),
 });
 
 interface Todo {

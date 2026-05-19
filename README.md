@@ -1,4 +1,4 @@
-# my-tanstack-starter
+# tanstack-start-template
 
 A modern full-stack React application template built with TanStack Start, featuring simple authentication functionality and a clean, responsive design.
 
@@ -32,7 +32,7 @@ A modern full-stack React application template built with TanStack Start, featur
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd my-tanstack-starter
+cd tanstack-start-template
 
 # Run setup script (installs dependencies, sets up database)
 pnpm setup

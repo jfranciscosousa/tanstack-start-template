@@ -1,6 +1,6 @@
 #!/usr/bin/env pnpm zx
 
-const TEMPLATE_NAME = "my-tanstack-starter";
+const TEMPLATE_NAME = "tanstack-start-template";
 
 console.log("🚀 Setting up TanStack Start project...");
 
@@ -12,7 +12,7 @@ app_name ||= TEMPLATE_NAME;
 if (app_name !== TEMPLATE_NAME) {
   console.log(`✏️  Renaming app to '${app_name}'...`);
   await $`sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" README.md`;
-  await $`sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" src/routes/__root.tsx`;
+  await $`sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" src/lib/app-config.ts`;
   console.log("✅ App renamed");
 }
 
