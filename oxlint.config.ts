@@ -56,6 +56,12 @@ export default defineConfig({
       },
     },
     {
+      files: ["src/test/*.ts"],
+      rules: {
+        "import/no-nodejs-modules": "off",
+      },
+    },
+    {
       files: ["scripts/**/*.ts"],
       globals: {
         // oxlint-disable-next-line id-length
