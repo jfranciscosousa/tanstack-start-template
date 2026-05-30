@@ -29,11 +29,11 @@ export default function SignupPage() {
             className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20"
             aria-hidden="true"
           >
-            <span className="font-display text-xl leading-none font-bold text-primary-foreground italic">
+            <span className="font-display text-xl leading-none font-bold text-primary-foreground">
               T
             </span>
           </div>
-          <h1 className="font-display text-3xl font-bold tracking-tight italic">
+          <h1 className="font-display text-3xl font-bold tracking-tight">
             Create account.
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">

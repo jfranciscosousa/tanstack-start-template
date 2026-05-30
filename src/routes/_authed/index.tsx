@@ -218,7 +218,7 @@ function RouteComponent() {
       {/* Header */}
       <div className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground italic">
+          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
             My Tasks
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
@@ -271,7 +271,7 @@ function RouteComponent() {
       {/* Empty state */}
       {todos.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="mb-5 font-display text-7xl leading-none font-bold text-primary/20 italic select-none">
+          <p className="mb-5 font-display text-7xl leading-none font-bold text-primary/20 select-none">
             All clear.
           </p>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground/70">

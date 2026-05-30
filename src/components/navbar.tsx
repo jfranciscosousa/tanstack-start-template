@@ -100,12 +100,12 @@ export function Navbar({ user }: NavbarProps) {
             className="flex h-7 w-7 items-center justify-center rounded-md bg-primary"
             aria-hidden="true"
           >
-            <span className="font-display text-sm leading-none font-bold text-primary-foreground italic">
+            <span className="font-display text-sm leading-none font-bold text-primary-foreground">
               T
             </span>
           </div>
           <span
-            className="hidden font-display text-sm font-semibold text-foreground/90 italic transition-colors group-hover:text-foreground sm:inline"
+            className="hidden font-display text-sm font-semibold text-foreground/90 transition-colors group-hover:text-foreground sm:inline"
             aria-hidden="true"
           >
             TanStack

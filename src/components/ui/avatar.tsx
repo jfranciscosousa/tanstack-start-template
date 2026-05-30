@@ -1,50 +1,129 @@
-import type { ReactNode } from "react";
-import type { VariantProps } from "class-variance-authority";
+import type { ComponentProps } from "react";
 
-import { cva } from "class-variance-authority";
+import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
 
 import { cn } from "~/lib/utils";
 
-const avatarVariants = cva(
-  "flex shrink-0 items-center justify-center rounded-lg",
-  {
-    defaultVariants: {
-      size: "md",
-      variant: "default",
-    },
-    variants: {
-      size: {
-        xs: "h-6 w-6 p-1",
-        sm: "h-8 w-8 p-2",
-        md: "h-10 w-10 p-2",
-        lg: "h-12 w-12 p-3",
-        xl: "h-16 w-16 p-4",
-      },
-      variant: {
-        default: "bg-primary text-primary-foreground",
-        secondary: "bg-secondary text-secondary-foreground",
-        destructive: "text-destructive-foreground bg-destructive",
-        accent: "bg-accent text-accent-foreground",
-        muted: "bg-muted text-muted-foreground",
-        warning:
-          "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-        info: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-        success:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
-      },
-    },
-  }
-);
+type AvatarVariant =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "accent"
+  | "muted"
+  | "warning"
+  | "info"
+  | "success";
 
-interface AvatarProps extends VariantProps<typeof avatarVariants> {
-  children: ReactNode;
-  className?: string;
-}
+const avatarVariantClasses: Record<AvatarVariant, string> = {
+  default: "bg-primary text-primary-foreground",
+  secondary: "bg-secondary text-secondary-foreground",
+  destructive: "bg-destructive/10 text-destructive",
+  accent: "bg-accent text-accent-foreground",
+  muted: "bg-muted text-muted-foreground",
+  warning: "bg-warning/10 text-warning",
+  info: "bg-info/10 text-info",
+  success: "bg-success/10 text-success",
+};
 
-export function Avatar({ children, size, variant, className }: AvatarProps) {
+function Avatar({
+  className,
+  size = "default",
+  variant = "default",
+  ...props
+}: AvatarPrimitive.Root.Props & {
+  size?: "default" | "sm" | "lg";
+  variant?: AvatarVariant;
+}) {
   return (
-    <div className={cn(avatarVariants({ size, variant }), className)}>
-      {children}
-    </div>
+    <AvatarPrimitive.Root
+      data-slot="avatar"
+      data-size={size}
+      className={cn(
+        "group/avatar relative flex size-8 shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken data-[size=lg]:size-10 data-[size=sm]:size-6 dark:after:mix-blend-lighten",
+        avatarVariantClasses[variant],
+        className
+      )}
+      {...props}
+    />
   );
 }
+
+function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
+  return (
+    <AvatarPrimitive.Image
+      data-slot="avatar-image"
+      className={cn(
+        "aspect-square size-full rounded-full object-cover",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function AvatarFallback({
+  className,
+  ...props
+}: AvatarPrimitive.Fallback.Props) {
+  return (
+    <AvatarPrimitive.Fallback
+      data-slot="avatar-fallback"
+      className={cn(
+        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function AvatarBadge({ className, ...props }: ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="avatar-badge"
+      className={cn(
+        "absolute right-0 bottom-0 z-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground bg-blend-color ring-2 ring-background select-none",
+        "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden",
+        "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2",
+        "group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function AvatarGroup({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="avatar-group"
+      className={cn(
+        "group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function AvatarGroupCount({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="avatar-group-count"
+      className={cn(
+        "relative flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-10 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+  AvatarBadge,
+};
