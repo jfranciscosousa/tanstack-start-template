@@ -1,4 +1,3 @@
-import { checker } from "vite-plugin-checker";
 import { defineConfig } from "vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -6,12 +5,10 @@ import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import babel from "@rolldown/plugin-babel";
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   resolve: { tsconfigPaths: true },
 
   plugins: [
-    mode === "development" && checker({ oxlint: true, typescript: true }),
-
     tanstackStart(),
 
     nitroV2Plugin({
@@ -28,4 +25,4 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 3000,
   },
-}));
+});

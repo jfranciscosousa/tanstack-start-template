@@ -54,10 +54,10 @@ function readEnv(filePath: string): Record<string, string> {
   const content = fs.readFileSync(filePath, "utf8");
   const result: Record<string, string> = {};
   for (const line of content.split("\n")) {
-    const match = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+    const match = line.match(/^(?<key>[A-Z_][A-Z0-9_]*)=(?<value>.*)$/);
     if (match) {
-      const [, key, value] = match;
-      result[key] = value;
+      const { key, value } = match.groups ?? {};
+      if (key !== undefined && value !== undefined) result[key] = value;
     }
   }
   return result;

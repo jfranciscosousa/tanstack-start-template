@@ -110,6 +110,7 @@ export default defineConfig({
     "react/only-export-components": "off",
     "react/react-in-jsx-scope": "off",
     "react/forbid-component-props": "off",
+    "react/jsx-no-literals": "off",
     "sort-imports": "off",
     "sort-keys": "off",
     "typescript/no-explicit-any": "error",
