@@ -1,5 +1,5 @@
 autoInstallPeers: false
-minimumReleaseAge: 7200
+minimumReleaseAge: 2880
 resolutionMode: highest
 allowBuilds:
   '@parcel/watcher': true
