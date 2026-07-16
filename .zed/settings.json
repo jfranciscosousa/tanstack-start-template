@@ -74,6 +74,7 @@
       ]
     },
     "JavaScript": {
+      "language_servers": ["typescript-ls", "!vtsls", "..."],
       "format_on_save": "on",
       "prettier": {
         "allowed": false
@@ -181,6 +182,7 @@
       ]
     },
     "TypeScript": {
+      "language_servers": ["typescript-ls", "!vtsls", "..."],
       "format_on_save": "on",
       "prettier": {
         "allowed": false
@@ -191,14 +193,10 @@
             "name": "oxfmt"
           }
         }
-      ],
-      "language_servers": [
-        "typescript-ls",
-        "!typescript-language-server",
-        "!vtsls"
       ]
     },
     "TSX": {
+      "language_servers": ["typescript-ls", "!vtsls", "..."],
       "format_on_save": "on",
       "prettier": {
         "allowed": false
@@ -209,11 +207,6 @@
             "name": "oxfmt"
           }
         }
-      ],
-      "language_servers": [
-        "typescript-ls",
-        "!typescript-language-server",
-        "!vtsls"
       ]
     },
     "Vue.js": {
