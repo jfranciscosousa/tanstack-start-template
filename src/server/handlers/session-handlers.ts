@@ -27,7 +27,7 @@ export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
 );
 
 export const revokeSession = createServerFn({ method: "POST" })
-  .inputValidator((token: unknown) => z.string().parse(token))
+  .validator((token: unknown) => z.string().parse(token))
   .handler(async ({ data: token }) => {
     const req = getRequest();
     const session = await auth.api.getSession({ headers: req.headers });

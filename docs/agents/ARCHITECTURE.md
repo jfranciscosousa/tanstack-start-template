@@ -13,7 +13,7 @@ only     no HTTP    + validation
 
 - `db/schema.ts` — schema definitions only, no queries
 - `services/` — Drizzle queries, pure business logic, use `createServerOnlyFn`
-- `handlers/` — `createServerFn` + `.inputValidator()` + Zod, delegates to services
+- `handlers/` — `createServerFn` + `.validator()` + Zod, delegates to services
 - `routes/` — thin shells: route config, loader, and `validateSearch` only
 - `domains/` — all page UI and sub-components, grouped by feature
 
@@ -36,7 +36,7 @@ const schema = zfd.formData({
 });
 
 export const updateProfileFn = createServerFn({ method: "POST" })
-  .inputValidator((formData: FormData) => schema.parse(formData))
+  .validator((formData: FormData) => schema.parse(formData))
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession(); // throws if not authed
     return await updateUser(user.id, data);

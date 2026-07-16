@@ -19,7 +19,7 @@ export const getTodosFn = createServerFn({ method: "GET" }).handler(
 );
 
 export const createTodoFn = createServerFn({ method: "POST" })
-  .inputValidator(createTodoSchema)
+  .validator(createTodoSchema)
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
 
@@ -27,7 +27,7 @@ export const createTodoFn = createServerFn({ method: "POST" })
   });
 
 export const deleteTodoFn = createServerFn({ method: "POST" })
-  .inputValidator(deleteTodoSchema)
+  .validator(deleteTodoSchema)
   .handler(async ({ data }) => {
     const { user } = await useLoggedInAppSession();
 

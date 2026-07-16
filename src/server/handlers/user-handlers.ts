@@ -9,7 +9,7 @@ import { AppError, ParamsError } from "~/errors";
 export { updateUserSchema };
 
 export const updateUserFn = createServerFn({ method: "POST" })
-  .inputValidator(updateUserSchema)
+  .validator(updateUserSchema)
   .handler(async ({ data }) => {
     const req = getRequest();
     const session = await auth.api.getSession({ headers: req.headers });
@@ -71,7 +71,7 @@ export const updateUserFn = createServerFn({ method: "POST" })
   });
 
 export const updateThemeFn = createServerFn({ method: "POST" })
-  .inputValidator(updateThemeSchema)
+  .validator(updateThemeSchema)
   .handler(async ({ data }) => {
     const req = getRequest();
     const session = await auth.api.getSession({ headers: req.headers });
