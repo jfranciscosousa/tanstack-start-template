@@ -9,20 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnauthedRouteImport } from './routes/_unauthed'
 import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as UnauthedRouteImport } from './routes/_unauthed'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
-import { Route as UnauthedSignupRouteImport } from './routes/_unauthed/signup'
-import { Route as UnauthedLoginRouteImport } from './routes/_unauthed/login'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
+import { Route as UnauthedLoginRouteImport } from './routes/_unauthed/login'
+import { Route as UnauthedSignupRouteImport } from './routes/_unauthed/signup'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const UnauthedRoute = UnauthedRouteImport.update({
-  id: '/_unauthed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnauthedRoute = UnauthedRouteImport.update({
+  id: '/_unauthed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedIndexRoute = AuthedIndexRouteImport.update({
@@ -30,20 +30,20 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedRoute,
 } as any)
-const UnauthedSignupRoute = UnauthedSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => UnauthedRoute,
+const AuthedProfileRoute = AuthedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const UnauthedLoginRoute = UnauthedLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => UnauthedRoute,
 } as any)
-const AuthedProfileRoute = AuthedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthedRoute,
+const UnauthedSignupRoute = UnauthedSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => UnauthedRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -99,18 +99,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_unauthed': {
-      id: '/_unauthed'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof UnauthedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authed': {
       id: '/_authed'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_unauthed': {
+      id: '/_unauthed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof UnauthedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/': {
@@ -120,12 +120,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
     }
-    '/_unauthed/signup': {
-      id: '/_unauthed/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof UnauthedSignupRouteImport
-      parentRoute: typeof UnauthedRoute
+    '/_authed/profile': {
+      id: '/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthedProfileRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_unauthed/login': {
       id: '/_unauthed/login'
@@ -134,12 +134,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthedLoginRouteImport
       parentRoute: typeof UnauthedRoute
     }
-    '/_authed/profile': {
-      id: '/_authed/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthedProfileRouteImport
-      parentRoute: typeof AuthedRoute
+    '/_unauthed/signup': {
+      id: '/_unauthed/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof UnauthedSignupRouteImport
+      parentRoute: typeof UnauthedRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
