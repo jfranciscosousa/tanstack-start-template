@@ -1,8 +1,18 @@
-import { createStart } from "@tanstack/react-start";
+import { evlogErrorHandler } from "evlog/nitro/v3";
+import {
+  createCsrfMiddleware,
+  createMiddleware,
+  createStart,
+} from "@tanstack/react-start";
 
-import { requestLoggingMiddleware } from "./middlewares/logging";
+const csrfMiddleware = createCsrfMiddleware({
+  filter: ctx => ctx.handlerType === "serverFn",
+});
 
 export const startInstance = createStart(() => ({
   defaultSsr: false,
-  requestMiddleware: [requestLoggingMiddleware],
+  requestMiddleware: [
+    csrfMiddleware,
+    createMiddleware().server(evlogErrorHandler),
+  ],
 }));

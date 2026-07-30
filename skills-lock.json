@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "analyze-logs": {
+      "source": "evlog.dev",
+      "sourceType": "well-known",
+      "computedHash": "b556e4e5cf892e89c57b7f513039b1f4df45d2b6d0cf2912ae03ea07cdf67c42"
+    },
     "better-auth-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
@@ -10,6 +15,11 @@
       "source": "better-auth/skills",
       "sourceType": "github",
       "computedHash": "5717187bba9c22030c7174c74012f01c359f21e2ce87e0eb80e24244d8b8c915"
+    },
+    "build-audit-logs": {
+      "source": "evlog.dev",
+      "sourceType": "well-known",
+      "computedHash": "b74766565be941fd68ac91f642704a45a9683482821c51f9b298246aeb38f5cc"
     },
     "create-auth-skill": {
       "source": "better-auth/skills",
@@ -25,6 +35,11 @@
       "source": "anthropics/skills",
       "sourceType": "github",
       "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "review-logging-patterns": {
+      "source": "evlog.dev",
+      "sourceType": "well-known",
+      "computedHash": "1639ebcb462bd06ccecf51428cb69f5cd8a5ff306393ccb4ff1ae7a1f21cb699"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
