@@ -25,8 +25,6 @@ Load these when working on the relevant area:
 
 ## Code guidelines
 
-<<<<<<< Updated upstream
-
 - Variables should have clear simple names. Don't: `e`. Do: `event`
 - All source files must use hyphen-case (kebab-case) naming except specific TanStack Router files
 - Don't generate database migrations directly — use `pnpm db generate`
@@ -35,5 +33,3 @@ Load these when working on the relevant area:
 - All source files must use hyphen-case (kebab-case) naming except specific TanstackRouter files
 - Don't generate database migrations directly, use `bin/db generate`
 - Run targeted checks after changing code. Linter, formatters, tests where applicable
-
-> > > > > > > Stashed changes
