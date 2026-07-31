@@ -4,13 +4,14 @@ All scripts live in `scripts/` and are available as `pnpm <name>` via package.js
 
 ## Development
 
-| Script             | pnpm shortcut | What it does                                                                   |
-| ------------------ | ------------- | ------------------------------------------------------------------------------ |
-| `scripts/dev.ts`   | `pnpm dev`    | Start dev server at `http://localhost:3000`                                    |
-| `scripts/build.ts` | `pnpm build`  | Production build → `.output/`                                                  |
-| `scripts/start.ts` | `pnpm start`  | Start production server (requires `pnpm build` first)                          |
-| `scripts/setup.ts` | `pnpm setup`  | First-time setup: copies `.env` files, installs deps, creates and migrates DBs |
-| `scripts/clean.ts` | `pnpm clean`  | Remove build artifacts, cache, test results                                    |
+| Script                      | pnpm shortcut         | What it does                                                                   |
+| --------------------------- | --------------------- | ------------------------------------------------------------------------------ |
+| `scripts/dev.ts`            | `pnpm dev`            | Start dev server at `http://localhost:3000`                                    |
+| `scripts/build.ts`          | `pnpm build`          | Production build → `.output/`                                                  |
+| `scripts/start.ts`          | `pnpm start`          | Start production server (requires `pnpm build` first)                          |
+| `scripts/setup.ts`          | `pnpm setup`          | First-time setup: copies `.env` files, installs deps, creates and migrates DBs |
+| `scripts/worktree.ts setup` | `pnpm worktree setup` | Provision a fresh, already-created Git worktree                                |
+| `scripts/clean.ts`          | `pnpm clean`          | Remove build artifacts, cache, test results                                    |
 
 ## Code Quality
 

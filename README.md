@@ -54,6 +54,11 @@ pnpm start        # Start production server
 pnpm setup        # Initial project setup
 ```
 
+For a worktree created by an editor or another tool, run `pnpm worktree setup` from
+inside that worktree. It provisions a separate database, port, environment, and
+dependencies without creating another Git worktree. To create and provision one
+from the main checkout, use `pnpm worktree create <name>`.
+
 ### Testing
 
 ```bash

@@ -33,6 +33,12 @@ console.log(`
   pnpm db studio          Open Drizzle Studio UI
   pnpm db:reset           Drop and recreate DB, then migrate
 
+🌿 Worktree Commands:
+  pnpm worktree create <name>  Create and provision a new worktree
+  pnpm worktree setup          Provision an already-created worktree
+  pnpm worktree list           List worktrees and configuration issues
+  pnpm worktree delete <name>  Remove a worktree and its database
+
 🤖 CI/CD Commands:
   pnpm ci                 Run full CI pipeline (lint, type-check, test)
   pnpm validate-env       Validate environment configuration

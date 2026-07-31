@@ -155,7 +155,8 @@ async function cmdCreate(name: string) {
     process.exit(1);
   }
 
-  const mainEnv = readEnv(path.join(repoRoot, ".env"));
+  const mainWorktree = worktrees.find(wt => wt.isMain);
+  const mainEnv = readEnv(path.join(mainWorktree?.path ?? repoRoot, ".env"));
   if (!mainEnv.DATABASE_URL) {
     console.error("❌ Main .env has no DATABASE_URL. Run `pnpm setup` first.");
     process.exit(1);
@@ -183,17 +184,97 @@ async function cmdCreate(name: string) {
   console.log(`🌿 Creating git worktree...`);
   await $`git worktree add ${worktreePath} -b ${name}`;
 
-  console.log(`🗄️  Cloning database ${sourceDb} → ${newDb}...`);
-  await cloneDatabase(mainEnv.DATABASE_URL, sourceDb, newDb);
-
-  console.log(`📦 Cloning node_modules (APFS clonefile)...`);
-  await cloneNodeModules(repoRoot, worktreePath);
-
-  console.log(`📄 Writing .env...`);
-  writeWorktreeEnv(worktreePath, mainEnv, { newDbUrl, newPort });
+  await provisionWorktree({
+    sourcePath: mainWorktree?.path ?? repoRoot,
+    targetPath: worktreePath,
+    mainEnv,
+    newDb,
+    newDbUrl,
+    newPort,
+    sourceDb,
+  });
 
   console.log(`\n✅ Worktree '${name}' ready`);
   console.log(`   cd ${worktreePath} && pnpm dev`);
+}
+
+async function cmdSetup() {
+  const worktrees = await listWorktrees();
+  const current = worktrees.find(
+    wt => path.resolve(wt.path) === path.resolve(repoRoot)
+  );
+
+  if (!current || current.isMain) {
+    console.error("❌ Run `pnpm worktree setup` from a non-main Git worktree");
+    process.exit(1);
+  }
+
+  const mainWorktree = worktrees.find(wt => wt.isMain);
+  const mainPath = mainWorktree?.path ?? repoRoot;
+  const mainEnv = readEnv(path.join(mainPath, ".env"));
+  if (!mainEnv.DATABASE_URL) {
+    console.error(
+      "❌ Main worktree .env has no DATABASE_URL. Run `pnpm setup` first."
+    );
+    process.exit(1);
+  }
+
+  const maxPort = Math.max(
+    DEFAULT_PORT,
+    ...worktrees
+      .filter(worktree => worktree.path !== current.path)
+      .map(worktree => worktree.port ?? DEFAULT_PORT)
+  );
+  const newPort = maxPort + 1;
+  const sourceDb = dbNameFromUrl(mainEnv.DATABASE_URL);
+  const newDb = `${sourceDb}_${current.name.replace(/-/g, "_")}`;
+  const newDbUrl = replaceDbName(mainEnv.DATABASE_URL, newDb);
+
+  console.log(`📋 Plan:`);
+  console.log(`   path:   ${current.path}`);
+  console.log(`   branch: ${current.branch}`);
+  console.log(`   port:   ${newPort}`);
+  console.log(`   db:     ${newDb} (cloned from ${sourceDb})\n`);
+
+  await provisionWorktree({
+    sourcePath: mainPath,
+    targetPath: current.path,
+    mainEnv,
+    newDb,
+    newDbUrl,
+    newPort,
+    sourceDb,
+  });
+
+  console.log(`\n✅ Worktree '${current.name}' ready`);
+  console.log(`   pnpm dev`);
+}
+
+async function provisionWorktree({
+  sourcePath,
+  targetPath,
+  mainEnv,
+  newDb,
+  newDbUrl,
+  newPort,
+  sourceDb,
+}: {
+  sourcePath: string;
+  targetPath: string;
+  mainEnv: Record<string, string>;
+  newDb: string;
+  newDbUrl: string;
+  newPort: number;
+  sourceDb: string;
+}) {
+  console.log(`🗄️  Cloning database ${sourceDb} → ${newDb}...`);
+  await cloneDatabase(mainEnv.DATABASE_URL, sourceDb, newDb);
+
+  console.log(`📦 Preparing node_modules...`);
+  await cloneNodeModules(sourcePath, targetPath);
+
+  console.log(`📄 Writing .env...`);
+  writeWorktreeEnv(targetPath, mainEnv, { newDbUrl, newPort });
 }
 
 async function cmdDelete(name: string) {
@@ -359,6 +440,10 @@ async function dropDatabase(url: string, dbName: string) {
 async function cloneNodeModules(from: string, to: string) {
   const src = path.join(from, "node_modules");
   const dst = path.join(to, "node_modules");
+  if (fs.existsSync(dst)) {
+    console.log(`   (node_modules already exists, skipping)`);
+    return;
+  }
   if (!fs.existsSync(src)) {
     console.log(`   (no node_modules in main, running pnpm install instead)`);
     await $`cd ${to} && pnpm install`;
@@ -413,6 +498,9 @@ switch (subcommand) {
   case "add":
     await cmdCreate(args[0]);
     break;
+  case "setup":
+    await cmdSetup();
+    break;
   case "delete":
   case "remove":
   case "rm":
@@ -425,7 +513,7 @@ switch (subcommand) {
   default:
     console.error(`Unknown subcommand: ${subcommand}`);
     console.error(
-      `Usage: pnpm worktree [list|create <name>|delete <name>|cleanup]`
+      `Usage: pnpm worktree [list|create <name>|setup|delete <name>|cleanup]`
     );
     process.exit(1);
 }
