@@ -6,7 +6,7 @@ import { ProfileTab } from "~/domains/profile/profile-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export default function ProfilePage() {
-  const { sessions, currentSessionToken } = Route.useLoaderData();
+  const sessions = Route.useLoaderData();
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -36,10 +36,7 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="sessions" className="mt-6">
-            <SessionsTab
-              sessions={sessions}
-              currentSessionToken={currentSessionToken}
-            />
+            <SessionsTab sessions={sessions} />
           </TabsContent>
         </Tabs>
       </div>

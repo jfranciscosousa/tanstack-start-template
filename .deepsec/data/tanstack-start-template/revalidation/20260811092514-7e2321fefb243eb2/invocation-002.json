@@ -1,0 +1,129 @@
+{
+  "batchIndex": 1,
+  "label": "initial",
+  "timestamp": "2026-08-11T09:27:27.711Z",
+  "files": [
+    "scripts/db.reset.ts",
+    "scripts/worktree.ts",
+    "src/errors/index.ts",
+    "src/lib/auth.ts",
+    "src/routes/_authed/profile.tsx"
+  ],
+  "requested": [
+    {
+      "findingId": "finding_290f434246b844e2",
+      "filePath": "scripts/db.reset.ts",
+      "title": "Database credentials are printed to logs",
+      "alias": "F1"
+    },
+    {
+      "findingId": "finding_630a8f82263775e8",
+      "filePath": "scripts/db.reset.ts",
+      "title": "Database reset can drop a production database if misconfigured",
+      "alias": "F2"
+    },
+    {
+      "findingId": "finding_02085c5d68e52786",
+      "filePath": "scripts/worktree.ts",
+      "title": "Worktree database create/drop uses raw SQL with unvalidated identifiers",
+      "alias": "F3"
+    },
+    {
+      "findingId": "finding_faa7260ec582075f",
+      "filePath": "src/errors/index.ts",
+      "title": "Raw exception messages are rendered to users",
+      "alias": "F4"
+    },
+    {
+      "findingId": "finding_95cff7549b83c151",
+      "filePath": "src/lib/auth.ts",
+      "title": "Account email addresses can be changed without ownership verification",
+      "alias": "F5"
+    },
+    {
+      "findingId": "finding_1f8b549133e54a8b",
+      "filePath": "src/routes/_authed/profile.tsx",
+      "title": "Session bearer tokens are returned to browser route data",
+      "alias": "F6"
+    }
+  ],
+  "rawResponses": [
+    {
+      "kind": "initial",
+      "rawText": "[\n  {\n    \"findingId\": \"F1\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `scripts/db.reset.ts` no longer interpolates the original `DATABASE_URL` into log output. It constructs a separate `URL` object and explicitly clears `username`, `password`, `search`, and `hash` before logging it. The remaining logged value contains only non-secret connection-location information such as protocol, host, port, and database path. The original credential disclosure was real because PostgreSQL URLs commonly embed credentials, but that data flow no longer reaches `console.log`. `loadEnv()` only logs the environment filename and number of variables, not their values. This mitigation was added in the current hardening commit `8679bed`, so the reported vulnerable lines no longer match the source.\"\n  },\n  {\n    \"findingId\": \"F2\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The reset script now rejects execution when `NODE_ENV` is exactly `production` before opening a database connection. It also requires an explicit `--force-reset` flag followed by the exact database name parsed from `DATABASE_URL`, preventing an ordinary or accidental invocation from reaching the destructive statements. Non-local database hosts additionally require `--allow-remote-reset`, an interactive TTY, and exact manual entry of both the database name and hostname. Only after all applicable checks pass does the script execute the `DROP SCHEMA ... CASCADE` statements. A localhost production database could still be reset if an operator bypassed the environment convention and deliberately supplied the exact force confirmation, but that is explicit authorized destructive use rather than the unguarded accidental invocation described by the finding. These safeguards were introduced by the current hardening commit `8679bed`, so the original no-confirmation condition has been patched.\"\n  },\n  {\n    \"findingId\": \"F3\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"All database identifiers reaching `sql.unsafe` now pass through `quoteDatabaseName()`, which first calls `validateDatabaseName()`. That validator permits only ASCII letters, digits, underscores, and hyphens, with an alphanumeric first character, so quotes, semicolons, whitespace, and other SQL syntax cannot enter the raw statement. Both source and destination identifiers are validated in `cloneDatabase()`, and the identifier passed to `dropDatabase()` receives the same validation. Although `cmdSetup()` can still derive a name from a Git worktree basename, `replaceDbName()` and later identifier quoting validate the resulting database name and fail safely if it is malformed. The delete path also calculates the expected repository-derived database name and refuses to drop a database read from the worktree `.env` unless it exactly equals that expected value; it additionally asks for confirmation. The cleanup `LIKE` expression remains parameterized, and database names returned from PostgreSQL are validated again before raw `DROP DATABASE` use. Consequently, neither SQL syntax injection nor dropping an arbitrary `.env`-selected database remains possible through the reported paths.\"\n  },\n  {\n    \"findingId\": \"F4\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"`renderError()` still returns the `message` property from every object without checking whether it is an approved public error type. The helper is directly used by the shared client-side `Form` component and by the active-session revocation UI, and TanStack server-function errors preserve their message across serialization, as the project's `ParamsError` implementation explicitly documents. Expected password failures are converted to controlled `ParamsError` messages, but errors from `auth.api.changeEmail`, `auth.api.updateUser`, session listing, and session revocation are not generally caught or sanitized by the application handlers. A concrete trigger exists around concurrent email changes: Better Auth performs an email-existence check before updating the uniquely indexed `users.email`, so racing two accounts toward the same previously unused address can make one update raise a database uniqueness error after both checks pass. If that dependency error propagates through the server function, the form renders its raw PostgreSQL/adapter message, potentially revealing table or constraint names and database implementation details. React escapes the text and therefore prevents XSS, but it does not mitigate information disclosure. The impact is limited to diagnostic information rather than credentials or authorization bypass, so the reported medium severity is reasonable.\"\n  },\n  {\n    \"findingId\": \"F5\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"The Better Auth configuration explicitly enables email changes and sets `updateEmailWithoutVerification: true`, while no email-verification sender is configured. Better Auth's installed implementation confirms that this option immediately updates the email only when the current user is not verified; this application's normal email/password registrations are unverified because no verification flow is configured. `updateUserFn` exposes the operation to authenticated users and calls `auth.api.changeEmail` whenever the submitted address differs from the session address. Server-side validation checks only that the new value is a syntactically valid email and does not prove mailbox ownership. Although the HTML form marks the current-password field as required, the schema accepts an empty value and the handler does not require password verification for an email-only change, so a direct server-function request with an authenticated session can bypass that UI control. An attacker with a stolen session can therefore replace the victim's login identifier with an arbitrary unused address and prevent the victim from signing in with the old address, while an ordinary user can associate an identity they do not control with their account. Better Auth's sensitive-session middleware does not establish ownership of the new mailbox, so it does not mitigate the reported issue.\"\n  },\n  {\n    \"findingId\": \"F6\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The profile loader still calls `fetchUserSessions()`, but that server function now returns only `SessionView[]`, whose public fields do not include a token. `toSessionViews()` consumes the Better Auth tokens exclusively on the server to compute the `isCurrent` boolean and constructs new objects containing only session IDs and display metadata. The current token and the tokens from `listSessions()` therefore never appear in the returned loader payload. Revocation now accepts a non-secret session ID, authenticates the caller, resolves that ID against the caller's own `listSessions()` result, and passes the corresponding token to Better Auth only server-side. It also rejects unknown IDs and the current session, preventing cross-user revocation or token disclosure through that interface. The accompanying server test explicitly verifies that no returned object has a `token` property. Thus, the bearer-token serialization described by the finding has been removed while retaining secure session management.\"\n  }\n]",
+      "parsedCount": 6
+    }
+  ],
+  "repairAttempts": 0,
+  "parsedVerdicts": [
+    {
+      "findingId": "F1",
+      "verdict": "fixed",
+      "reasoning": "The current `scripts/db.reset.ts` no longer interpolates the original `DATABASE_URL` into log output. It constructs a separate `URL` object and explicitly clears `username`, `password`, `search`, and `hash` before logging it. The remaining logged value contains only non-secret connection-location information such as protocol, host, port, and database path. The original credential disclosure was real because PostgreSQL URLs commonly embed credentials, but that data flow no longer reaches `console.log`. `loadEnv()` only logs the environment filename and number of variables, not their values. This mitigation was added in the current hardening commit `8679bed`, so the reported vulnerable lines no longer match the source."
+    },
+    {
+      "findingId": "F2",
+      "verdict": "fixed",
+      "reasoning": "The reset script now rejects execution when `NODE_ENV` is exactly `production` before opening a database connection. It also requires an explicit `--force-reset` flag followed by the exact database name parsed from `DATABASE_URL`, preventing an ordinary or accidental invocation from reaching the destructive statements. Non-local database hosts additionally require `--allow-remote-reset`, an interactive TTY, and exact manual entry of both the database name and hostname. Only after all applicable checks pass does the script execute the `DROP SCHEMA ... CASCADE` statements. A localhost production database could still be reset if an operator bypassed the environment convention and deliberately supplied the exact force confirmation, but that is explicit authorized destructive use rather than the unguarded accidental invocation described by the finding. These safeguards were introduced by the current hardening commit `8679bed`, so the original no-confirmation condition has been patched."
+    },
+    {
+      "findingId": "F3",
+      "verdict": "fixed",
+      "reasoning": "All database identifiers reaching `sql.unsafe` now pass through `quoteDatabaseName()`, which first calls `validateDatabaseName()`. That validator permits only ASCII letters, digits, underscores, and hyphens, with an alphanumeric first character, so quotes, semicolons, whitespace, and other SQL syntax cannot enter the raw statement. Both source and destination identifiers are validated in `cloneDatabase()`, and the identifier passed to `dropDatabase()` receives the same validation. Although `cmdSetup()` can still derive a name from a Git worktree basename, `replaceDbName()` and later identifier quoting validate the resulting database name and fail safely if it is malformed. The delete path also calculates the expected repository-derived database name and refuses to drop a database read from the worktree `.env` unless it exactly equals that expected value; it additionally asks for confirmation. The cleanup `LIKE` expression remains parameterized, and database names returned from PostgreSQL are validated again before raw `DROP DATABASE` use. Consequently, neither SQL syntax injection nor dropping an arbitrary `.env`-selected database remains possible through the reported paths."
+    },
+    {
+      "findingId": "F4",
+      "verdict": "true-positive",
+      "reasoning": "`renderError()` still returns the `message` property from every object without checking whether it is an approved public error type. The helper is directly used by the shared client-side `Form` component and by the active-session revocation UI, and TanStack server-function errors preserve their message across serialization, as the project's `ParamsError` implementation explicitly documents. Expected password failures are converted to controlled `ParamsError` messages, but errors from `auth.api.changeEmail`, `auth.api.updateUser`, session listing, and session revocation are not generally caught or sanitized by the application handlers. A concrete trigger exists around concurrent email changes: Better Auth performs an email-existence check before updating the uniquely indexed `users.email`, so racing two accounts toward the same previously unused address can make one update raise a database uniqueness error after both checks pass. If that dependency error propagates through the server function, the form renders its raw PostgreSQL/adapter message, potentially revealing table or constraint names and database implementation details. React escapes the text and therefore prevents XSS, but it does not mitigate information disclosure. The impact is limited to diagnostic information rather than credentials or authorization bypass, so the reported medium severity is reasonable."
+    },
+    {
+      "findingId": "F5",
+      "verdict": "true-positive",
+      "reasoning": "The Better Auth configuration explicitly enables email changes and sets `updateEmailWithoutVerification: true`, while no email-verification sender is configured. Better Auth's installed implementation confirms that this option immediately updates the email only when the current user is not verified; this application's normal email/password registrations are unverified because no verification flow is configured. `updateUserFn` exposes the operation to authenticated users and calls `auth.api.changeEmail` whenever the submitted address differs from the session address. Server-side validation checks only that the new value is a syntactically valid email and does not prove mailbox ownership. Although the HTML form marks the current-password field as required, the schema accepts an empty value and the handler does not require password verification for an email-only change, so a direct server-function request with an authenticated session can bypass that UI control. An attacker with a stolen session can therefore replace the victim's login identifier with an arbitrary unused address and prevent the victim from signing in with the old address, while an ordinary user can associate an identity they do not control with their account. Better Auth's sensitive-session middleware does not establish ownership of the new mailbox, so it does not mitigate the reported issue."
+    },
+    {
+      "findingId": "F6",
+      "verdict": "fixed",
+      "reasoning": "The profile loader still calls `fetchUserSessions()`, but that server function now returns only `SessionView[]`, whose public fields do not include a token. `toSessionViews()` consumes the Better Auth tokens exclusively on the server to compute the `isCurrent` boolean and constructs new objects containing only session IDs and display metadata. The current token and the tokens from `listSessions()` therefore never appear in the returned loader payload. Revocation now accepts a non-secret session ID, authenticates the caller, resolves that ID against the caller's own `listSessions()` result, and passes the corresponding token to Better Auth only server-side. It also rejects unknown IDs and the current session, preventing cross-user revocation or token disclosure through that interface. The accompanying server test explicitly verifies that no returned object has a `token` property. Thus, the bearer-token serialization described by the finding has been removed while retaining secure session management."
+    }
+  ],
+  "reconciliation": {
+    "matches": [
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F1",
+        "resolvedFindingId": "finding_290f434246b844e2"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F2",
+        "resolvedFindingId": "finding_630a8f82263775e8"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F3",
+        "resolvedFindingId": "finding_02085c5d68e52786"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F4",
+        "resolvedFindingId": "finding_faa7260ec582075f"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F5",
+        "resolvedFindingId": "finding_95cff7549b83c151"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F6",
+        "resolvedFindingId": "finding_1f8b549133e54a8b"
+      }
+    ],
+    "missingFindingIds": [],
+    "unknownVerdicts": [],
+    "ambiguousVerdicts": []
+  },
+  "persistedCount": 6,
+  "unresolvedFindingIds": []
+}

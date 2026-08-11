@@ -16,6 +16,12 @@ updateUserSchema defines passwordConfirmation but only validates its length/empt
 
 Add a schema-level cross-field refinement to updateUserSchema requiring passwordConfirmation to equal password whenever password is non-empty. Consider doing the same for signUpSchema so password confirmation is enforced by the shared schema rather than only by UI field validation.
 
+## Revalidation
+
+**Verdict:** true-positive
+
+The complete `updateUserSchema` validates `password` and `passwordConfirmation` independently but has no object-level refinement requiring equality. Because both fields have defaults, the schema can also accept a non-empty password with an omitted or empty confirmation. `updateUserFn` uses this schema as its server-function validator, but its password-changing branch passes only `currentPassword` and `password` to `auth.api.changePassword`; `passwordConfirmation` is never consulted. An authenticated user can therefore invoke the server function directly with a valid current password, a valid new password, and a different valid-length confirmation, and the password will be changed to the value in `password`. Better Auth still verifies the current password, session authentication is required, and the global server-function CSRF middleware blocks cross-origin request forgery, so this is not an account-takeover or privilege-escalation issue. The equality check in `src/domains/profile/profile-tab.tsx` is field-level client validation and does not protect direct callers or alternative clients. The current repository version still contains the vulnerable schema and handler behavior, with no server-side equality check or downstream confirmation enforcement. Thus the reported validation-contract bypass and resulting risk of an unintended password change or lockout are real, with BUG severity appropriate.
+
 ## Recent committers (`git log`)
 
 - Francisco Sousa <francisco.sousa@hey.com> (2026-03-17)

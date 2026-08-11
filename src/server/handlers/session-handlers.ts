@@ -5,8 +5,33 @@ import { createServerFn } from "@tanstack/react-start";
 import { auth } from "~/lib/auth";
 import { AppError } from "~/errors";
 
+export interface SessionView {
+  id: string;
+  userAgent?: string | null;
+  ipAddress?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  expiresAt: Date;
+  isCurrent: boolean;
+}
+
+export function toSessionViews(
+  sessions: (Omit<SessionView, "isCurrent"> & { token: string })[],
+  currentSessionToken: string
+): SessionView[] {
+  return sessions.map(session => ({
+    id: session.id,
+    userAgent: session.userAgent,
+    ipAddress: session.ipAddress,
+    createdAt: session.createdAt,
+    updatedAt: session.updatedAt,
+    expiresAt: session.expiresAt,
+    isCurrent: session.token === currentSessionToken,
+  }));
+}
+
 export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
-  async () => {
+  async (): Promise<SessionView[]> => {
     const req = getRequest();
     const session = await auth.api.getSession({ headers: req.headers });
 
@@ -19,16 +44,13 @@ export const fetchUserSessions = createServerFn({ method: "GET" }).handler(
 
     const sessions = await auth.api.listSessions({ headers: req.headers });
 
-    return {
-      currentSessionToken: session.session.token,
-      sessions,
-    };
+    return toSessionViews(sessions, session.session.token);
   }
 );
 
 export const revokeSession = createServerFn({ method: "POST" })
-  .validator((token: unknown) => z.string().parse(token))
-  .handler(async ({ data: token }) => {
+  .validator((sessionId: unknown) => z.string().min(1).parse(sessionId))
+  .handler(async ({ data: sessionId }) => {
     const req = getRequest();
     const session = await auth.api.getSession({ headers: req.headers });
 
@@ -36,12 +58,19 @@ export const revokeSession = createServerFn({ method: "POST" })
       throw new AppError("UNAUTHORIZED", "You must be logged in");
     }
 
-    if (token === session.session.token) {
+    const sessions = await auth.api.listSessions({ headers: req.headers });
+    const targetSession = sessions.find(item => item.id === sessionId);
+
+    if (!targetSession) {
+      throw new AppError("NOT_FOUND", "Session not found");
+    }
+
+    if (targetSession.token === session.session.token) {
       throw new AppError("BAD_REQUEST", "Cannot revoke your current session");
     }
 
     await auth.api.revokeSession({
       headers: req.headers,
-      body: { token },
+      body: { token: targetSession.token },
     });
   });

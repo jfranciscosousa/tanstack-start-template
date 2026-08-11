@@ -16,6 +16,12 @@
 
 Only expose messages from explicitly recognized public error types such as `AppError` with an allowlisted code. Return a generic internal-server-error message for all unexpected exceptions, while recording detailed exception data exclusively in server-side logs.
 
+## Revalidation
+
+**Verdict:** true-positive
+
+`renderError()` still returns the `message` property from every object without checking whether it is an approved public error type. The helper is directly used by the shared client-side `Form` component and by the active-session revocation UI, and TanStack server-function errors preserve their message across serialization, as the project's `ParamsError` implementation explicitly documents. Expected password failures are converted to controlled `ParamsError` messages, but errors from `auth.api.changeEmail`, `auth.api.updateUser`, session listing, and session revocation are not generally caught or sanitized by the application handlers. A concrete trigger exists around concurrent email changes: Better Auth performs an email-existence check before updating the uniquely indexed `users.email`, so racing two accounts toward the same previously unused address can make one update raise a database uniqueness error after both checks pass. If that dependency error propagates through the server function, the form renders its raw PostgreSQL/adapter message, potentially revealing table or constraint names and database implementation details. React escapes the text and therefore prevents XSS, but it does not mitigate information disclosure. The impact is limited to diagnostic information rather than credentials or authorization bypass, so the reported medium severity is reasonable.
+
 ## Recent committers (`git log`)
 
 - Francisco Sousa <francisco.sousa@hey.com> (2026-04-26)

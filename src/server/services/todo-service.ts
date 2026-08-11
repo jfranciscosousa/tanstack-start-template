@@ -34,7 +34,7 @@ export const createTodo = createServerOnlyFn(
 
 export const deleteTodo = createServerOnlyFn(
   async (user: User, todoId: string) => {
-    const todo = await db
+    const [todo] = await db
       .delete(todos)
       .where(and(eq(todos.id, todoId), eq(todos.userId, user.id)))
       .returning();

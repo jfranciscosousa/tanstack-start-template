@@ -10,7 +10,11 @@ import {
 } from "~/test/server-utils";
 import { auth } from "~/lib/auth";
 
-import { fetchUserSessions, revokeSession } from "./session-handlers";
+import {
+  fetchUserSessions,
+  revokeSession,
+  toSessionViews,
+} from "./session-handlers";
 
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () => new Request("http://localhost:3000/"),
@@ -35,10 +39,10 @@ describe("session handlers", () => {
   });
 
   describe("fetchUserSessions", () => {
-    it("should call getSession and listSessions when logged in", async () => {
+    it("returns session metadata without bearer tokens", async () => {
       const mockSessions = makeSessionsMock(testUser, [
-        "other-tok1",
-        "other-tok2",
+        "current-token",
+        "other-token",
       ]);
       const mockSession = makeSessionMock(testUser, "current-token");
 
@@ -46,64 +50,82 @@ describe("session handlers", () => {
       vi.mocked(auth.api.listSessions).mockResolvedValue(mockSessions);
 
       await fetchUserSessions();
+      const result = toSessionViews(mockSessions, mockSession.session.token);
 
-      expect(vi.mocked(auth.api.getSession)).toHaveBeenCalledWith(
-        expect.objectContaining({ headers: expect.any(Headers) })
-      );
-      expect(vi.mocked(auth.api.listSessions)).toHaveBeenCalledWith(
-        expect.objectContaining({ headers: expect.any(Headers) })
-      );
+      expect(result).toStrictEqual([
+        expect.objectContaining({
+          id: mockSessions[0]?.id,
+          isCurrent: true,
+        }),
+        expect.objectContaining({
+          id: mockSessions[1]?.id,
+          isCurrent: false,
+        }),
+      ]);
+      expect(result.filter(item => "token" in item)).toHaveLength(0);
     });
 
-    it("should throw UNAUTHORIZED when not logged in", async () => {
+    it("throws UNAUTHORIZED when not logged in", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
-      try {
-        await fetchUserSessions();
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        expect((error as AppError).code).toBe("UNAUTHORIZED");
-      }
+      await expect(fetchUserSessions()).rejects.toMatchObject({
+        code: "UNAUTHORIZED",
+      } satisfies Partial<AppError>);
     });
   });
 
   describe("revokeSession", () => {
-    it("should call auth.api.revokeSession for a different session token", async () => {
+    it("resolves an owned session id to its token server-side", async () => {
       const mockSession = makeSessionMock(testUser, "current-token");
+      const [targetSession] = makeSessionsMock(testUser, ["other-token"]);
+      if (!targetSession) throw new Error("Expected a target session");
       vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.listSessions).mockResolvedValue([targetSession]);
       vi.mocked(auth.api.revokeSession).mockResolvedValue({ status: true });
 
-      await revokeSession({ data: "other-token" });
+      await revokeSession({ data: targetSession.id });
 
       expect(vi.mocked(auth.api.revokeSession)).toHaveBeenCalledWith(
         expect.objectContaining({ body: { token: "other-token" } })
       );
     });
 
-    it("should throw BAD_REQUEST when trying to revoke the current session token", async () => {
+    it("rejects the current session id", async () => {
       const mockSession = makeSessionMock(testUser, "current-token");
+      const [currentSession] = makeSessionsMock(testUser, ["current-token"]);
+      if (!currentSession) throw new Error("Expected the current session");
       vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.listSessions).mockResolvedValue([currentSession]);
 
-      try {
-        await revokeSession({ data: "current-token" });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        expect((error as AppError).code).toBe("BAD_REQUEST");
-        expect((error as AppError).message).toBe(
-          "Cannot revoke your current session"
-        );
-      }
+      await expect(
+        revokeSession({ data: currentSession.id })
+      ).rejects.toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Cannot revoke your current session",
+      } satisfies Partial<AppError>);
     });
 
-    it("should throw UNAUTHORIZED when not logged in", async () => {
+    it("rejects a session id that does not belong to the user", async () => {
+      const mockSession = makeSessionMock(testUser, "current-token");
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.listSessions).mockResolvedValue([]);
+
+      await expect(
+        revokeSession({ data: "unknown-session" })
+      ).rejects.toMatchObject({
+        code: "NOT_FOUND",
+      } satisfies Partial<AppError>);
+      expect(auth.api.revokeSession).not.toHaveBeenCalled();
+    });
+
+    it("throws UNAUTHORIZED when not logged in", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(null);
 
-      try {
-        await revokeSession({ data: "some-token" });
-        expect.fail("Expected error to be thrown");
-      } catch (error) {
-        expect((error as AppError).code).toBe("UNAUTHORIZED");
-      }
+      await expect(
+        revokeSession({ data: "some-session" })
+      ).rejects.toMatchObject({
+        code: "UNAUTHORIZED",
+      } satisfies Partial<AppError>);
     });
   });
 });

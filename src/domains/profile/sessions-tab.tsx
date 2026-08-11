@@ -10,6 +10,8 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 
+import type { SessionView } from "~/server/handlers/session-handlers";
+
 import { revokeSession } from "~/server/handlers/session-handlers";
 import { cn } from "~/lib/utils";
 import { useMutation } from "~/hooks/use-mutation";
@@ -21,17 +23,7 @@ import { Avatar } from "~/components/ui/avatar";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 
 interface SessionsTabProps {
-  sessions: {
-    id: string;
-    token: string;
-    userId: string;
-    userAgent?: string | null | undefined;
-    ipAddress?: string | null | undefined;
-    createdAt: Date;
-    updatedAt: Date;
-    expiresAt: Date;
-  }[];
-  currentSessionToken: string | undefined;
+  sessions: SessionView[];
 }
 
 function getDeviceName(userAgent: string | null | undefined) {
@@ -78,31 +70,25 @@ function formatDate(date: Date) {
 
 interface SessionCardProps {
   session: SessionsTabProps["sessions"][number];
-  isCurrentSession: boolean;
-  onRevoke: (token: string) => void;
+  onRevoke: (sessionId: string) => void;
   isRevoking: boolean;
 }
 
-function SessionCard({
-  session,
-  isCurrentSession,
-  onRevoke,
-  isRevoking,
-}: SessionCardProps) {
+function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
   const DeviceIcon = getDeviceIcon(session.userAgent);
 
   function handleRevoke() {
-    onRevoke(session.token);
+    onRevoke(session.id);
   }
 
   return (
-    <Card className={cn(isCurrentSession && "ring-2 ring-primary")}>
+    <Card className={cn(session.isCurrent && "ring-2 ring-primary")}>
       <CardContent>
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-1 items-start gap-4">
             <Avatar
               size="lg"
-              variant={isCurrentSession ? "default" : "secondary"}
+              variant={session.isCurrent ? "default" : "secondary"}
             >
               <DeviceIcon size={24} />
             </Avatar>
@@ -112,7 +98,7 @@ function SessionCard({
                 <h3 className="font-semibold">
                   {getDeviceName(session.userAgent)}
                 </h3>
-                {isCurrentSession && (
+                {session.isCurrent && (
                   <Badge variant="default" className="text-xs">
                     Current
                   </Badge>
@@ -135,7 +121,7 @@ function SessionCard({
           </div>
 
           <div className="shrink-0">
-            {!isCurrentSession && (
+            {!session.isCurrent && (
               <Button
                 type="button"
                 variant="destructive"
@@ -157,10 +143,7 @@ function SessionCard({
   );
 }
 
-export function SessionsTab({
-  sessions,
-  currentSessionToken,
-}: SessionsTabProps) {
+export function SessionsTab({ sessions }: SessionsTabProps) {
   const router = useRouter();
   const revokeFn = useServerFn(revokeSession);
 
@@ -172,8 +155,8 @@ export function SessionsTab({
     },
   });
 
-  function handleRevoke(token: string) {
-    revokeMutation.mutate({ data: token });
+  function handleRevoke(sessionId: string) {
+    revokeMutation.mutate({ data: sessionId });
   }
 
   return (
@@ -200,7 +183,6 @@ export function SessionsTab({
               <SessionCard
                 key={session.id}
                 session={session}
-                isCurrentSession={session.token === currentSessionToken}
                 onRevoke={handleRevoke}
                 isRevoking={revokeMutation.status === "pending"}
               />

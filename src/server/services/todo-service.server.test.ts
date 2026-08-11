@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
 
+import type { AppError } from "~/errors";
+
 import { createTestUser } from "~/test/server-utils";
 
 import type { User } from "../db/schema";
@@ -108,13 +110,23 @@ describe("todo service", () => {
         .values({ content: "Other's todo", userId: otherUser.id })
         .returning();
 
-      await deleteTodo(testUser, otherTodo.id);
+      await expect(deleteTodo(testUser, otherTodo.id)).rejects.toMatchObject({
+        code: "NOT_FOUND",
+      } satisfies Partial<AppError>);
 
       const fromDb = await db.query.todos.findFirst({
         where: { id: otherTodo.id },
       });
 
       expect(fromDb).toBeDefined();
+    });
+
+    it("should throw NOT_FOUND when the todo does not exist", async () => {
+      await expect(
+        deleteTodo(testUser, "00000000-0000-0000-0000-000000000000")
+      ).rejects.toMatchObject({
+        code: "NOT_FOUND",
+      } satisfies Partial<AppError>);
     });
   });
 
