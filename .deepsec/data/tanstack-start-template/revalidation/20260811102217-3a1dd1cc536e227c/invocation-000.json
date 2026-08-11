@@ -1,0 +1,43 @@
+{
+  "batchIndex": 0,
+  "label": "initial",
+  "timestamp": "2026-08-11T10:23:10.879Z",
+  "files": ["src/errors/index.ts"],
+  "requested": [
+    {
+      "findingId": "finding_faa7260ec582075f",
+      "filePath": "src/errors/index.ts",
+      "title": "Raw exception messages are rendered to users",
+      "alias": "F1"
+    }
+  ],
+  "rawResponses": [
+    {
+      "kind": "initial",
+      "rawText": "[\n  {\n    \"findingId\": \"F1\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The original implementation was vulnerable because `renderError` returned arbitrary objects' `message` values, and the shared Form and SessionsTab components rendered those values to users. The current `src/errors/index.ts` instead returns a message only when `isAppError` recognizes an actual `AppError` or its serialized representation with the `AppError` marker, an allowlisted error code, and a string `publicMessage`. Zod-style errors receive a fixed 422 message, while every other exception—including database, Better Auth, and generic `Error` instances—receives the fixed `An unexpected error occurred.` message. All production `AppError` construction sites use static public messages or the predefined defaults; none pass dependency exception text or attacker-controlled input as `publicMessage`. The client-facing Form and SessionsTab still call `renderError`, but unexpected server-function failures can therefore no longer carry their raw messages to those rendering sinks. `src/errors/index.test.ts` explicitly covers a simulated PostgreSQL constraint error and verifies that its raw message is replaced by the generic response. Git history identifies commit `a041f94337e958247fb48f6d2ab0ed41cb6dc446` (`Harden session and profile data handling`) immediately before the revalidation-results commit, consistent with the security-hardening changes now present.\"\n  }\n]",
+      "parsedCount": 1
+    }
+  ],
+  "repairAttempts": 0,
+  "parsedVerdicts": [
+    {
+      "findingId": "F1",
+      "verdict": "fixed",
+      "reasoning": "The original implementation was vulnerable because `renderError` returned arbitrary objects' `message` values, and the shared Form and SessionsTab components rendered those values to users. The current `src/errors/index.ts` instead returns a message only when `isAppError` recognizes an actual `AppError` or its serialized representation with the `AppError` marker, an allowlisted error code, and a string `publicMessage`. Zod-style errors receive a fixed 422 message, while every other exception—including database, Better Auth, and generic `Error` instances—receives the fixed `An unexpected error occurred.` message. All production `AppError` construction sites use static public messages or the predefined defaults; none pass dependency exception text or attacker-controlled input as `publicMessage`. The client-facing Form and SessionsTab still call `renderError`, but unexpected server-function failures can therefore no longer carry their raw messages to those rendering sinks. `src/errors/index.test.ts` explicitly covers a simulated PostgreSQL constraint error and verifies that its raw message is replaced by the generic response. Git history identifies commit `a041f94337e958247fb48f6d2ab0ed41cb6dc446` (`Harden session and profile data handling`) immediately before the revalidation-results commit, consistent with the security-hardening changes now present."
+    }
+  ],
+  "reconciliation": {
+    "matches": [
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F1",
+        "resolvedFindingId": "finding_faa7260ec582075f"
+      }
+    ],
+    "missingFindingIds": [],
+    "unknownVerdicts": [],
+    "ambiguousVerdicts": []
+  },
+  "persistedCount": 1,
+  "unresolvedFindingIds": []
+}

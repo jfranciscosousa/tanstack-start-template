@@ -1,0 +1,113 @@
+{
+  "batchIndex": 0,
+  "label": "initial",
+  "timestamp": "2026-08-11T10:03:23.443Z",
+  "files": [
+    ".github/workflows/ci.yml",
+    "src/server/handlers/session-handlers.ts",
+    "src/server/handlers/user-handlers.ts",
+    "src/domains/profile/profile-page.tsx",
+    "src/domains/profile/sessions-tab.tsx"
+  ],
+  "requested": [
+    {
+      "findingId": "finding_fcb5c108ca90a882",
+      "filePath": ".github/workflows/ci.yml",
+      "title": "GitHub Actions are referenced by mutable tags",
+      "alias": "F1"
+    },
+    {
+      "findingId": "finding_4a848730dba705b0",
+      "filePath": "src/server/handlers/session-handlers.ts",
+      "title": "Session tokens are returned to client-side code",
+      "alias": "F2"
+    },
+    {
+      "findingId": "finding_b924f8da9b0fcb6b",
+      "filePath": "src/server/handlers/user-handlers.ts",
+      "title": "Email changes are accepted without verification",
+      "alias": "F3"
+    },
+    {
+      "findingId": "finding_036649300ef68a7b",
+      "filePath": "src/domains/profile/profile-page.tsx",
+      "title": "Raw session tokens are passed into client-rendered profile data",
+      "alias": "F4"
+    },
+    {
+      "findingId": "finding_5e516729bf642319",
+      "filePath": "src/domains/profile/sessions-tab.tsx",
+      "title": "Session management UI stores and submits bearer session tokens client-side",
+      "alias": "F5"
+    }
+  ],
+  "rawResponses": [
+    {
+      "kind": "initial",
+      "rawText": "[\n  {\n    \"findingId\": \"F1\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current workflow no longer references any action by a mutable major-version tag. Every flagged action, including checkout, setup-node, pnpm/action-setup, cache, tool-versions-action, and upload-artifact, is pinned to a full 40-character commit SHA. The trailing comments such as `# v6` are informational and do not affect action resolution. GitHub Actions therefore fetches the specified immutable commits rather than resolving publisher-controlled tags. This removes the reported tag-movement attack path, although deliberately updating those SHAs remains a supply-chain-sensitive operation. The finding accurately describes an earlier configuration but is patched in the current `.github/workflows/ci.yml`.\"\n  },\n  {\n    \"findingId\": \"F2\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `fetchUserSessions` implementation no longer returns `currentSessionToken` or the raw result of `auth.api.listSessions`. It maps each record through `toSessionViews`, which copies only metadata and derives an `isCurrent` boolean by comparing tokens on the server. The exported `SessionView` interface has no token field, and the accompanying server test explicitly verifies that returned objects contain no `token` property. Revocation now accepts a session ID, authenticates the request, finds that ID only within the current user's `listSessions` result, and resolves the bearer token entirely server-side. Thus loader serialization exposes only a non-authenticator identifier and session metadata, not reusable credentials. This is the hardening represented by recent commit `a041f94` and fixes the originally reported exposure.\"\n  },\n  {\n    \"findingId\": \"F3\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"The authenticated `updateUserFn` calls `auth.api.changeEmail` whenever a syntactically valid submitted email differs from the current session email. In `src/lib/auth.ts`, Better Auth explicitly enables `updateEmailWithoutVerification: true`, and no email-delivery or new-address verification callback is configured. The Zod schema verifies only the address format and length, not control of the destination mailbox. Although the rendered form marks `currentPassword` as required, the server schema accepts an empty string and the handler performs its password check only when that string is truthy, so a direct server-function caller can change email without reauthentication. An authenticated malicious user can consequently claim an unused address belonging to another person, while an attacker holding a stolen session can replace the victim's account email without proving control of either mailbox. Authentication, CSRF middleware, and same-origin protections establish authorization to invoke the function but do not verify ownership of the new address. The configuration comment itself acknowledges that retaining this behavior once email delivery is used would be unsafe, and the project describes itself as a production-ready authentication template.\"\n  },\n  {\n    \"findingId\": \"F4\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The profile route still serializes loader data to the client, but that data is now the sanitized `SessionView[]` returned by `fetchUserSessions`. `ProfilePage` receives only this array and passes it to `SessionsTab`; there is no longer a separate `currentSessionToken` value. Current-session status is computed on the server and represented as a boolean. The session DTO includes metadata and a session ID but excludes Better Auth's bearer `token`. Consequently, SSR or client hydration cannot reveal the credentials described by the finding. Recent commit `a041f94` introduced this sanitized data flow and fixes the original profile-page exposure.\"\n  },\n  {\n    \"findingId\": \"F5\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `SessionsTab` props are typed as `SessionView[]`, whose records contain no bearer-token field. Rendering and current-session highlighting use the server-derived `session.isCurrent` boolean rather than comparing tokens in browser code. Revocation submits only `session.id` through the server function. On the server, that ID is matched against sessions returned for the authenticated user, the current session is rejected, and only then is the corresponding token passed internally to Better Auth. This preserves ownership enforcement while keeping credential material outside the client boundary. These changes in recent commit `a041f94` directly implement the recommended remediation and fix the reported UI-level token exposure.\"\n  }\n]",
+      "parsedCount": 5
+    }
+  ],
+  "repairAttempts": 0,
+  "parsedVerdicts": [
+    {
+      "findingId": "F1",
+      "verdict": "fixed",
+      "reasoning": "The current workflow no longer references any action by a mutable major-version tag. Every flagged action, including checkout, setup-node, pnpm/action-setup, cache, tool-versions-action, and upload-artifact, is pinned to a full 40-character commit SHA. The trailing comments such as `# v6` are informational and do not affect action resolution. GitHub Actions therefore fetches the specified immutable commits rather than resolving publisher-controlled tags. This removes the reported tag-movement attack path, although deliberately updating those SHAs remains a supply-chain-sensitive operation. The finding accurately describes an earlier configuration but is patched in the current `.github/workflows/ci.yml`."
+    },
+    {
+      "findingId": "F2",
+      "verdict": "fixed",
+      "reasoning": "The current `fetchUserSessions` implementation no longer returns `currentSessionToken` or the raw result of `auth.api.listSessions`. It maps each record through `toSessionViews`, which copies only metadata and derives an `isCurrent` boolean by comparing tokens on the server. The exported `SessionView` interface has no token field, and the accompanying server test explicitly verifies that returned objects contain no `token` property. Revocation now accepts a session ID, authenticates the request, finds that ID only within the current user's `listSessions` result, and resolves the bearer token entirely server-side. Thus loader serialization exposes only a non-authenticator identifier and session metadata, not reusable credentials. This is the hardening represented by recent commit `a041f94` and fixes the originally reported exposure."
+    },
+    {
+      "findingId": "F3",
+      "verdict": "true-positive",
+      "reasoning": "The authenticated `updateUserFn` calls `auth.api.changeEmail` whenever a syntactically valid submitted email differs from the current session email. In `src/lib/auth.ts`, Better Auth explicitly enables `updateEmailWithoutVerification: true`, and no email-delivery or new-address verification callback is configured. The Zod schema verifies only the address format and length, not control of the destination mailbox. Although the rendered form marks `currentPassword` as required, the server schema accepts an empty string and the handler performs its password check only when that string is truthy, so a direct server-function caller can change email without reauthentication. An authenticated malicious user can consequently claim an unused address belonging to another person, while an attacker holding a stolen session can replace the victim's account email without proving control of either mailbox. Authentication, CSRF middleware, and same-origin protections establish authorization to invoke the function but do not verify ownership of the new address. The configuration comment itself acknowledges that retaining this behavior once email delivery is used would be unsafe, and the project describes itself as a production-ready authentication template."
+    },
+    {
+      "findingId": "F4",
+      "verdict": "fixed",
+      "reasoning": "The profile route still serializes loader data to the client, but that data is now the sanitized `SessionView[]` returned by `fetchUserSessions`. `ProfilePage` receives only this array and passes it to `SessionsTab`; there is no longer a separate `currentSessionToken` value. Current-session status is computed on the server and represented as a boolean. The session DTO includes metadata and a session ID but excludes Better Auth's bearer `token`. Consequently, SSR or client hydration cannot reveal the credentials described by the finding. Recent commit `a041f94` introduced this sanitized data flow and fixes the original profile-page exposure."
+    },
+    {
+      "findingId": "F5",
+      "verdict": "fixed",
+      "reasoning": "The current `SessionsTab` props are typed as `SessionView[]`, whose records contain no bearer-token field. Rendering and current-session highlighting use the server-derived `session.isCurrent` boolean rather than comparing tokens in browser code. Revocation submits only `session.id` through the server function. On the server, that ID is matched against sessions returned for the authenticated user, the current session is rejected, and only then is the corresponding token passed internally to Better Auth. This preserves ownership enforcement while keeping credential material outside the client boundary. These changes in recent commit `a041f94` directly implement the recommended remediation and fix the reported UI-level token exposure."
+    }
+  ],
+  "reconciliation": {
+    "matches": [
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F1",
+        "resolvedFindingId": "finding_fcb5c108ca90a882"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F2",
+        "resolvedFindingId": "finding_4a848730dba705b0"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F3",
+        "resolvedFindingId": "finding_b924f8da9b0fcb6b"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F4",
+        "resolvedFindingId": "finding_036649300ef68a7b"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F5",
+        "resolvedFindingId": "finding_5e516729bf642319"
+      }
+    ],
+    "missingFindingIds": [],
+    "unknownVerdicts": [],
+    "ambiguousVerdicts": []
+  },
+  "persistedCount": 5,
+  "unresolvedFindingIds": []
+}

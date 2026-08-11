@@ -5,6 +5,9 @@
   "description": "deepsec scanning workspace",
   "workspaces": [],
   "type": "module",
+  "scripts": {
+    "deepsec": "scripts/deepsec-guard.sh"
+  },
   "dependencies": {
     "deepsec": "2.3.4"
   },

@@ -30,11 +30,48 @@ export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
 export class AppError extends Error {
   public code: ErrorCode;
+  public publicMessage: string;
 
-  public constructor(code: ErrorCode, message?: string) {
-    super(message || DEFAULT_MESSAGES[code]);
+  public constructor(code: ErrorCode, publicMessage?: string) {
+    const message = publicMessage || DEFAULT_MESSAGES[code];
+    super(JSON.stringify({ type: "AppError", code, publicMessage: message }));
     this.code = code;
+    this.publicMessage = message;
     this.name = "AppError";
+  }
+}
+
+function isAppError(
+  error: unknown
+): error is { code: ErrorCode; publicMessage: string } {
+  if (error instanceof AppError) {
+    return true;
+  }
+
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const { message } = error as any;
+  if (typeof message !== "string") {
+    return false;
+  }
+
+  try {
+    const parsed = JSON.parse(message);
+    if (
+      parsed?.type !== "AppError" ||
+      !Object.values(ERROR_CODES).includes(parsed.code) ||
+      typeof parsed.publicMessage !== "string"
+    ) {
+      return false;
+    }
+
+    (error as any).code = parsed.code;
+    (error as any).publicMessage = parsed.publicMessage;
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -51,12 +88,12 @@ function isZodIssues(error: any) {
 }
 
 export function renderError(error: unknown): string {
-  if (isZodIssues(error)) {
-    return DEFAULT_MESSAGES[ERROR_CODES.UNPROCESSEABLE_ENTITY];
+  if (isAppError(error)) {
+    return error.publicMessage;
   }
 
-  if (error && typeof error === "object" && (error as any)?.message) {
-    return (error as any).message;
+  if (isZodIssues(error)) {
+    return DEFAULT_MESSAGES[ERROR_CODES.UNPROCESSEABLE_ENTITY];
   }
 
   return DEFAULT_MESSAGES[ERROR_CODES.INTERNAL_SERVER_ERROR];

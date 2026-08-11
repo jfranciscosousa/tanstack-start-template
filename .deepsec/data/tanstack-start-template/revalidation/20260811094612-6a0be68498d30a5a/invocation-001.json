@@ -1,0 +1,113 @@
+{
+  "batchIndex": 0,
+  "label": "initial",
+  "timestamp": "2026-08-11T09:46:58.603Z",
+  "files": [
+    ".github/workflows/ci.yml",
+    "src/server/handlers/session-handlers.ts",
+    "src/server/handlers/user-handlers.ts",
+    "src/domains/profile/profile-page.tsx",
+    "src/domains/profile/sessions-tab.tsx"
+  ],
+  "requested": [
+    {
+      "findingId": "finding_fcb5c108ca90a882",
+      "filePath": ".github/workflows/ci.yml",
+      "title": "GitHub Actions are referenced by mutable tags",
+      "alias": "F1"
+    },
+    {
+      "findingId": "finding_4a848730dba705b0",
+      "filePath": "src/server/handlers/session-handlers.ts",
+      "title": "Session tokens are returned to client-side code",
+      "alias": "F2"
+    },
+    {
+      "findingId": "finding_b924f8da9b0fcb6b",
+      "filePath": "src/server/handlers/user-handlers.ts",
+      "title": "Email changes are accepted without verification",
+      "alias": "F3"
+    },
+    {
+      "findingId": "finding_036649300ef68a7b",
+      "filePath": "src/domains/profile/profile-page.tsx",
+      "title": "Raw session tokens are passed into client-rendered profile data",
+      "alias": "F4"
+    },
+    {
+      "findingId": "finding_5e516729bf642319",
+      "filePath": "src/domains/profile/sessions-tab.tsx",
+      "title": "Session management UI stores and submits bearer session tokens client-side",
+      "alias": "F5"
+    }
+  ],
+  "rawResponses": [
+    {
+      "kind": "initial",
+      "rawText": "[\n  {\n    \"findingId\": \"F1\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `.github/workflows/ci.yml` no longer references any action through a mutable major-version tag. Every `uses` entry is pinned to a full 40-character commit SHA, including checkout, tool-versions-action, setup-node, pnpm/action-setup, cache, and upload-artifact. The trailing comments such as `# v6` and `# v2` are informational and do not affect action resolution. GitHub Actions therefore fetches the specified immutable commits rather than whatever code a publisher's major-version tag later points to. A compromised publisher could not exploit the originally described tag-moving scenario without also compromising GitHub's commit-object integrity. The original supply-chain weakness was real, but the current workflow implements the recommended SHA-pinning mitigation.\"\n  },\n  {\n    \"findingId\": \"F2\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `fetchUserSessions` no longer returns `currentSessionToken` or the raw records produced by `auth.api.listSessions`. It passes those records through `toSessionViews`, which constructs new objects containing only the session ID, user agent, IP address, timestamps, and a derived `isCurrent` boolean. Although tokens are used transiently inside the server handler to derive that boolean, they are not properties of the returned `SessionView` objects and therefore do not enter route-loader serialization. Revocation now accepts a validated session ID and resolves it against the authenticated user's session list entirely on the server before passing the associated token to Better Auth. The handler also rejects unknown IDs and the caller's current session, providing ownership and current-session checks. The accompanying server test explicitly verifies that no returned object has a `token` property. Commit `a041f94` (`Harden session and profile data handling`) is identified in the history as the patch for this exposure.\"\n  },\n  {\n    \"findingId\": \"F3\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"The authenticated `updateUserFn` calls `auth.api.changeEmail` whenever a syntactically valid submitted email differs from the current session email. In `src/lib/auth.ts`, Better Auth explicitly enables email changes with `updateEmailWithoutVerification: true`, and no email-delivery or new-address verification callback is configured. The Zod validator checks only email syntax and length; it cannot establish control of the destination mailbox. Although the rendered form marks `currentPassword` as required, the server schema accepts an empty string and the handler verifies the password only when `data.currentPassword` is non-empty, so a direct server-function caller can omit meaningful reauthentication. A malicious authenticated user can consequently assign an unused address belonging to another person and cause application code to treat that address as the account identity without mailbox proof. More seriously, an attacker with a stolen authenticated session can immediately replace the victim's login email without knowing the password or completing a challenge, interfering with recovery and helping retain control. Session authentication and ordinary request protections prove only possession of the existing session; they do not mitigate the missing verification of the new address.\"\n  },\n  {\n    \"findingId\": \"F4\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `ProfilePage` reads a single `SessionView[]` from `Route.useLoaderData` rather than destructuring raw sessions and a `currentSessionToken`. It passes only that sanitized array to `SessionsTab`. The profile route's loader calls the patched `fetchUserSessions`, which creates fresh DTOs without Better Auth bearer tokens and represents current-session status with an `isCurrent` boolean. TanStack Start may serialize these IDs and metadata for hydration, but no session token now reaches that serialization path. There is no alternate token lookup or forwarding in `profile-page.tsx`. Thus a same-origin script inspecting the route data can no longer recover the credentials described by the finding. Commit `a041f94` (`Harden session and profile data handling`) patched this client-rendered data flow.\"\n  },\n  {\n    \"findingId\": \"F5\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current `SessionsTab` accepts `SessionView[]`, whose type has no bearer-token or `currentSessionToken` field. `SessionCard` uses the server-derived `session.isCurrent` property for display and passes only `session.id` to the revocation callback. The mutation consequently submits a non-secret session identifier rather than an authentication credential. In `revokeSession`, the server authenticates the request, obtains only the caller's sessions from Better Auth, and resolves the submitted ID within that list before accessing the token. It rejects IDs that are not owned by the authenticated user and refuses to revoke the current session. The raw token crosses only the internal server-to-Better-Auth boundary and is never returned to or supplied by browser code. Commit `a041f94` (`Harden session and profile data handling`) implements the recommended sanitized DTO and server-side token resolution.\"\n  }\n]",
+      "parsedCount": 5
+    }
+  ],
+  "repairAttempts": 0,
+  "parsedVerdicts": [
+    {
+      "findingId": "F1",
+      "verdict": "fixed",
+      "reasoning": "The current `.github/workflows/ci.yml` no longer references any action through a mutable major-version tag. Every `uses` entry is pinned to a full 40-character commit SHA, including checkout, tool-versions-action, setup-node, pnpm/action-setup, cache, and upload-artifact. The trailing comments such as `# v6` and `# v2` are informational and do not affect action resolution. GitHub Actions therefore fetches the specified immutable commits rather than whatever code a publisher's major-version tag later points to. A compromised publisher could not exploit the originally described tag-moving scenario without also compromising GitHub's commit-object integrity. The original supply-chain weakness was real, but the current workflow implements the recommended SHA-pinning mitigation."
+    },
+    {
+      "findingId": "F2",
+      "verdict": "fixed",
+      "reasoning": "The current `fetchUserSessions` no longer returns `currentSessionToken` or the raw records produced by `auth.api.listSessions`. It passes those records through `toSessionViews`, which constructs new objects containing only the session ID, user agent, IP address, timestamps, and a derived `isCurrent` boolean. Although tokens are used transiently inside the server handler to derive that boolean, they are not properties of the returned `SessionView` objects and therefore do not enter route-loader serialization. Revocation now accepts a validated session ID and resolves it against the authenticated user's session list entirely on the server before passing the associated token to Better Auth. The handler also rejects unknown IDs and the caller's current session, providing ownership and current-session checks. The accompanying server test explicitly verifies that no returned object has a `token` property. Commit `a041f94` (`Harden session and profile data handling`) is identified in the history as the patch for this exposure."
+    },
+    {
+      "findingId": "F3",
+      "verdict": "true-positive",
+      "reasoning": "The authenticated `updateUserFn` calls `auth.api.changeEmail` whenever a syntactically valid submitted email differs from the current session email. In `src/lib/auth.ts`, Better Auth explicitly enables email changes with `updateEmailWithoutVerification: true`, and no email-delivery or new-address verification callback is configured. The Zod validator checks only email syntax and length; it cannot establish control of the destination mailbox. Although the rendered form marks `currentPassword` as required, the server schema accepts an empty string and the handler verifies the password only when `data.currentPassword` is non-empty, so a direct server-function caller can omit meaningful reauthentication. A malicious authenticated user can consequently assign an unused address belonging to another person and cause application code to treat that address as the account identity without mailbox proof. More seriously, an attacker with a stolen authenticated session can immediately replace the victim's login email without knowing the password or completing a challenge, interfering with recovery and helping retain control. Session authentication and ordinary request protections prove only possession of the existing session; they do not mitigate the missing verification of the new address."
+    },
+    {
+      "findingId": "F4",
+      "verdict": "fixed",
+      "reasoning": "The current `ProfilePage` reads a single `SessionView[]` from `Route.useLoaderData` rather than destructuring raw sessions and a `currentSessionToken`. It passes only that sanitized array to `SessionsTab`. The profile route's loader calls the patched `fetchUserSessions`, which creates fresh DTOs without Better Auth bearer tokens and represents current-session status with an `isCurrent` boolean. TanStack Start may serialize these IDs and metadata for hydration, but no session token now reaches that serialization path. There is no alternate token lookup or forwarding in `profile-page.tsx`. Thus a same-origin script inspecting the route data can no longer recover the credentials described by the finding. Commit `a041f94` (`Harden session and profile data handling`) patched this client-rendered data flow."
+    },
+    {
+      "findingId": "F5",
+      "verdict": "fixed",
+      "reasoning": "The current `SessionsTab` accepts `SessionView[]`, whose type has no bearer-token or `currentSessionToken` field. `SessionCard` uses the server-derived `session.isCurrent` property for display and passes only `session.id` to the revocation callback. The mutation consequently submits a non-secret session identifier rather than an authentication credential. In `revokeSession`, the server authenticates the request, obtains only the caller's sessions from Better Auth, and resolves the submitted ID within that list before accessing the token. It rejects IDs that are not owned by the authenticated user and refuses to revoke the current session. The raw token crosses only the internal server-to-Better-Auth boundary and is never returned to or supplied by browser code. Commit `a041f94` (`Harden session and profile data handling`) implements the recommended sanitized DTO and server-side token resolution."
+    }
+  ],
+  "reconciliation": {
+    "matches": [
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F1",
+        "resolvedFindingId": "finding_fcb5c108ca90a882"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F2",
+        "resolvedFindingId": "finding_4a848730dba705b0"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F3",
+        "resolvedFindingId": "finding_b924f8da9b0fcb6b"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F4",
+        "resolvedFindingId": "finding_036649300ef68a7b"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F5",
+        "resolvedFindingId": "finding_5e516729bf642319"
+      }
+    ],
+    "missingFindingIds": [],
+    "unknownVerdicts": [],
+    "ambiguousVerdicts": []
+  },
+  "persistedCount": 5,
+  "unresolvedFindingIds": []
+}

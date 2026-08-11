@@ -101,7 +101,7 @@ describe("session handlers", () => {
         revokeSession({ data: currentSession.id })
       ).rejects.toMatchObject({
         code: "BAD_REQUEST",
-        message: "Cannot revoke your current session",
+        publicMessage: "Cannot revoke your current session",
       } satisfies Partial<AppError>);
     });
 

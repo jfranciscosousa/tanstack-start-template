@@ -1,0 +1,129 @@
+{
+  "batchIndex": 1,
+  "label": "initial",
+  "timestamp": "2026-08-11T10:04:16.411Z",
+  "files": [
+    "scripts/db.reset.ts",
+    "scripts/worktree.ts",
+    "src/errors/index.ts",
+    "src/lib/auth.ts",
+    "src/routes/_authed/profile.tsx"
+  ],
+  "requested": [
+    {
+      "findingId": "finding_290f434246b844e2",
+      "filePath": "scripts/db.reset.ts",
+      "title": "Database credentials are printed to logs",
+      "alias": "F1"
+    },
+    {
+      "findingId": "finding_630a8f82263775e8",
+      "filePath": "scripts/db.reset.ts",
+      "title": "Database reset can drop a production database if misconfigured",
+      "alias": "F2"
+    },
+    {
+      "findingId": "finding_02085c5d68e52786",
+      "filePath": "scripts/worktree.ts",
+      "title": "Worktree database create/drop uses raw SQL with unvalidated identifiers",
+      "alias": "F3"
+    },
+    {
+      "findingId": "finding_faa7260ec582075f",
+      "filePath": "src/errors/index.ts",
+      "title": "Raw exception messages are rendered to users",
+      "alias": "F4"
+    },
+    {
+      "findingId": "finding_95cff7549b83c151",
+      "filePath": "src/lib/auth.ts",
+      "title": "Account email addresses can be changed without ownership verification",
+      "alias": "F5"
+    },
+    {
+      "findingId": "finding_1f8b549133e54a8b",
+      "filePath": "src/routes/_authed/profile.tsx",
+      "title": "Session bearer tokens are returned to browser route data",
+      "alias": "F6"
+    }
+  ],
+  "rawResponses": [
+    {
+      "kind": "initial",
+      "rawText": "[\n  {\n    \"findingId\": \"F1\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current script no longer prints the original DATABASE_URL. It parses the URL and clears the username, password, query string, and fragment before logging the resulting database location. The only environment-related message from loadEnv reports the file name and number of variables loaded, not their values. Consequently, credentials and provider tokens embedded in standard PostgreSQL URLs are excluded from output. The sanitized output still includes the host and database name, which is consistent with the recommendation and is not a bearer credential. The vulnerable logging described by the finding has therefore been patched in scripts/db.reset.ts.\"\n  },\n  {\n    \"findingId\": \"F2\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current script refuses to run when NODE_ENV is production before establishing a database connection. Every reset also requires --force-reset followed by the exact database name parsed from DATABASE_URL, preventing an ordinary accidental invocation. Non-local database hosts additionally require --allow-remote-reset, an interactive TTY, and exact entry of both the database and host. CI or other noninteractive automation cannot approve a remote reset because of the explicit TTY checks. Only after these checks does the script connect and execute the destructive schema statements. These layered safeguards address the previously reported unguarded production-reset path.\"\n  },\n  {\n    \"findingId\": \"F3\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"Database identifiers now pass through validateDatabaseName, which permits only ASCII alphanumeric characters, underscores, and hyphens with an alphanumeric first character. quoteDatabaseName performs that validation before surrounding the identifier with double quotes, so an embedded quote or SQL fragment cannot reach sql.unsafe. cloneDatabase applies this function to both sourceDb and newDb, while dropDatabase applies it to dbName. The setup path also invokes replaceDbName for the derived database name, which independently validates it before cloning. The delete path compares the selected database against the expected main-database/worktree-derived name and refuses unexpected values. Thus the previously unvalidated raw identifier interpolation has been patched, although sql.unsafe remains in use with strictly validated quoted identifiers.\"\n  },\n  {\n    \"findingId\": \"F4\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"renderError still returns the message property of every object that has one, without requiring AppError, ParamsError, or another explicitly public error type. The Form component uses this result directly for failures from client-facing server functions, and SessionsTab does the same for revocation failures. TanStack Start preserves an exception's message across server-function serialization, as also documented by the ParamsError implementation, so a server-side dependency message can reach the browser. Most expected validation and authentication failures are converted to controlled errors, but unexpected Better Auth, adapter, or PostgreSQL exceptions are not universally caught or normalized. For example, concurrent email changes can pass Better Auth's pre-update uniqueness check and then cause a database uniqueness error during the update, whose operational message can propagate to the form. React escapes the message and therefore prevents XSS, but it does not prevent disclosure of table, constraint, or database details. An authenticated attacker can deliberately exercise such error paths and observe the returned text, making the information-disclosure issue real.\"\n  },\n  {\n    \"findingId\": \"F5\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"The Better Auth configuration explicitly enables changeEmail and sets updateEmailWithoutVerification to true while defining no emailVerification sender. Better Auth's installed implementation allows the immediate-update branch when the current account is unverified and the destination email is not already registered. It then updates the stored email and session cookie without proving control of the destination address. The application invokes this API from updateUserFn using only the current session; the schema accepts an empty currentPassword, and password verification is skipped in that case. Better Auth's sensitive-session middleware and the application's CSRF middleware reduce exposure to stale sessions and cross-site requests, but neither proves mailbox ownership or requires the account password. A user—or an attacker holding a sufficiently fresh session—can therefore replace an unverified account's login email with an address they do not control. The account remains marked unverified, which limits identity-assurance impact, but the unauthorized identifier change and potential victim lockout still support the reported medium-severity finding.\"\n  },\n  {\n    \"findingId\": \"F6\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"fetchUserSessions now returns SessionView objects containing only an ID, device metadata, timestamps, and an isCurrent boolean. toSessionViews compares tokens exclusively on the server and deliberately omits each token from the mapped result. The profile route serializes only this sanitized array, so neither the current token nor other session bearer tokens enter browser route data. Revocation accepts a non-secret session ID, lists the authenticated user's sessions server-side, verifies that the ID belongs to that user, and resolves it to the token only inside the server handler. It also rejects attempts to revoke the current session. The accompanying tests explicitly assert that returned session objects have no token property, confirming that the previously reported exposure has been patched.\"\n  }\n]",
+      "parsedCount": 6
+    }
+  ],
+  "repairAttempts": 0,
+  "parsedVerdicts": [
+    {
+      "findingId": "F1",
+      "verdict": "fixed",
+      "reasoning": "The current script no longer prints the original DATABASE_URL. It parses the URL and clears the username, password, query string, and fragment before logging the resulting database location. The only environment-related message from loadEnv reports the file name and number of variables loaded, not their values. Consequently, credentials and provider tokens embedded in standard PostgreSQL URLs are excluded from output. The sanitized output still includes the host and database name, which is consistent with the recommendation and is not a bearer credential. The vulnerable logging described by the finding has therefore been patched in scripts/db.reset.ts."
+    },
+    {
+      "findingId": "F2",
+      "verdict": "fixed",
+      "reasoning": "The current script refuses to run when NODE_ENV is production before establishing a database connection. Every reset also requires --force-reset followed by the exact database name parsed from DATABASE_URL, preventing an ordinary accidental invocation. Non-local database hosts additionally require --allow-remote-reset, an interactive TTY, and exact entry of both the database and host. CI or other noninteractive automation cannot approve a remote reset because of the explicit TTY checks. Only after these checks does the script connect and execute the destructive schema statements. These layered safeguards address the previously reported unguarded production-reset path."
+    },
+    {
+      "findingId": "F3",
+      "verdict": "fixed",
+      "reasoning": "Database identifiers now pass through validateDatabaseName, which permits only ASCII alphanumeric characters, underscores, and hyphens with an alphanumeric first character. quoteDatabaseName performs that validation before surrounding the identifier with double quotes, so an embedded quote or SQL fragment cannot reach sql.unsafe. cloneDatabase applies this function to both sourceDb and newDb, while dropDatabase applies it to dbName. The setup path also invokes replaceDbName for the derived database name, which independently validates it before cloning. The delete path compares the selected database against the expected main-database/worktree-derived name and refuses unexpected values. Thus the previously unvalidated raw identifier interpolation has been patched, although sql.unsafe remains in use with strictly validated quoted identifiers."
+    },
+    {
+      "findingId": "F4",
+      "verdict": "true-positive",
+      "reasoning": "renderError still returns the message property of every object that has one, without requiring AppError, ParamsError, or another explicitly public error type. The Form component uses this result directly for failures from client-facing server functions, and SessionsTab does the same for revocation failures. TanStack Start preserves an exception's message across server-function serialization, as also documented by the ParamsError implementation, so a server-side dependency message can reach the browser. Most expected validation and authentication failures are converted to controlled errors, but unexpected Better Auth, adapter, or PostgreSQL exceptions are not universally caught or normalized. For example, concurrent email changes can pass Better Auth's pre-update uniqueness check and then cause a database uniqueness error during the update, whose operational message can propagate to the form. React escapes the message and therefore prevents XSS, but it does not prevent disclosure of table, constraint, or database details. An authenticated attacker can deliberately exercise such error paths and observe the returned text, making the information-disclosure issue real."
+    },
+    {
+      "findingId": "F5",
+      "verdict": "true-positive",
+      "reasoning": "The Better Auth configuration explicitly enables changeEmail and sets updateEmailWithoutVerification to true while defining no emailVerification sender. Better Auth's installed implementation allows the immediate-update branch when the current account is unverified and the destination email is not already registered. It then updates the stored email and session cookie without proving control of the destination address. The application invokes this API from updateUserFn using only the current session; the schema accepts an empty currentPassword, and password verification is skipped in that case. Better Auth's sensitive-session middleware and the application's CSRF middleware reduce exposure to stale sessions and cross-site requests, but neither proves mailbox ownership or requires the account password. A user—or an attacker holding a sufficiently fresh session—can therefore replace an unverified account's login email with an address they do not control. The account remains marked unverified, which limits identity-assurance impact, but the unauthorized identifier change and potential victim lockout still support the reported medium-severity finding."
+    },
+    {
+      "findingId": "F6",
+      "verdict": "fixed",
+      "reasoning": "fetchUserSessions now returns SessionView objects containing only an ID, device metadata, timestamps, and an isCurrent boolean. toSessionViews compares tokens exclusively on the server and deliberately omits each token from the mapped result. The profile route serializes only this sanitized array, so neither the current token nor other session bearer tokens enter browser route data. Revocation accepts a non-secret session ID, lists the authenticated user's sessions server-side, verifies that the ID belongs to that user, and resolves it to the token only inside the server handler. It also rejects attempts to revoke the current session. The accompanying tests explicitly assert that returned session objects have no token property, confirming that the previously reported exposure has been patched."
+    }
+  ],
+  "reconciliation": {
+    "matches": [
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F1",
+        "resolvedFindingId": "finding_290f434246b844e2"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F2",
+        "resolvedFindingId": "finding_630a8f82263775e8"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F3",
+        "resolvedFindingId": "finding_02085c5d68e52786"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F4",
+        "resolvedFindingId": "finding_faa7260ec582075f"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F5",
+        "resolvedFindingId": "finding_95cff7549b83c151"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F6",
+        "resolvedFindingId": "finding_1f8b549133e54a8b"
+      }
+    ],
+    "missingFindingIds": [],
+    "unknownVerdicts": [],
+    "ambiguousVerdicts": []
+  },
+  "persistedCount": 6,
+  "unresolvedFindingIds": []
+}
