@@ -1,0 +1,113 @@
+{
+  "batchIndex": 0,
+  "label": "initial",
+  "timestamp": "2026-08-11T09:41:12.876Z",
+  "files": [
+    ".github/workflows/ci.yml",
+    "src/server/handlers/session-handlers.ts",
+    "src/server/handlers/user-handlers.ts",
+    "src/domains/profile/profile-page.tsx",
+    "src/domains/profile/sessions-tab.tsx"
+  ],
+  "requested": [
+    {
+      "findingId": "finding_fcb5c108ca90a882",
+      "filePath": ".github/workflows/ci.yml",
+      "title": "GitHub Actions are referenced by mutable tags",
+      "alias": "F1"
+    },
+    {
+      "findingId": "finding_4a848730dba705b0",
+      "filePath": "src/server/handlers/session-handlers.ts",
+      "title": "Session tokens are returned to client-side code",
+      "alias": "F2"
+    },
+    {
+      "findingId": "finding_b924f8da9b0fcb6b",
+      "filePath": "src/server/handlers/user-handlers.ts",
+      "title": "Email changes are accepted without verification",
+      "alias": "F3"
+    },
+    {
+      "findingId": "finding_036649300ef68a7b",
+      "filePath": "src/domains/profile/profile-page.tsx",
+      "title": "Raw session tokens are passed into client-rendered profile data",
+      "alias": "F4"
+    },
+    {
+      "findingId": "finding_5e516729bf642319",
+      "filePath": "src/domains/profile/sessions-tab.tsx",
+      "title": "Session management UI stores and submits bearer session tokens client-side",
+      "alias": "F5"
+    }
+  ],
+  "rawResponses": [
+    {
+      "kind": "initial",
+      "rawText": "[\n  {\n    \"findingId\": \"F1\",\n    \"verdict\": \"true-positive\",\n    \"reasoning\": \"The workflow fully confirms that actions/checkout@v6, marocchino/tool-versions-action@v2, actions/setup-node@v6, pnpm/action-setup@v6, actions/cache@v5, and actions/upload-artifact@v7 are referenced through mutable major-version tags. Each action executes publisher-controlled code in the build job, so a compromised publisher or maliciously moved tag would affect subsequent push-triggered runs without any repository change. Such code could access the checked-out source, modify test execution, poison caches, or tamper with the uploaded Playwright artifact. The job also receives a GITHUB_TOKEN, and the workflow neither restricts its permissions explicitly nor disables checkout credential persistence, leaving the precise impact dependent on repository defaults. The hard-coded Better Auth and database values are test-only, but that does not mitigate access to the job token or CI outputs. Pinning each action to a full commit SHA would prevent a moved tag from silently changing executed code, so this is a real supply-chain exposure at the reported severity.\"\n  },\n  {\n    \"findingId\": \"F2\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current src/server/handlers/session-handlers.ts does not return currentSessionToken or the raw result of auth.api.listSessions. Instead, fetchUserSessions passes the records through toSessionViews, which constructs fresh objects containing only id, userAgent, ipAddress, timestamps, and a derived isCurrent boolean. Tokens are used transiently on the server to calculate that boolean but are not included in the returned SessionView objects. Revocation now accepts a validated session ID, authenticates the request, and resolves that ID against listSessions for the authenticated user before retrieving the token server-side. It also rejects the current session and rejects IDs not present in the caller's session list. The accompanying server test explicitly verifies that returned records have no token property. Git history identifies a041f94, \\\"Harden session and profile data handling,\\\" as the patch that removed the reported exposure.\"\n  },\n  {\n    \"findingId\": \"F3\",\n    \"verdict\": \"false-positive\",\n    \"reasoning\": \"The underlying behavior is accurately identified: updateUserFn accepts a syntactically valid new email from an authenticated caller, and src/lib/auth.ts enables updateEmailWithoutVerification. Better Auth 1.6.25 immediately changes the address under this option when the current account is unverified, and this project configures no email-verification sender. However, the reviewed application never establishes mailbox ownership as an identity guarantee: initial email/password registration is also available without email verification. No roles, allowlists, authorization checks, invitations, password recovery flow, public identity assertions, or other downstream operation trusts the email as verified. The database uniqueness constraint prevents replacing the email of an existing account, while claiming an unused address gives the caller no access to another existing user's account or mailbox. The source comment expressly describes this as a temporary configuration until email delivery is implemented. It would become a vulnerability if verified-email semantics or email-based trust were added, but the concrete impersonation impact asserted by this finding is not present in the current codebase.\"\n  },\n  {\n    \"findingId\": \"F4\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current src/domains/profile/profile-page.tsx obtains only a SessionView array from Route.useLoaderData and passes that array to SessionsTab. The profile route loader calls the patched fetchUserSessions implementation, whose returned objects do not contain Better Auth tokens or a separate currentSessionToken. Current-session status is represented by the server-derived isCurrent boolean. Consequently, TanStack Start may serialize the session metadata and session IDs for hydration, but no bearer token enters that serialization path. The profile page contains no alternate access to or forwarding of session credentials. This directly removes the data flow described in the finding. The relevant patch is commit a041f94, \\\"Harden session and profile data handling.\\\"\"\n  },\n  {\n    \"findingId\": \"F5\",\n    \"verdict\": \"fixed\",\n    \"reasoning\": \"The current SessionsTab accepts SessionView[], and SessionView has no token or currentSessionToken field. SessionCard uses the server-provided isCurrent property for display and passes only session.id to the revocation callback. The browser therefore neither compares bearer tokens nor submits one to the revoke server function. On the server, revokeSession authenticates the caller, resolves the submitted ID only within that caller's listSessions result, rejects the current session, and supplies the corresponding token directly to Better Auth. This ownership lookup also prevents an attacker from revoking another user's session merely by learning or guessing its ID. The component tests verify submission of a non-secret ID and use token-free fixtures. Commit a041f94, \\\"Harden session and profile data handling,\\\" patched the previously reported client-side credential handling.\"\n  }\n]",
+      "parsedCount": 5
+    }
+  ],
+  "repairAttempts": 0,
+  "parsedVerdicts": [
+    {
+      "findingId": "F1",
+      "verdict": "true-positive",
+      "reasoning": "The workflow fully confirms that actions/checkout@v6, marocchino/tool-versions-action@v2, actions/setup-node@v6, pnpm/action-setup@v6, actions/cache@v5, and actions/upload-artifact@v7 are referenced through mutable major-version tags. Each action executes publisher-controlled code in the build job, so a compromised publisher or maliciously moved tag would affect subsequent push-triggered runs without any repository change. Such code could access the checked-out source, modify test execution, poison caches, or tamper with the uploaded Playwright artifact. The job also receives a GITHUB_TOKEN, and the workflow neither restricts its permissions explicitly nor disables checkout credential persistence, leaving the precise impact dependent on repository defaults. The hard-coded Better Auth and database values are test-only, but that does not mitigate access to the job token or CI outputs. Pinning each action to a full commit SHA would prevent a moved tag from silently changing executed code, so this is a real supply-chain exposure at the reported severity."
+    },
+    {
+      "findingId": "F2",
+      "verdict": "fixed",
+      "reasoning": "The current src/server/handlers/session-handlers.ts does not return currentSessionToken or the raw result of auth.api.listSessions. Instead, fetchUserSessions passes the records through toSessionViews, which constructs fresh objects containing only id, userAgent, ipAddress, timestamps, and a derived isCurrent boolean. Tokens are used transiently on the server to calculate that boolean but are not included in the returned SessionView objects. Revocation now accepts a validated session ID, authenticates the request, and resolves that ID against listSessions for the authenticated user before retrieving the token server-side. It also rejects the current session and rejects IDs not present in the caller's session list. The accompanying server test explicitly verifies that returned records have no token property. Git history identifies a041f94, \"Harden session and profile data handling,\" as the patch that removed the reported exposure."
+    },
+    {
+      "findingId": "F3",
+      "verdict": "false-positive",
+      "reasoning": "The underlying behavior is accurately identified: updateUserFn accepts a syntactically valid new email from an authenticated caller, and src/lib/auth.ts enables updateEmailWithoutVerification. Better Auth 1.6.25 immediately changes the address under this option when the current account is unverified, and this project configures no email-verification sender. However, the reviewed application never establishes mailbox ownership as an identity guarantee: initial email/password registration is also available without email verification. No roles, allowlists, authorization checks, invitations, password recovery flow, public identity assertions, or other downstream operation trusts the email as verified. The database uniqueness constraint prevents replacing the email of an existing account, while claiming an unused address gives the caller no access to another existing user's account or mailbox. The source comment expressly describes this as a temporary configuration until email delivery is implemented. It would become a vulnerability if verified-email semantics or email-based trust were added, but the concrete impersonation impact asserted by this finding is not present in the current codebase."
+    },
+    {
+      "findingId": "F4",
+      "verdict": "fixed",
+      "reasoning": "The current src/domains/profile/profile-page.tsx obtains only a SessionView array from Route.useLoaderData and passes that array to SessionsTab. The profile route loader calls the patched fetchUserSessions implementation, whose returned objects do not contain Better Auth tokens or a separate currentSessionToken. Current-session status is represented by the server-derived isCurrent boolean. Consequently, TanStack Start may serialize the session metadata and session IDs for hydration, but no bearer token enters that serialization path. The profile page contains no alternate access to or forwarding of session credentials. This directly removes the data flow described in the finding. The relevant patch is commit a041f94, \"Harden session and profile data handling.\""
+    },
+    {
+      "findingId": "F5",
+      "verdict": "fixed",
+      "reasoning": "The current SessionsTab accepts SessionView[], and SessionView has no token or currentSessionToken field. SessionCard uses the server-provided isCurrent property for display and passes only session.id to the revocation callback. The browser therefore neither compares bearer tokens nor submits one to the revoke server function. On the server, revokeSession authenticates the caller, resolves the submitted ID only within that caller's listSessions result, rejects the current session, and supplies the corresponding token directly to Better Auth. This ownership lookup also prevents an attacker from revoking another user's session merely by learning or guessing its ID. The component tests verify submission of a non-secret ID and use token-free fixtures. Commit a041f94, \"Harden session and profile data handling,\" patched the previously reported client-side credential handling."
+    }
+  ],
+  "reconciliation": {
+    "matches": [
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F1",
+        "resolvedFindingId": "finding_fcb5c108ca90a882"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F2",
+        "resolvedFindingId": "finding_4a848730dba705b0"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F3",
+        "resolvedFindingId": "finding_b924f8da9b0fcb6b"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F4",
+        "resolvedFindingId": "finding_036649300ef68a7b"
+      },
+      {
+        "matchedBy": "finding-id",
+        "returnedFindingId": "F5",
+        "resolvedFindingId": "finding_5e516729bf642319"
+      }
+    ],
+    "missingFindingIds": [],
+    "unknownVerdicts": [],
+    "ambiguousVerdicts": []
+  },
+  "persistedCount": 5,
+  "unresolvedFindingIds": []
+}
