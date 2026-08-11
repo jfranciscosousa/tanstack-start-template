@@ -1,0 +1,6 @@
+{
+  "tags": ["drizzle", "github-actions", "node", "react"],
+  "sentinels": ["package.json"],
+  "detectedAt": "2026-08-11T08:24:42.675Z",
+  "rootPath": "/home/jfranciscosousa/Projects/tanstack-start-template"
+}

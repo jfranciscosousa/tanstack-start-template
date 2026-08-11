@@ -30,6 +30,7 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
+      // It would be an extremely unsafe practice to keep this enabled after email delivery is implemented.
       updateEmailWithoutVerification: true,
     },
     additionalFields: {

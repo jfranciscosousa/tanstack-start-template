@@ -22,6 +22,10 @@ const filteredArgs = args.filter(arg => arg !== "--watch");
 const vitestArgs = [useWatch ? "" : "run", ...filteredArgs].filter(Boolean);
 console.log(`> vitest ${vitestArgs.join(" ")}`);
 
+const testDatabaseUrl = process.env.DATABASE_URL;
+if (!testDatabaseUrl) throw new Error("DATABASE_URL is not set");
+const testDatabaseName = new URL(testDatabaseUrl).pathname.replace(/^\//, "");
+
 $.stdio = "inherit";
-await $`zx scripts/db.reset.ts`;
+await $`zx scripts/db.reset.ts --force-reset ${testDatabaseName}`;
 await $`pnpm exec vitest ${vitestArgs}`;

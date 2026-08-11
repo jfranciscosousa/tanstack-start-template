@@ -46,12 +46,12 @@ pnpm test:e2e src/test/e2e/authentication.test.ts
 
 ## Database
 
-| Script                   | pnpm shortcut      | What it does                           |
-| ------------------------ | ------------------ | -------------------------------------- |
-| `scripts/db.ts generate` | `pnpm db generate` | Generate migration from schema changes |
-| `scripts/db.ts migrate`  | `pnpm db migrate`  | Apply pending migrations               |
-| `scripts/db.ts studio`   | `pnpm db studio`   | Open Drizzle Studio UI                 |
-| `scripts/db-reset.ts`    | `pnpm db:reset`    | Drop and recreate DB, then migrate     |
+| Script                   | pnpm shortcut                                 | What it does                                                                                                         |
+| ------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `scripts/db.ts generate` | `pnpm db generate`                            | Generate migration from schema changes                                                                               |
+| `scripts/db.ts migrate`  | `pnpm db migrate`                             | Apply pending migrations                                                                                             |
+| `scripts/db.ts studio`   | `pnpm db studio`                              | Open Drizzle Studio UI                                                                                               |
+| `scripts/db.reset.ts`    | `pnpm db:reset --force-reset <database-name>` | Reset a local, non-production DB. Remote databases also require `--allow-remote-reset` and interactive verification. |
 
 All `scripts/db.ts` commands forward args to `drizzle-kit` and load the right env automatically.
 

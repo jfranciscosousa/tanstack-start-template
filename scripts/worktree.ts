@@ -68,9 +68,21 @@ function dbNameFromUrl(url: string): string {
 }
 
 function replaceDbName(url: string, newName: string): string {
+  validateDatabaseName(newName);
   const parsed = new URL(url);
   parsed.pathname = `/${newName}`;
   return parsed.toString();
+}
+
+function validateDatabaseName(name: string): void {
+  if (!/^[a-z0-9][a-z0-9_-]*$/i.test(name)) {
+    throw new Error(`Unsafe database name: ${name}`);
+  }
+}
+
+function quoteDatabaseName(name: string): string {
+  validateDatabaseName(name);
+  return `"${name}"`;
 }
 
 async function cmdList() {
@@ -308,6 +320,13 @@ async function cmdDelete(name: string) {
     : (expectedDb ?? null);
   const dbUrl = target?.databaseUrl ?? mainEnv.DATABASE_URL ?? null;
 
+  if (dbName && dbName !== expectedDb) {
+    console.error(
+      `❌ Refusing to drop unexpected database '${dbName}'. Expected '${expectedDb ?? "none"}'.`
+    );
+    process.exit(1);
+  }
+
   if (!target) {
     console.log(
       `⚠️  No matching git worktree found — proceeding with best-effort cleanup of:`
@@ -407,9 +426,13 @@ async function cloneDatabase(
   newDb: string
 ) {
   const adminUrl = replaceDbName(sourceUrl, "postgres");
+  const quotedSourceDb = quoteDatabaseName(sourceDb);
+  const quotedNewDb = quoteDatabaseName(newDb);
   const sql = postgres(adminUrl);
   try {
-    await sql.unsafe(`CREATE DATABASE "${newDb}" WITH TEMPLATE "${sourceDb}"`);
+    await sql.unsafe(
+      `CREATE DATABASE ${quotedNewDb} WITH TEMPLATE ${quotedSourceDb}`
+    );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("being accessed by other users")) {
@@ -427,9 +450,10 @@ async function cloneDatabase(
 
 async function dropDatabase(url: string, dbName: string) {
   const adminUrl = replaceDbName(url, "postgres");
+  const quotedDbName = quoteDatabaseName(dbName);
   const sql = postgres(adminUrl);
   try {
-    await sql.unsafe(`DROP DATABASE IF EXISTS "${dbName}" WITH (FORCE)`);
+    await sql.unsafe(`DROP DATABASE IF EXISTS ${quotedDbName} WITH (FORCE)`);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`⚠️  Could not drop database: ${message}`);

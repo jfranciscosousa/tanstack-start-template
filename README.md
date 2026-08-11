@@ -115,7 +115,8 @@ The application uses PostgreSQL with Drizzle ORM. The schema is defined in `src/
 pnpm db generate    # Generate migration files from schema changes
 pnpm db migrate     # Apply pending migrations
 pnpm db studio      # Open Drizzle Studio database browser
-pnpm db:reset       # Drop and recreate DB, then migrate
+pnpm db:reset --force-reset <database-name> # Reset a local, non-production DB
+# Remote DBs also require --allow-remote-reset and interactive verification
 ```
 
 ## Contributing

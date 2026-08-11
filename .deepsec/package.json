@@ -1,0 +1,12 @@
+{
+  "name": "deepsec-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "deepsec scanning workspace",
+  "workspaces": [],
+  "type": "module",
+  "dependencies": {
+    "deepsec": "2.3.4"
+  },
+  "packageManager": "pnpm@11.18.0"
+}

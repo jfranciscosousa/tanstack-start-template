@@ -17,7 +17,11 @@ loadEnv();
 
 console.log("🎭 Setting up end-to-end tests...");
 
+const testDatabaseUrl = process.env.DATABASE_URL;
+if (!testDatabaseUrl) throw new Error("DATABASE_URL is not set");
+const testDatabaseName = new URL(testDatabaseUrl).pathname.replace(/^\//, "");
+
 $.stdio = "inherit";
 await $`pnpm exec playwright install chromium`;
-await $`zx scripts/db.reset.ts`;
+await $`zx scripts/db.reset.ts --force-reset ${testDatabaseName}`;
 console.log("✅ End-to-end dependencies set up successfully!");

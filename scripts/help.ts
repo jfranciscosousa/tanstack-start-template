@@ -31,7 +31,9 @@ console.log(`
   pnpm db generate        Generate migration from schema changes
   pnpm db migrate         Apply pending migrations
   pnpm db studio          Open Drizzle Studio UI
-  pnpm db:reset           Drop and recreate DB, then migrate
+  pnpm db:reset --force-reset <database-name>
+                          Reset a local, non-production DB. Remote DBs require
+                          --allow-remote-reset and interactive verification
 
 🌿 Worktree Commands:
   pnpm worktree create <name>  Create and provision a new worktree
