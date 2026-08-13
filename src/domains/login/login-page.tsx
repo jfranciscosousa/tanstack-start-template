@@ -4,12 +4,13 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { loginSchema } from "~/schemas/session-schemas";
 import { Route } from "~/routes/_unauthed/login";
 import { authClient } from "~/lib/auth-client";
+import { AppError } from "~/errors";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
 
 export default function LoginPage() {
-  const { redirectUrl } = Route.useSearch();
-  const router = useRouter();
+  const { redirectUrl } = Route.useSearch(),
+   router = useRouter();
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
@@ -62,7 +63,7 @@ export default function LoginPage() {
                 email: values.email,
                 password: values.password,
               });
-              if (error) throw new Error(error.message);
+              if (error) throw new AppError("UNAUTHORIZED", error.message);
               await router.invalidate();
               await router.navigate({ to: values.redirectUrl || "/" });
             }}
