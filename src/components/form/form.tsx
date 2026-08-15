@@ -35,11 +35,11 @@ export function Form<TValues extends Record<string, string>>({
 }: FormProps<TValues>) {
   const groups: FormGroupConfig<TValues>[] = isGroupConfig(fields)
     ? fields
-    : [{ fields }];
-  const [serverFieldErrors, setServerFieldErrors] = useState<
+    : [{ fields }],
+   [serverFieldErrors, setServerFieldErrors] = useState<
     Record<string, string[]>
-  >({});
-  const [serverError, setServerError] = useState<string>();
+  >({}),
+   [serverError, setServerError] = useState<string>();
 
   function clearServerFieldError(name: string) {
     setServerFieldErrors(prev => {
@@ -111,13 +111,13 @@ export function Form<TValues extends Record<string, string>>({
                 }}
               >
                 {field => {
-                  const wasSubmitted = field.form.state.submissionAttempts > 0;
-                  const tanstackInvalid =
+                  const wasSubmitted = field.form.state.submissionAttempts > 0,
+                   tanstackInvalid =
                     (field.state.meta.isTouched || wasSubmitted) &&
-                    !field.state.meta.isValid;
-                  const fieldServerErrors =
-                    serverFieldErrors[fieldConfig.name] ?? [];
-                  const allErrors = [
+                    !field.state.meta.isValid,
+                   fieldServerErrors =
+                    serverFieldErrors[fieldConfig.name] ?? [],
+                   allErrors = [
                     ...(tanstackInvalid
                       ? field.state.meta.errors.filter(Boolean).map(err => ({
                           message:
@@ -128,9 +128,9 @@ export function Form<TValues extends Record<string, string>>({
                         }))
                       : []),
                     ...fieldServerErrors.map(msg => ({ message: msg })),
-                  ];
-                  const isInvalid = allErrors.length > 0;
-                  const errors = isInvalid ? allErrors : undefined;
+                  ],
+                   isInvalid = allErrors.length > 0,
+                   errors = isInvalid ? allErrors : undefined;
 
                   if (fieldConfig.type === "password") {
                     return (
@@ -180,28 +180,22 @@ export function Form<TValues extends Record<string, string>>({
         ))}
 
         <form.Subscribe selector={state => state.errors}>
-          {errors => {
-            const hasFormErrors = errors.length > 0;
-
-            return (
-              <>
-                {hasFormErrors && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      The form has some errors, please review them.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {serverError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{serverError}</AlertDescription>
-                  </Alert>
-                )}
-              </>
-            );
-          }}
+          {errors =>
+            errors.length > 0 && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  The form has some errors, please review them.
+                </AlertDescription>
+              </Alert>
+            )
+          }
         </form.Subscribe>
+
+        {serverError && (
+          <Alert variant="destructive">
+            <AlertDescription>{serverError}</AlertDescription>
+          </Alert>
+        )}
 
         {renderSubmit(form)}
       </FieldGroup>
