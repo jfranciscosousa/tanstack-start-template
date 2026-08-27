@@ -11,5 +11,5 @@
   "dependencies": {
     "deepsec": "2.3.4"
   },
-  "packageManager": "pnpm@11.18.0"
+  "packageManager": "pnpm@12.0.0"
 }
