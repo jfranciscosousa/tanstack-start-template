@@ -69,6 +69,7 @@ export default defineConfig({
         question: "readonly",
       },
       rules: {
+        complexity: "off",
         "no-console": "off",
         "import/unambiguous": "off",
         "import/no-nodejs-modules": "off",
@@ -77,7 +78,7 @@ export default defineConfig({
   ],
   plugins: ["react", "react-perf", "typescript", "eslint", "import"],
   rules: {
-    complexity: "off",
+    complexity: ["error", { max: 10 }],
     "eslint/no-unused-vars": [
       "error",
       {
@@ -98,6 +99,7 @@ export default defineConfig({
     "max-lines-per-function": "off",
     "max-statements": "off",
     "no-magic-numbers": "off",
+    "one-var": ["error", "never"],
     "no-nested-ternary": "error",
     "no-ternary": "off",
     "no-undefined": "off",

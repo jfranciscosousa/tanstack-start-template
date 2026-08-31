@@ -20,6 +20,15 @@ export class ParamsError extends Error {
   }
 }
 
+function isServerSideError(error: any) {
+  // Server-side: class instance still has meta directly
+  return (
+    error.name === "ParamsError" &&
+    typeof error.meta === "object" &&
+    error.meta !== null
+  );
+}
+
 export function isParamsError(
   error: unknown
 ): error is { name: "ParamsError"; meta: ParamsErrorMeta } {
@@ -27,12 +36,7 @@ export function isParamsError(
     return false;
   }
 
-  // Server-side: class instance still has meta directly
-  if (
-    (error as any).name === "ParamsError" &&
-    typeof (error as any).meta === "object" &&
-    (error as any).meta !== null
-  ) {
+  if (isServerSideError(error)) {
     return true;
   }
 

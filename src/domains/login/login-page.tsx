@@ -9,8 +9,8 @@ import { Button, buttonVariants } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
 
 export default function LoginPage() {
-  const { redirectUrl } = Route.useSearch(),
-   router = useRouter();
+  const { redirectUrl } = Route.useSearch();
+  const router = useRouter();
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">

@@ -35,11 +35,11 @@ export function Form<TValues extends Record<string, string>>({
 }: FormProps<TValues>) {
   const groups: FormGroupConfig<TValues>[] = isGroupConfig(fields)
     ? fields
-    : [{ fields }],
-   [serverFieldErrors, setServerFieldErrors] = useState<
+    : [{ fields }];
+  const [serverFieldErrors, setServerFieldErrors] = useState<
     Record<string, string[]>
-  >({}),
-   [serverError, setServerError] = useState<string>();
+  >({});
+  const [serverError, setServerError] = useState<string>();
 
   function clearServerFieldError(name: string) {
     setServerFieldErrors(prev => {
@@ -111,13 +111,13 @@ export function Form<TValues extends Record<string, string>>({
                 }}
               >
                 {field => {
-                  const wasSubmitted = field.form.state.submissionAttempts > 0,
-                   tanstackInvalid =
+                  const wasSubmitted = field.form.state.submissionAttempts > 0;
+                  const tanstackInvalid =
                     (field.state.meta.isTouched || wasSubmitted) &&
-                    !field.state.meta.isValid,
-                   fieldServerErrors =
-                    serverFieldErrors[fieldConfig.name] ?? [],
-                   allErrors = [
+                    !field.state.meta.isValid;
+                  const fieldServerErrors =
+                    serverFieldErrors[fieldConfig.name] ?? [];
+                  const allErrors = [
                     ...(tanstackInvalid
                       ? field.state.meta.errors.filter(Boolean).map(err => ({
                           message:
@@ -128,9 +128,9 @@ export function Form<TValues extends Record<string, string>>({
                         }))
                       : []),
                     ...fieldServerErrors.map(msg => ({ message: msg })),
-                  ],
-                   isInvalid = allErrors.length > 0,
-                   errors = isInvalid ? allErrors : undefined;
+                  ];
+                  const isInvalid = allErrors.length > 0;
+                  const errors = isInvalid ? allErrors : undefined;
 
                   if (fieldConfig.type === "password") {
                     return (
