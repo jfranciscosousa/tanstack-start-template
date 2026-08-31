@@ -20,9 +20,9 @@ loadEnv();
 console.log("🧪 Running all tests...");
 
 console.log("📋 Running unit tests with Vitest...");
-await $`zx scripts/test.vitest.ts`;
+await $`pnpm test:vitest`;
 
 console.log("🎭 Running end-to-end tests...");
-await $`zx scripts/test.e2e.ts`;
+await $`pnpm test:e2e`;
 
 console.log("✅ All tests completed successfully!");

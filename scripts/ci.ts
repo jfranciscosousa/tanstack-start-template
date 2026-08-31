@@ -5,12 +5,12 @@ $.stdio = "inherit";
 console.log("🤖 Running CI pipeline...");
 
 console.log("🔍 Running type checks...");
-await $`zx scripts/ts-check.ts`;
+await $`pnpm ts-check`;
 
 console.log("🎭 Installing Playwright browsers...");
 await $`pnpm exec playwright install chromium`;
 
 console.log("🧪 Running all tests...");
-await $`zx scripts/test.ts`;
+await $`pnpm test`;
 
 console.log("✅ CI pipeline completed successfully!");

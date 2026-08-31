@@ -23,5 +23,5 @@ const testDatabaseName = new URL(testDatabaseUrl).pathname.replace(/^\//, "");
 
 $.stdio = "inherit";
 await $`pnpm exec playwright install chromium`;
-await $`zx scripts/db.reset.ts --force-reset ${testDatabaseName}`;
+await $`pnpm db:reset --force-reset ${testDatabaseName}`;
 console.log("✅ End-to-end dependencies set up successfully!");

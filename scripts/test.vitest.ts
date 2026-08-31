@@ -27,5 +27,5 @@ if (!testDatabaseUrl) throw new Error("DATABASE_URL is not set");
 const testDatabaseName = new URL(testDatabaseUrl).pathname.replace(/^\//, "");
 
 $.stdio = "inherit";
-await $`zx scripts/db.reset.ts --force-reset ${testDatabaseName}`;
+await $`pnpm db:reset --force-reset ${testDatabaseName}`;
 await $`pnpm exec vitest ${vitestArgs}`;
