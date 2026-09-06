@@ -44,8 +44,9 @@ export function Form<TValues extends Record<string, string>>({
   function clearServerFieldError(name: string) {
     setServerFieldErrors(prev => {
       if (!prev[name]) return prev;
-      const { [name]: _omit, ...rest } = prev;
-      return rest;
+      return Object.fromEntries(
+        Object.entries(prev).filter(([fieldName]) => fieldName !== name)
+      );
     });
   }
   const form = useForm({

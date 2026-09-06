@@ -43,9 +43,9 @@ function getDeviceName(userAgent: string | null | undefined) {
   return "Desktop";
 }
 
-function getDeviceIcon(userAgent: string | null | undefined) {
+function DeviceIcon({ userAgent }: { userAgent: string | null | undefined }) {
   if (!userAgent) {
-    return Monitor;
+    return <Monitor size={24} />;
   }
   const ua = userAgent.toLowerCase();
   if (
@@ -53,12 +53,12 @@ function getDeviceIcon(userAgent: string | null | undefined) {
     ua.includes("android") ||
     ua.includes("iphone")
   ) {
-    return Smartphone;
+    return <Smartphone size={24} />;
   }
   if (ua.includes("tablet") || ua.includes("ipad")) {
-    return Tablet;
+    return <Tablet size={24} />;
   }
-  return Monitor;
+  return <Monitor size={24} />;
 }
 
 function formatDate(date: Date) {
@@ -75,8 +75,6 @@ interface SessionCardProps {
 }
 
 function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
-  const DeviceIcon = getDeviceIcon(session.userAgent);
-
   function handleRevoke() {
     onRevoke(session.id);
   }
@@ -90,7 +88,7 @@ function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
               size="lg"
               variant={session.isCurrent ? "default" : "secondary"}
             >
-              <DeviceIcon size={24} />
+              <DeviceIcon userAgent={session.userAgent} />
             </Avatar>
 
             <div className="min-w-0 flex-1">
