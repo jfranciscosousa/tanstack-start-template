@@ -64,7 +64,7 @@ export default function LoginPage() {
                 password: values.password,
               });
               if (error) throw new AppError("UNAUTHORIZED", error.message);
-              await router.invalidate();
+              await router.invalidate({ sync: true });
               await router.navigate({ to: values.redirectUrl || "/" });
             }}
             renderSubmit={form => (
