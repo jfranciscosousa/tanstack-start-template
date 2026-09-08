@@ -80,7 +80,7 @@ export const Route = createRootRoute({
 });
 
 export function useCurrentUser() {
-  const user = Route.useLoaderData()?.user;
+  const { user } = Route.useRouteContext();
 
   if (!user) {
     throw new AppError("NOT_FOUND");
@@ -90,7 +90,7 @@ export function useCurrentUser() {
 }
 
 function RootComponent() {
-  const { user } = Route.useLoaderData();
+  const { user } = Route.useRouteContext();
   const theme = (user?.theme ?? "dark") as "dark" | "light";
 
   return (

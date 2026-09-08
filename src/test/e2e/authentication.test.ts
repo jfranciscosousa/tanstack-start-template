@@ -21,8 +21,18 @@ test("signs up and lands on the todos page", async ({ page, screen }) => {
   await page.waitForURL("/");
 });
 
-test("logins", async ({ page, screen }) => {
+test("logs in without rendering the authentication error boundary", async ({
+  page,
+  screen,
+}) => {
+  const errors: string[] = [];
+  page.on("console", message => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+
   await createUserAndLogin(page, screen);
+
+  expect(errors.filter(error => error.includes("AppError"))).toEqual([]);
 });
 
 test("shows login and then redirects to original page", async ({
