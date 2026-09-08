@@ -4,7 +4,7 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import { auth } from "~/lib/auth";
 import { AppError } from "~/errors";
 
-export const useLoggedInAppSession = createServerOnlyFn(async () => {
+export const getLoggedInAppSession = createServerOnlyFn(async () => {
   const req = getRequest();
   const session = await auth.api.getSession({ headers: req.headers });
 

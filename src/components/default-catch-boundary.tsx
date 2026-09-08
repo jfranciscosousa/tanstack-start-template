@@ -10,6 +10,11 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 
+function handleGoBack(event: React.MouseEvent) {
+  event.preventDefault();
+  window.history.back();
+}
+
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter();
   const isRoot = useMatch({
@@ -21,11 +26,6 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 
   function handleTryAgain() {
     void router.invalidate();
-  }
-
-  function handleGoBack(event: React.MouseEvent) {
-    event.preventDefault();
-    window.history.back();
   }
 
   return (

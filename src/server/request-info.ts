@@ -75,6 +75,10 @@ async function getLocationFromIP(ip: string): Promise<string | null> {
   try {
     const response = await fetch(`https://ipapi.co/${ip}/json/`);
 
+    if (!response.ok) {
+      return null;
+    }
+
     const schema = z.object({
       city: z.string(),
       country_name: z.string(),

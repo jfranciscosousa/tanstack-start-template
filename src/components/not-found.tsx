@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 
 import { Link } from "@tanstack/react-router";
 
-export function NotFound({ children }: { children?: ReactNode }) {
-  function handleGoBack() {
-    window.history.back();
-  }
+function handleGoBack() {
+  window.history.back();
+}
 
+export function NotFound({ children }: { children?: ReactNode }) {
   return (
     <div className="space-y-2 p-2">
       <div className="text-gray-600 dark:text-gray-400">

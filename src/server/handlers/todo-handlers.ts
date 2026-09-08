@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { createTodoSchema, deleteTodoSchema } from "~/schemas/todo-schemas";
 
-import { useLoggedInAppSession } from "../web-session";
+import { getLoggedInAppSession } from "../web-session";
 import {
   createTodo,
   deleteAllTodos,
@@ -12,7 +12,7 @@ import {
 
 export const getTodosFn = createServerFn({ method: "GET" }).handler(
   async () => {
-    const { user } = await useLoggedInAppSession();
+    const { user } = await getLoggedInAppSession();
 
     return getTodos(user);
   }
@@ -21,7 +21,7 @@ export const getTodosFn = createServerFn({ method: "GET" }).handler(
 export const createTodoFn = createServerFn({ method: "POST" })
   .validator(createTodoSchema)
   .handler(async ({ data }) => {
-    const { user } = await useLoggedInAppSession();
+    const { user } = await getLoggedInAppSession();
 
     return createTodo(user, data.content);
   });
@@ -29,7 +29,7 @@ export const createTodoFn = createServerFn({ method: "POST" })
 export const deleteTodoFn = createServerFn({ method: "POST" })
   .validator(deleteTodoSchema)
   .handler(async ({ data }) => {
-    const { user } = await useLoggedInAppSession();
+    const { user } = await getLoggedInAppSession();
 
     return deleteTodo(user, data.id);
   });
@@ -37,7 +37,7 @@ export const deleteTodoFn = createServerFn({ method: "POST" })
 export const deleteAllTodosFn = createServerFn({
   method: "POST",
 }).handler(async () => {
-  const { user } = await useLoggedInAppSession();
+  const { user } = await getLoggedInAppSession();
 
   return deleteAllTodos(user);
 });

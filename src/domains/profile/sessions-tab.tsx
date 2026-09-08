@@ -26,6 +26,11 @@ interface SessionsTabProps {
   sessions: SessionView[];
 }
 
+const sessionDateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
 function getDeviceName(userAgent: string | null | undefined) {
   if (!userAgent) {
     return "Desktop";
@@ -62,10 +67,7 @@ function DeviceIcon({ userAgent }: { userAgent: string | null | undefined }) {
 }
 
 function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(date));
+  return sessionDateFormatter.format(date);
 }
 
 interface SessionCardProps {

@@ -26,6 +26,7 @@ const fetchCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const Route = createRootRoute({
+  ssr: true,
   beforeLoad: async () => ({
     user: await fetchCurrentUser(),
   }),
@@ -35,6 +36,9 @@ export const Route = createRootRoute({
       <DefaultCatchBoundary {...props} />
     </RootDocument>
   ),
+  loader: ctx => ({
+    user: ctx.context.user,
+  }),
   head: () => ({
     links: [
       { href: appCss, rel: "stylesheet" },
@@ -72,11 +76,7 @@ export const Route = createRootRoute({
       }),
     ],
   }),
-  loader: ctx => ({
-    user: ctx.context.user,
-  }),
   notFoundComponent: () => <NotFound />,
-  ssr: true,
 });
 
 export function useCurrentUser() {
@@ -113,6 +113,7 @@ function RootDocument({
         <HeadContent />
       </head>
       <body className="min-h-screen">
+        {/* oxlint-disable-next-line react-doctor/anchor-target-exists -- #main is rendered by the authenticated route outlet. */}
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-md"

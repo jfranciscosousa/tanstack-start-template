@@ -10,6 +10,17 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
 
+const accountDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: new Intl.DateTimeFormat().resolvedOptions().timeZone,
+});
+
+function formatAccountDate(date: Date | null | undefined) {
+  return date ? accountDateFormatter.format(new Date(date)) : "N/A";
+}
+
 export function ProfileTab() {
   const user = useCurrentUser();
   const router = useRouter();
@@ -121,13 +132,7 @@ export function ProfileTab() {
               <div>
                 <p className="text-xs text-muted-foreground">Member Since</p>
                 <p className="text-sm font-semibold">
-                  {user?.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "N/A"}
+                  {formatAccountDate(user?.createdAt)}
                 </p>
               </div>
             </div>
@@ -138,13 +143,7 @@ export function ProfileTab() {
               <div>
                 <p className="text-xs text-muted-foreground">Last Updated</p>
                 <p className="text-sm font-semibold">
-                  {user?.updatedAt
-                    ? new Date(user.updatedAt).toLocaleDateString("en-US", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "N/A"}
+                  {formatAccountDate(user?.updatedAt)}
                 </p>
               </div>
             </div>

@@ -1,6 +1,16 @@
+import {
+  RECOMMENDED_RULES,
+  TANSTACK_START_RULES,
+} from "oxlint-plugin-react-doctor";
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
+  jsPlugins: [
+    {
+      name: "react-doctor",
+      specifier: "oxlint-plugin-react-doctor",
+    },
+  ],
   options: {},
   categories: {
     correctness: "error",
@@ -78,6 +88,17 @@ export default defineConfig({
   ],
   plugins: ["react", "react-perf", "typescript", "eslint", "import"],
   rules: {
+    ...RECOMMENDED_RULES,
+    ...TANSTACK_START_RULES,
+    "react-doctor/react-compiler-no-manual-memoization": "off",
+    "react-doctor/no-multi-component-file": "off",
+    "react-doctor/anchor-target-exists": "off",
+    "react-doctor/only-export-components": "off",
+    "react-doctor/jsx-no-jsx-as-prop": "off",
+    "react-doctor/jsx-max-depth": "off",
+    "react-doctor/jsx-no-new-array-as-prop": "off",
+    "react-doctor/jsx-no-new-object-as-prop": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
     complexity: ["error", { max: 10 }],
     "eslint/no-unused-vars": [
       "error",
@@ -93,7 +114,7 @@ export default defineConfig({
     "jsx-max-depth": "off",
     "jsx-no-jsx-as-prop": "off",
     "jsx-no-new-array-as-prop": "off",
-    "jsx-no-new-function-as-prop": "off",
+    "react-doctor/jsx-no-new-function-as-prop": "off",
     "jsx-no-new-object-as-prop": "off",
     "max-lines": "off",
     "max-lines-per-function": "off",

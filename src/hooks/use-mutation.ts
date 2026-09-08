@@ -1,3 +1,4 @@
+// oxlint-disable-next-line react-doctor/no-flush-sync -- Mutation state must commit immediately to keep dependent UI stable.
 import { flushSync } from "react-dom";
 import { useCallback, useState } from "react";
 

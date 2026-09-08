@@ -56,7 +56,7 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
 
   return (
     <div className="group break-inside-avoid">
-      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-1 ring-foreground/5 transition-all duration-200 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
+      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-1 ring-foreground/5 transition-[border-color,box-shadow] duration-200 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground/90">
@@ -241,7 +241,7 @@ function RouteComponent() {
         <label htmlFor="todo-content" className="sr-only">
           New task
         </label>
-        <div className="flex overflow-hidden rounded-lg border border-border bg-card shadow-sm ring-1 ring-foreground/5 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary">
+        <div className="flex overflow-hidden rounded-lg border border-border bg-card shadow-sm ring-1 ring-foreground/5 transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-2 focus-within:ring-primary">
           <Input
             id="todo-content"
             name="content"
