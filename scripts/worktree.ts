@@ -97,6 +97,8 @@ async function cmdList() {
   }
 
   let issueCount = 0;
+  let missingWorktreeCount = 0;
+  let configurationIssueCount = 0;
 
   console.log(`Found ${worktrees.length} worktree(s):\n`);
   for (const wt of worktrees) {
@@ -105,13 +107,20 @@ async function cmdList() {
     const port = wt.port ?? DEFAULT_PORT;
 
     const issues: string[] = [];
-    if (!fs.existsSync(wt.path)) issues.push("worktree dir is missing");
-    if (!wt.databaseUrl || !dbName) issues.push("no .env / DATABASE_URL");
-    else if (existingDbs && !existingDbs.has(dbName)) {
+    if (!fs.existsSync(wt.path)) {
+      issues.push("worktree dir is missing");
+      missingWorktreeCount += 1;
+    }
+    if (!wt.databaseUrl || !dbName) {
+      issues.push("no .env / DATABASE_URL");
+      configurationIssueCount += 1;
+    } else if (existingDbs && !existingDbs.has(dbName)) {
       issues.push(`database '${dbName}' does not exist`);
+      configurationIssueCount += 1;
     }
     if ((portCounts.get(port) ?? 0) > 1) {
       issues.push(`port ${port} conflicts with another worktree`);
+      configurationIssueCount += 1;
     }
 
     issueCount += issues.length;
@@ -126,8 +135,16 @@ async function cmdList() {
   }
 
   if (issueCount > 0) {
+    console.log(`⚠️  ${issueCount} issue(s) found.`);
+  }
+  if (missingWorktreeCount > 0) {
     console.log(
-      `⚠️  ${issueCount} issue(s) found. Run \`pnpm worktree cleanup\` to prune orphans.`
+      `Run \`pnpm worktree cleanup\` to prune ${missingWorktreeCount} stale Git worktree record(s).`
+    );
+  }
+  if (configurationIssueCount > 0) {
+    console.log(
+      "Run `pnpm worktree setup` from each affected non-main worktree to provision its .env, database, and port."
     );
   }
 }
