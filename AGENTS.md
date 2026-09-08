@@ -18,5 +18,5 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 - Variables should have clear simple names. Don't: `e`. Do: `event`
 - All source files must use hyphen-case (kebab-case) naming except specific TanStack Router files
-- Don't generate database migrations directly — use `pnpm db generate`
+- Don't apply db changes directly — use `pnpm db generate`
 - Run targeted checks after changing code. Linter, formatters, tests where applicable. Focused, avoid running unrelated tests and checks for unrelated files.
