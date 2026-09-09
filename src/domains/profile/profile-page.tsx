@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export default function ProfilePage() {
   const sessions = Route.useLoaderData();
+  const { tab } = Route.useSearch();
+  const navigate = Route.useNavigate();
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -19,7 +21,17 @@ export default function ProfilePage() {
           </p>
         </div>
 
-        <Tabs defaultValue="profile" className="flex flex-col">
+        <Tabs
+          value={tab}
+          onValueChange={value => {
+            if (value !== "profile" && value !== "sessions") return;
+
+            void navigate({
+              search: current => ({ ...current, tab: value }),
+            });
+          }}
+          className="flex flex-col"
+        >
           <TabsList className="w-full">
             <TabsTrigger value="profile" className="flex-1">
               <User size={16} />

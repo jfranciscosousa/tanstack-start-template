@@ -41,7 +41,25 @@ test("shows login and then redirects to original page", async ({
 }) => {
   await createUserAndLogin(page, screen, "/profile");
 
-  await page.waitForURL("/profile");
+  await page.waitForURL("/profile?tab=profile");
+});
+
+test("drives profile tabs from URL state", async ({ page, screen }) => {
+  await createUserAndLogin(page, screen, "/profile?tab=sessions");
+
+  await page.waitForURL("/profile?tab=sessions");
+  await expect(page.getByRole("tab", { name: /sessions/i })).toHaveAttribute(
+    "aria-selected",
+    "true"
+  );
+
+  await page.getByRole("tab", { name: "Profile" }).click();
+  await page.waitForURL("/profile?tab=profile");
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Profile" })).toHaveAttribute(
+    "aria-selected",
+    "true"
+  );
 });
 
 test("logs out and drops user on login page", async ({ page, screen }) => {

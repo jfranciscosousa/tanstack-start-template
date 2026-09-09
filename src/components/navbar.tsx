@@ -19,7 +19,11 @@ import {
 import { Button } from "~/components/ui/button";
 
 const profileLink = (
-  <Link to="/profile" className="flex w-full items-center gap-2">
+  <Link
+    to="/profile"
+    search={{ tab: "profile" }}
+    className="flex w-full items-center gap-2"
+  >
     <Settings size={14} aria-hidden="true" />
     Edit Profile
   </Link>
