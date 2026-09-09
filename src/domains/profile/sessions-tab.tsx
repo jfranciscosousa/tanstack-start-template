@@ -14,6 +14,7 @@ import type { SessionView } from "~/server/handlers/session-handlers";
 
 import { revokeSession } from "~/server/handlers/session-handlers";
 import { cn } from "~/lib/utils";
+import { formatDate } from "~/lib/date";
 import { useMutation } from "~/hooks/use-mutation";
 import { renderError } from "~/errors";
 import { Card, CardContent } from "~/components/ui/card";
@@ -25,11 +26,6 @@ import { Alert, AlertDescription } from "~/components/ui/alert";
 interface SessionsTabProps {
   sessions: SessionView[];
 }
-
-const sessionDateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
 
 function getDeviceName(userAgent: string | null | undefined) {
   if (!userAgent) {
@@ -64,10 +60,6 @@ function DeviceIcon({ userAgent }: { userAgent: string | null | undefined }) {
     return <Tablet size={24} />;
   }
   return <Monitor size={24} />;
-}
-
-function formatDate(date: Date) {
-  return sessionDateFormatter.format(date);
 }
 
 interface SessionCardProps {
@@ -114,7 +106,9 @@ function SessionCard({ session, onRevoke, isRevoking }: SessionCardProps) {
                 )}
                 <div className="flex items-center gap-2">
                   <Clock size={14} />
-                  <span>Last active: {formatDate(session.updatedAt)}</span>
+                  <span>
+                    Last active: {formatDate(session.updatedAt, "date-time")}
+                  </span>
                 </div>
               </div>
             </div>

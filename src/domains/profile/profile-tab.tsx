@@ -6,20 +6,10 @@ import { useRouter } from "@tanstack/react-router";
 import { updateUserFn } from "~/server/handlers/user-handlers";
 import { updateUserSchema } from "~/schemas/user-schemas";
 import { useCurrentUser } from "~/routes/__root";
+import { formatDate } from "~/lib/date";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
-
-const accountDateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: new Intl.DateTimeFormat().resolvedOptions().timeZone,
-});
-
-function formatAccountDate(date: Date | null | undefined) {
-  return date ? accountDateFormatter.format(new Date(date)) : "N/A";
-}
 
 export function ProfileTab() {
   const user = useCurrentUser();
@@ -132,7 +122,7 @@ export function ProfileTab() {
               <div>
                 <p className="text-xs text-muted-foreground">Member Since</p>
                 <p className="text-sm font-semibold">
-                  {formatAccountDate(user?.createdAt)}
+                  {formatDate(user?.createdAt, "long-date")}
                 </p>
               </div>
             </div>
@@ -143,7 +133,7 @@ export function ProfileTab() {
               <div>
                 <p className="text-xs text-muted-foreground">Last Updated</p>
                 <p className="text-sm font-semibold">
-                  {formatAccountDate(user?.updatedAt)}
+                  {formatDate(user?.updatedAt, "long-date")}
                 </p>
               </div>
             </div>

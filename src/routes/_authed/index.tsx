@@ -11,6 +11,7 @@ import {
   deleteTodoFn,
   getTodosFn,
 } from "~/server/handlers/todo-handlers";
+import { formatDate } from "~/lib/date";
 import { APP_NAME } from "~/lib/app-config.js";
 import { useMutation } from "~/hooks/use-mutation";
 import { Input } from "~/components/ui/input";
@@ -63,13 +64,7 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
               {todo.content}
             </p>
             <time className="mt-2.5 block font-mono text-[11px] tracking-wide text-muted-foreground/60 uppercase">
-              {new Date(todo.createdAt).toLocaleDateString(undefined, {
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
+              {formatDate(todo.createdAt, "date-time")}
             </time>
           </div>
           <Button
