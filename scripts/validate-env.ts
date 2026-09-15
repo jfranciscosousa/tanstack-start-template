@@ -1,5 +1,9 @@
-console.log("✅ Validating environment configuration...");
+// Validates environment configuration via Varlock (.env.schema).
+// Usage: pnpm validate-env [-- <varlock load flags>]
+// Override per command: APP_ENV=production pnpm validate-env
 
-// TODO: pnpm tsx tasks/validateConfig.ts
+$.stdio = "inherit";
 
-console.log("✅ Environment validation completed successfully!");
+const args = process.argv.slice(2);
+
+await $`pnpm exec varlock load ${args}`;

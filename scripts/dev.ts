@@ -1,6 +1,9 @@
+import { codegenEnvTypes } from "./helpers/varlock-codegen.ts";
 import { loadEnv } from "./helpers/env.ts";
 
 loadEnv();
+
+await codegenEnvTypes();
 
 $.stdio = "inherit";
 
