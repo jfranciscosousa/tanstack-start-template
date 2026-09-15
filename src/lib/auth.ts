@@ -6,7 +6,11 @@ import * as schema from "~/server/db/schema";
 import { db } from "~/server/db";
 
 function appUrl() {
-  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  // VERCEL_URL is the current deployment hostname (preview host on previews,
+  // Production host in production). VERCEL_PROJECT_PRODUCTION_URL is always
+  // The production hostname, so it serves only as fallback.
+  const vercelUrl =
+    process.env.VERCEL_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
 
   if (vercelUrl) return `https://${vercelUrl}`;
 
