@@ -4,9 +4,9 @@ import type { ComponentPropsWithRef } from "react";
 
 import { useRef } from "react";
 import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react";
+import { cn } from "cn";
 import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 
-import { cn } from "~/lib/utils";
 import {
   InputGroup,
   InputGroupAddon,

@@ -4,9 +4,9 @@ import type { ComponentProps, ReactNode } from "react";
 import type { VariantProps } from "class-variance-authority";
 
 import { useMemo } from "react";
+import { cn } from "cn";
 import { cva } from "class-variance-authority";
 
-import { cn } from "~/lib/utils";
 import { Separator } from "~/components/ui/separator";
 import { Label } from "~/components/ui/label";
 

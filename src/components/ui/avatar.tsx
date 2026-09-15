@@ -1,8 +1,7 @@
 import type { ComponentProps } from "react";
 
+import { cn } from "cn";
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
-
-import { cn } from "~/lib/utils";
 
 type AvatarVariant =
   | "default"
