@@ -24,6 +24,7 @@ export const createTodo = createServerOnlyFn(
       .insert(todos)
       .values({
         content,
+        createdAt: new Date(),
         userId: user.id,
       })
       .returning();

@@ -35,6 +35,7 @@ test("deletes todos", async ({ page, screen }) => {
 
   const notesCountBefore = await getNotesLength(page);
   await page.locator(".break-inside-avoid button").first().click();
+  await page.getByRole("button", { name: "Delete", exact: true }).click();
 
   await waitFor(async () =>
     expect(await getNotesLength(page)).toBe(notesCountBefore - 1)

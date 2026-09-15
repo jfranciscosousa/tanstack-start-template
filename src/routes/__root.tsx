@@ -17,6 +17,7 @@ import { auth } from "~/lib/auth";
 import { APP_NAME } from "~/lib/app-config.js";
 import { AppError } from "~/errors";
 import { NotFound } from "~/components/not-found.js";
+import { Navbar } from "~/components/navbar.js";
 import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
 
 const fetchCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
@@ -76,7 +77,7 @@ export const Route = createRootRoute({
       }),
     ],
   }),
-  notFoundComponent: () => <NotFound />,
+  notFoundComponent: RootNotFound,
 });
 
 export function useCurrentUser() {
@@ -97,6 +98,19 @@ function RootComponent() {
     <RootDocument theme={theme}>
       <Outlet />
     </RootDocument>
+  );
+}
+
+function RootNotFound() {
+  const { user } = Route.useRouteContext();
+
+  return (
+    <div className="min-h-screen">
+      {user && <Navbar user={user} />}
+      <main id="main" className="py-6">
+        <NotFound />
+      </main>
+    </div>
   );
 }
 

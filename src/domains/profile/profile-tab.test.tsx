@@ -102,13 +102,29 @@ describe("profileTab", () => {
     });
   });
 
-  it("navigates to home when the cancel button is clicked", async () => {
+  it("resets the form without navigating when cancel is clicked", async () => {
     const user = userEvent.setup();
     render(<ProfileTab />);
 
+    const nameInput = screen.getByLabelText("Full Name");
+    const currentPasswordInput = screen.getByLabelText("Current Password");
+    const passwordInput = screen.getByLabelText("New Password");
+    const passwordConfirmationInput = screen.getByLabelText(
+      "Confirm New Password"
+    );
+
+    await user.clear(nameInput);
+    await user.type(nameInput, "Jane Doe");
+    await user.type(currentPasswordInput, "oldpass");
+    await user.type(passwordInput, "newpass123");
+    await user.type(passwordConfirmationInput, "newpass123");
     await user.click(screen.getByRole("button", { name: /cancel/i }));
 
-    expect(mockNavigate).toHaveBeenCalledWith({ to: "/" });
+    expect(nameInput).toHaveValue("John Doe");
+    expect(currentPasswordInput).toHaveValue("");
+    expect(passwordInput).toHaveValue("");
+    expect(passwordConfirmationInput).toHaveValue("");
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it("blocks submission and shows an error when passwords do not match", async () => {

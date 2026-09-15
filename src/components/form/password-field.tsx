@@ -76,7 +76,7 @@ export function PasswordField({
           <InputGroupButton
             size="icon-xs"
             onClick={handleToggle}
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-label={`${showPassword ? "Hide" : "Show"} password for ${label}`}
           >
             {showPassword ? (
               <EyeOff size={14} aria-hidden="true" />

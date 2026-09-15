@@ -63,10 +63,14 @@ describe("todo service", () => {
   describe("createTodo", () => {
     it("should create a todo and return it", async () => {
       const content = faker.lorem.sentence();
+      const beforeCreate = Date.now();
 
       const todo = await createTodo(testUser, content);
+      const afterCreate = Date.now();
 
       expect(todo.content).toBe(content);
+      expect(todo.createdAt.getTime()).toBeGreaterThanOrEqual(beforeCreate);
+      expect(todo.createdAt.getTime()).toBeLessThanOrEqual(afterCreate);
       expect(todo.userId).toBe(testUser.id);
     });
 

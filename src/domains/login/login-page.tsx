@@ -98,7 +98,8 @@ export default function LoginPage() {
             search={{ redirectUrl }}
             className={buttonVariants({
               variant: "link",
-              className: "h-auto p-0 text-sm text-primary",
+              className:
+                "h-auto p-0 text-sm text-primary dark:text-primary-foreground",
             })}
           >
             <UserPlus size={14} aria-hidden="true" />

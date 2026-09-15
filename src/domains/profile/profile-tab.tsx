@@ -95,7 +95,7 @@ export function ProfileTab() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => void router.navigate({ to: "/" })}
+                      onClick={() => form.reset()}
                     >
                       Cancel
                     </Button>

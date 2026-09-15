@@ -51,7 +51,7 @@ function UserMonogram({
 
   return (
     <div
-      className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30"
+      className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30 dark:text-primary-foreground"
       aria-hidden="true"
     >
       <span className="text-xs leading-none font-semibold">{initials}</span>

@@ -1,14 +1,20 @@
+import { useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 
 import { signUpSchema } from "~/schemas/user-schemas";
 import { Route } from "~/routes/_unauthed/signup";
 import { authClient } from "~/lib/auth-client";
 import { Button, buttonVariants } from "~/components/ui/button";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Form } from "~/components/form/form";
+
+const DUPLICATE_EMAIL_ERROR_CODE = "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL";
+const DUPLICATE_EMAIL_ERROR_MESSAGE = "User already exists. Use another email.";
 
 export default function SignupPage() {
   const { redirectUrl } = Route.useSearch();
   const router = useRouter();
+  const [hasDuplicateEmail, setHasDuplicateEmail] = useState(false);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
@@ -88,11 +94,19 @@ export default function SignupPage() {
               },
             ]}
             onSubmit={async values => {
+              setHasDuplicateEmail(false);
               const { error } = await authClient.signUp.email({
                 name: values.name,
                 email: values.email,
                 password: values.password,
               });
+              if (
+                error?.code === DUPLICATE_EMAIL_ERROR_CODE ||
+                error?.message === DUPLICATE_EMAIL_ERROR_MESSAGE
+              ) {
+                setHasDuplicateEmail(true);
+                return;
+              }
               if (error) throw new Error(error.message);
               await router.invalidate();
               await router.navigate({ to: "/" });
@@ -111,6 +125,20 @@ export default function SignupPage() {
               </form.Subscribe>
             )}
           />
+          {hasDuplicateEmail && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>
+                An account with this email already exists.{" "}
+                <Link
+                  to="/login"
+                  search={{ redirectUrl }}
+                  className="underline underline-offset-4"
+                >
+                  Sign in instead.
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         {/* Sign in link */}
@@ -121,7 +149,8 @@ export default function SignupPage() {
             search={{ redirectUrl }}
             className={buttonVariants({
               variant: "link",
-              className: "h-auto p-0 text-sm text-primary",
+              className:
+                "h-auto p-0 text-sm text-primary dark:text-primary-foreground",
             })}
           >
             Sign in

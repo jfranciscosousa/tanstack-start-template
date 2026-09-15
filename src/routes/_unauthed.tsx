@@ -6,5 +6,9 @@ export const Route = createFileRoute("/_unauthed")({
       throw redirect({ to: "/" });
     }
   },
-  component: () => <Outlet />,
+  component: () => (
+    <main id="main">
+      <Outlet />
+    </main>
+  ),
 });

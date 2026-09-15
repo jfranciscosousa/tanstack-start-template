@@ -1,32 +1,42 @@
 import type { ReactNode } from "react";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 
-function handleGoBack() {
-  window.history.back();
-}
+import { buttonVariants } from "~/components/ui/button";
 
 export function NotFound({ children }: { children?: ReactNode }) {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+
+  function handleGoBack() {
+    if (canGoBack && window.history.length > 1) {
+      router.history.back();
+      return;
+    }
+
+    void router.navigate({ to: "/" });
+  }
+
   return (
-    <div className="space-y-2 p-2">
-      <div className="text-gray-600 dark:text-gray-400">
+    <div className="container mx-auto max-w-5xl px-5 py-8">
+      <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
+        Page not found
+      </h1>
+      <div className="mt-2 text-sm text-muted-foreground">
         {children || <p>The page you are looking for does not exist.</p>}
       </div>
-      <p className="flex flex-wrap items-center gap-2">
+      <div className="mt-6 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={handleGoBack}
-          className="rounded bg-emerald-500 px-2 py-1 text-sm font-black text-white uppercase"
+          className={buttonVariants()}
         >
           Go back
         </button>
-        <Link
-          to="/"
-          className="rounded bg-cyan-600 px-2 py-1 text-sm font-black text-white uppercase"
-        >
-          Start Over
+        <Link to="/" className={buttonVariants({ variant: "outline" })}>
+          Back to tasks
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

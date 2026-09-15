@@ -115,9 +115,12 @@ describe("signupPage", () => {
     });
   });
 
-  it("shows a server error alert when the signup function throws", async () => {
+  it("shows a sign-in link when the email already exists", async () => {
     mockSignUp.mockResolvedValueOnce({
-      error: { message: "Email already taken" },
+      error: {
+        code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+        message: "User already exists. Use another email.",
+      },
     });
     const user = userEvent.setup();
     render(<SignupPage />);
@@ -125,7 +128,28 @@ describe("signupPage", () => {
     await fillAndSubmit(user);
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "An account with this email already exists. Sign in instead."
+      );
+    });
+    expect(
+      screen.getByRole("link", { name: "Sign in instead." })
+    ).toHaveAttribute("href", "/login");
+  });
+
+  it("keeps other signup errors generic", async () => {
+    mockSignUp.mockResolvedValueOnce({
+      error: { code: "UNKNOWN_ERROR", message: "Sensitive server details" },
+    });
+    const user = userEvent.setup();
+    render(<SignupPage />);
+
+    await fillAndSubmit(user);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "An unexpected error occurred."
+      );
     });
   });
 });

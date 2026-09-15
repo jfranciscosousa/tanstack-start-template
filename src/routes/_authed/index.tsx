@@ -56,31 +56,58 @@ function TodoCard({ todo, onDelete, disabled }: TodoCardProps) {
   }
 
   return (
-    <div className="group break-inside-avoid">
-      <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-1 ring-foreground/5 transition-[border-color,box-shadow] duration-200 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
-        <div className="flex items-start gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground/90">
-              {todo.content}
-            </p>
-            <time className="mt-2.5 block font-mono text-[11px] tracking-wide text-muted-foreground/60 uppercase">
-              {formatDate(todo.createdAt, "date-time")}
-            </time>
+    <DialogRoot>
+      <div className="group break-inside-avoid">
+        <div className="rounded-lg border border-border/60 bg-card p-4 shadow-sm ring-1 ring-foreground/5 transition-[border-color,box-shadow] duration-200 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground/90">
+                {todo.content}
+              </p>
+              <time className="mt-2.5 block font-mono text-[11px] tracking-wide text-muted-foreground uppercase dark:text-muted-foreground/80">
+                {formatDate(todo.createdAt, "date-time")}
+              </time>
+            </div>
+            <DialogTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  disabled={disabled}
+                  aria-label={`Delete task: ${todo.content}`}
+                  className="mt-0.5 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 size={13} aria-hidden="true" />
+                </Button>
+              }
+            />
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            onClick={handleDelete}
-            disabled={disabled}
-            aria-label="Delete task"
-            className="mt-0.5 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-          >
-            <Trash2 size={13} aria-hidden="true" />
-          </Button>
         </div>
       </div>
-    </div>
+      <DialogContent>
+        <DialogTitle>Delete task?</DialogTitle>
+        <DialogDescription>
+          This will permanently delete this task. This cannot be undone.
+        </DialogDescription>
+        <div className="mt-6 flex justify-end gap-3">
+          <DialogClose render={cancelButton} />
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            disabled={disabled}
+          >
+            {disabled ? (
+              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Trash2 size={14} aria-hidden="true" />
+            )}
+            Delete
+          </Button>
+        </div>
+      </DialogContent>
+    </DialogRoot>
   );
 }
 
