@@ -34,7 +34,7 @@ test("updates profile", async ({ page, screen }) => {
   await page.goto("/profile");
   await page.getByLabel("Full Name").fill(newName);
   await page.locator("#password").fill(newPassword);
-  await page.getByLabel("Confirm New Password").fill(newPassword);
+  await page.locator("#passwordConfirmation").fill(newPassword);
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
@@ -102,7 +102,7 @@ test("does not update profile if password confirmation does not match", async ({
 
   await page.goto("/profile");
   await page.locator("#password").fill(newPassword);
-  await page.getByLabel("Confirm New Password").fill(`${newPassword}bad`);
+  await page.locator("#passwordConfirmation").fill(`${newPassword}bad`);
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
