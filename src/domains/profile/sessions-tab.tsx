@@ -7,13 +7,13 @@ import {
   Smartphone,
   Tablet,
 } from "lucide-react";
+import { cn } from "cn";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouter } from "@tanstack/react-router";
 
 import type { SessionView } from "~/server/handlers/session-handlers";
 
 import { revokeSession } from "~/server/handlers/session-handlers";
-import { cn } from "~/lib/utils";
 import { formatDate } from "~/lib/date";
 import { useMutation } from "~/hooks/use-mutation";
 import { renderError } from "~/errors";

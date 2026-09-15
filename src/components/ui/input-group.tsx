@@ -1,9 +1,9 @@
 import type { ComponentProps } from "react";
 import type { VariantProps } from "class-variance-authority";
 
+import { cn } from "cn";
 import { cva } from "class-variance-authority";
 
-import { cn } from "~/lib/utils";
 import { Textarea } from "~/components/ui/textarea";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";

@@ -1,9 +1,9 @@
 import type { ComponentProps } from "react";
 
 import { XIcon } from "lucide-react";
+import { cn } from "cn";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
-import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
