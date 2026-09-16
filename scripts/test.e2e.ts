@@ -5,6 +5,7 @@ import { existsSync } from "fs";
 import { loadEnv } from "./helpers/env.ts";
 
 process.env.NODE_ENV = "test";
+process.env.APP_ENV ??= "test";
 
 if (!process.env.CI && !existsSync(".env.test")) {
   console.error(
@@ -13,7 +14,7 @@ if (!process.env.CI && !existsSync(".env.test")) {
   process.exit(1);
 }
 
-loadEnv();
+await loadEnv();
 
 const args = process.argv.slice(3);
 const useUI = args.includes("--ui");

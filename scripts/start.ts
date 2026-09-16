@@ -4,7 +4,7 @@ import { existsSync } from "fs";
 
 import { loadEnv } from "./helpers/env.ts";
 
-loadEnv();
+await loadEnv();
 
 const SERVER_FILE = ".output/server/index.mjs";
 

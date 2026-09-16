@@ -1,6 +1,6 @@
 import { loadEnv } from "./helpers/env.ts";
 
-loadEnv();
+await loadEnv();
 
 const args = process.argv.slice(3);
 

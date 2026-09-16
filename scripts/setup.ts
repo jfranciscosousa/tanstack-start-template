@@ -1,6 +1,26 @@
 #!/usr/bin/env pnpm zx
 
+import { readFile, writeFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+
 const TEMPLATE_NAME = "tanstack-start-template";
+
+async function updateEnvFile(filePath: string, values: Record<string, string>) {
+  let content = await readFile(filePath, "utf8");
+
+  for (const [key, value] of Object.entries(values)) {
+    const line = `${key}=${value}`;
+    const pattern = new RegExp(`^${key}=.*$`, "m");
+
+    if (pattern.test(content)) {
+      content = content.replace(pattern, () => line);
+    } else {
+      content = `${content.trimEnd()}\n${line}\n`;
+    }
+  }
+
+  await writeFile(filePath, content);
+}
 
 console.log("🚀 Setting up TanStack Start project...");
 
@@ -50,11 +70,20 @@ const base = db_password
 const dev_db_url = `${base}/${dev_db_name}`;
 const test_db_url = `${base}/${test_db_name}`;
 
-// Update .env files with database URLs
-await $`sed -i '' "s|DATABASE_URL=.*|DATABASE_URL=${dev_db_url}|g" .env`;
-await $`sed -i '' "s|DATABASE_URL=.*|DATABASE_URL=${test_db_url}|g" .env.test`;
+const authSecret = randomBytes(32).toString("base64url");
 
-console.log("✅ Environment files configured with database URLs");
+await updateEnvFile(".env", {
+  DATABASE_URL: dev_db_url,
+  BETTER_AUTH_SECRET: authSecret,
+  BETTER_AUTH_URL: "http://localhost:3000",
+});
+await updateEnvFile(".env.test", {
+  DATABASE_URL: test_db_url,
+  BETTER_AUTH_SECRET: authSecret,
+  BETTER_AUTH_URL: "http://localhost:3001",
+});
+
+console.log("✅ Environment files configured");
 
 // Install dependencies
 console.log("\n📦 Installing dependencies...");

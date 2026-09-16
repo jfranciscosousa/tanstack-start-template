@@ -119,6 +119,12 @@
       "sourceType": "well-known",
       "computedHash": "1639ebcb462bd06ccecf51428cb69f5cd8a5ff306393ccb4ff1ae7a1f21cb699"
     },
+    "varlock": {
+      "source": "dmno-dev/varlock",
+      "sourceType": "github",
+      "skillPath": "skills/varlock/SKILL.md",
+      "computedHash": "604928d00a1369739dd4a65511cf70ac546b094b4ede5996b01fc2a2782e6438"
+    },
     "wait-what": {
       "source": "mattpocock/skills",
       "sourceType": "github",

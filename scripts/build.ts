@@ -1,6 +1,6 @@
-import { loadEnv } from "./helpers/env.ts";
+import { envPreflight } from "./helpers/env-preflight.ts";
 
-loadEnv();
+await envPreflight();
 
 console.log("🔨 Building TanStack Start application...");
 

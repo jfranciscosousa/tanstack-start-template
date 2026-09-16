@@ -47,6 +47,7 @@
     "react-dom": "^19.2.8",
     "shadcn": "^4.21.0",
     "sonner": "^2.0.8",
+    "varlock": "^1.19.0",
     "zod": "^4.5.4",
     "zod-form-data": "^3.0.3"
   },
@@ -62,8 +63,8 @@
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "@varlock/vite-integration": "^1.5.2",
     "@vitejs/plugin-react": "6.1.1",
-    "dotenv": "^17.4.2",
     "drizzle-kit": "1.0.0-rc.2-203eab8",
     "happy-dom": "^20.14.0",
     "husky": "^9.1.7",

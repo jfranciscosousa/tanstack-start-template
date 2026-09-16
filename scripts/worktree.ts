@@ -303,7 +303,13 @@ async function provisionWorktree({
   await cloneNodeModules(sourcePath, targetPath);
 
   console.log(`📄 Writing .env...`);
-  writeWorktreeEnv(targetPath, mainEnv, { newDbUrl, newPort });
+  writeWorktreeEnv({
+    sourcePath,
+    worktreePath: targetPath,
+    mainEnv,
+    newDbUrl,
+    newPort,
+  });
 }
 
 async function cmdDelete(name: string) {
@@ -498,31 +504,39 @@ async function cloneNodeModules(from: string, to: string) {
   }
 }
 
-function writeWorktreeEnv(
-  worktreePath: string,
-  mainEnv: Record<string, string>,
-  overrides: { newDbUrl: string; newPort: number }
-) {
+function writeWorktreeEnv({
+  sourcePath,
+  worktreePath,
+  mainEnv,
+  newDbUrl,
+  newPort,
+}: {
+  sourcePath: string;
+  worktreePath: string;
+  mainEnv: Record<string, string>;
+  newDbUrl: string;
+  newPort: number;
+}) {
   const envPath = path.join(worktreePath, ".env");
-  const sourceEnvPath = path.join(repoRoot, ".env");
+  const sourceEnvPath = path.join(sourcePath, ".env");
   let content = fs.readFileSync(sourceEnvPath, "utf8");
 
   content = content.replace(
     /^DATABASE_URL=.*$/m,
-    `DATABASE_URL=${overrides.newDbUrl}`
+    () => `DATABASE_URL=${newDbUrl}`
   );
 
   if (/^PORT=/m.test(content)) {
-    content = content.replace(/^PORT=.*$/m, `PORT=${overrides.newPort}`);
+    content = content.replace(/^PORT=.*$/m, () => `PORT=${newPort}`);
   } else {
-    content = `${content.trimEnd()}\nPORT=${overrides.newPort}\n`;
+    content = `${content.trimEnd()}\nPORT=${newPort}\n`;
   }
 
-  const newAuthUrl = `http://localhost:${overrides.newPort}`;
+  const newAuthUrl = `http://localhost:${newPort}`;
   if (mainEnv.BETTER_AUTH_URL) {
     content = content.replace(
       /^BETTER_AUTH_URL=.*$/m,
-      `BETTER_AUTH_URL=${newAuthUrl}`
+      () => `BETTER_AUTH_URL=${newAuthUrl}`
     );
   }
 

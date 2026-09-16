@@ -1,7 +1,3 @@
-import { loadEnv } from "./helpers/env.ts";
-
-loadEnv();
-
 const DEFAULT_PATHS = ["src", "scripts"];
 
 const args = process.argv.slice(3);

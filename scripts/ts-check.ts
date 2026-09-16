@@ -1,6 +1,6 @@
-import { loadEnv } from "./helpers/env.ts";
+import { codegenEnvTypes } from "./helpers/varlock-codegen.ts";
 
-loadEnv();
+await codegenEnvTypes();
 
 const args = process.argv.slice(3);
 const useWatch = args.includes("--watch");

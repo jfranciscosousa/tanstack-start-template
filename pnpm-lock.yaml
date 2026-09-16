@@ -175,6 +175,9 @@ importers:
       sonner:
         specifier: ^2.0.8
         version: 2.0.8(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      varlock:
+        specifier: ^1.19.0
+        version: 1.19.0
       zod:
         specifier: ^4.5.4
         version: 4.5.4
@@ -215,12 +218,12 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.7
         version: 19.2.7(@types/react@19.2.18)
+      '@varlock/vite-integration':
+        specifier: ^1.5.2
+        version: 1.5.2(varlock@1.19.0)(vite@8.2.2(@types/node@26.4.1)(jiti@2.7.0)(yaml@2.9.0))
       '@vitejs/plugin-react':
         specifier: 6.1.1
         version: 6.1.1(oxc-transform-react@0.148.0)(vite@8.2.2(@types/node@26.4.1)(jiti@2.7.0)(yaml@2.9.0))
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
       drizzle-kit:
         specifier: 1.0.0-rc.2-203eab8
         version: 1.0.0-rc.2-203eab8
@@ -1930,6 +1933,31 @@ packages:
     engines: {node: '>=16.20.0'}
     cpu: [x64]
     os: [win32]
+
+  '@varlock/native-helper-darwin@1.19.0':
+    resolution: {integrity: sha512-T8BxBz7SLTaEi/lYzn08HBc5f4Ko4wHnn8uKqO41obeFSPIiawMACV+DBtwrAILpMORMHEdGl1IUgkd/gYJDXQ==}
+    os: [darwin]
+
+  '@varlock/native-helper-linux-arm64@1.19.0':
+    resolution: {integrity: sha512-w0xJGQGqEbBDP/s6bjkI9O0QYjBfbGwecsIZ/izb7VswOrSCt8s17VRl+aOsm+ATROT4Mk73C/6hr3rZwg+QDw==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@varlock/native-helper-linux-x64@1.19.0':
+    resolution: {integrity: sha512-stFot27mctUCAIDnfTtNsUyuariltvNbLKdOLCqn9Re7ksH6QYYyzE2R0bPR8jJZSjOpuhSYA4IHZf/ryRPKuA==}
+    cpu: [x64]
+    os: [linux]
+
+  '@varlock/native-helper-win32-x64@1.19.0':
+    resolution: {integrity: sha512-3xtFmb9Ho4z4PwQCOo3RF5kgLWX5sj/7y8y0ZnjGbQptJBj4+tJC9tY7rHFuhK3nHhiPFS+f232lsyVSHj1Y7w==}
+    os: [win32, linux]
+
+  '@varlock/vite-integration@1.5.2':
+    resolution: {integrity: sha512-N46rTE/D/vVL780savwRDUgTX66T959se/JD7ZZjcOLlJtSYl9ecROL+s27o4vuIskDbh/ouyqYq4TX3a0tshQ==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      varlock: ^1.19.0
+      vite: '>=5'
 
   '@vitejs/plugin-react@6.1.1':
     resolution: {integrity: sha512-yxLaQV9gkhS8ezJqCM6+ndU7mDY6gqAg75NQ+0IjwEI8IYOmQCgkRwHKVSfWXW076DsqMo0Dk+0FK1U+M5RgFw==}
@@ -3932,6 +3960,11 @@ packages:
     resolution: {integrity: sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
+  varlock@1.19.0:
+    resolution: {integrity: sha512-AWXBRJq38E/ETuTCsa503iV5Eg4N54ZbbgTr0hdyNHA5XMDsMFOmNzzko0t5aj+KtVlaH/T7dH0MdPZJ0lIYNg==}
+    engines: {bun: '>=1.3.3', node: '>=22.3.0'}
+    hasBin: true
+
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
@@ -5426,6 +5459,23 @@ snapshots:
 
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
+
+  '@varlock/native-helper-darwin@1.19.0':
+    optional: true
+
+  '@varlock/native-helper-linux-arm64@1.19.0':
+    optional: true
+
+  '@varlock/native-helper-linux-x64@1.19.0':
+    optional: true
+
+  '@varlock/native-helper-win32-x64@1.19.0':
+    optional: true
+
+  '@varlock/vite-integration@1.5.2(varlock@1.19.0)(vite@8.2.2(@types/node@26.4.1)(jiti@2.7.0)(yaml@2.9.0))':
+    dependencies:
+      varlock: 1.19.0
+      vite: 8.2.2(@types/node@26.4.1)(jiti@2.7.0)(yaml@2.9.0)
 
   '@vitejs/plugin-react@6.1.1(oxc-transform-react@0.148.0)(vite@8.2.2(@types/node@26.4.1)(jiti@2.7.0)(yaml@2.9.0))':
     dependencies:
@@ -7117,6 +7167,13 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   validate-npm-package-name@7.0.2: {}
+
+  varlock@1.19.0:
+    optionalDependencies:
+      '@varlock/native-helper-darwin': 1.19.0
+      '@varlock/native-helper-linux-arm64': 1.19.0
+      '@varlock/native-helper-linux-x64': 1.19.0
+      '@varlock/native-helper-win32-x64': 1.19.0
 
   vary@1.1.2: {}
 
