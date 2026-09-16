@@ -1,4 +1,3 @@
-import { Toaster } from "sonner";
 import { getRequest } from "@tanstack/react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -16,6 +15,7 @@ import { seo } from "~/server/seo.js";
 import { auth } from "~/lib/auth";
 import { APP_NAME } from "~/lib/app-config.js";
 import { AppError } from "~/errors";
+import { Toaster } from "~/components/ui/sonner.js";
 import { NotFound } from "~/components/not-found.js";
 import { Navbar } from "~/components/navbar.js";
 import { DefaultCatchBoundary } from "~/components/default-catch-boundary.js";
@@ -134,7 +134,7 @@ function RootDocument({
         >
           Skip to main content
         </a>
-        <Toaster />
+        <Toaster theme={theme} />
 
         {children}
 
