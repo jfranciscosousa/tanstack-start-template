@@ -6,6 +6,7 @@ import { defineConfig } from "oxlint";
 
 export default defineConfig({
   jsPlugins: [
+    "@shadcn/lint",
     {
       name: "react-doctor",
       specifier: "oxlint-plugin-react-doctor",
@@ -116,6 +117,9 @@ export default defineConfig({
     "jsx-no-new-array-as-prop": "off",
     "react-doctor/jsx-no-new-function-as-prop": "off",
     "jsx-no-new-object-as-prop": "off",
+    "shadcn/no-inline-styles": "error",
+    "shadcn/no-unknown-classes": "error",
+    "shadcn/require-static-classes": "error",
     "max-lines": "off",
     "max-lines-per-function": "off",
     "max-statements": "off",
