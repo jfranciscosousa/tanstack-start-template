@@ -1,6 +1,6 @@
-import { envPreflight } from "./helpers/env-preflight.ts";
+import { codegenEnvTypes } from "./helpers/varlock-codegen.ts";
 
-await envPreflight();
+await codegenEnvTypes();
 
 const args = process.argv.slice(3);
 const useWatch = args.includes("--watch");

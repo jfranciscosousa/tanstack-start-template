@@ -9,10 +9,14 @@ async function updateEnvFile(filePath: string, values: Record<string, string>) {
   let content = await readFile(filePath, "utf8");
 
   for (const [key, value] of Object.entries(values)) {
-    content = content.replace(
-      new RegExp(`^${key}=.*$`, "m"),
-      () => `${key}=${value}`
-    );
+    const line = `${key}=${value}`;
+    const pattern = new RegExp(`^${key}=.*$`, "m");
+
+    if (pattern.test(content)) {
+      content = content.replace(pattern, () => line);
+    } else {
+      content = `${content.trimEnd()}\n${line}\n`;
+    }
   }
 
   await writeFile(filePath, content);

@@ -521,10 +521,13 @@ function writeWorktreeEnv({
   const sourceEnvPath = path.join(sourcePath, ".env");
   let content = fs.readFileSync(sourceEnvPath, "utf8");
 
-  content = content.replace(/^DATABASE_URL=.*$/m, `DATABASE_URL=${newDbUrl}`);
+  content = content.replace(
+    /^DATABASE_URL=.*$/m,
+    () => `DATABASE_URL=${newDbUrl}`
+  );
 
   if (/^PORT=/m.test(content)) {
-    content = content.replace(/^PORT=.*$/m, `PORT=${newPort}`);
+    content = content.replace(/^PORT=.*$/m, () => `PORT=${newPort}`);
   } else {
     content = `${content.trimEnd()}\nPORT=${newPort}\n`;
   }
@@ -533,7 +536,7 @@ function writeWorktreeEnv({
   if (mainEnv.BETTER_AUTH_URL) {
     content = content.replace(
       /^BETTER_AUTH_URL=.*$/m,
-      `BETTER_AUTH_URL=${newAuthUrl}`
+      () => `BETTER_AUTH_URL=${newAuthUrl}`
     );
   }
 

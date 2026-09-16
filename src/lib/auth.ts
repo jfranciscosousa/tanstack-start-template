@@ -6,11 +6,14 @@ import * as schema from "~/server/db/schema";
 import { db } from "~/server/db";
 
 function appUrl() {
-  // VERCEL_URL is the current deployment hostname (preview host on previews,
-  // Production host in production). VERCEL_PROJECT_PRODUCTION_URL is always
-  // The production hostname, so it serves only as fallback.
+  // On previews, use the deployment-specific host so auth works on preview
+  // URLs. On production, VERCEL_URL is the immutable deployment URL
+  // (myapp-<hash>.vercel.app), not the custom domain, so preference goes to
+  // VERCEL_PROJECT_PRODUCTION_URL.
   const vercelUrl =
-    process.env.VERCEL_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    process.env.APP_ENV === "preview"
+      ? process.env.VERCEL_URL
+      : (process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL);
 
   if (vercelUrl) return `https://${vercelUrl}`;
 
