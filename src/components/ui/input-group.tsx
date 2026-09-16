@@ -92,6 +92,7 @@ function InputGroupButton({
       type={type}
       data-size={size}
       variant={variant}
+      // oxlint-disable-next-line shadcn/require-static-classes -- Static CVA variants match the upstream shadcn InputGroup implementation.
       className={cn(inputGroupButtonVariants({ size }), className)}
       {...props}
     />
