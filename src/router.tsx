@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";
@@ -10,7 +11,10 @@ export function getRouter() {
     defaultNotFoundComponent: () => <NotFound />,
     defaultPendingComponent: () => (
       <div className="h-screen w-screen" data-testid="loader">
-        <span className="loading loading-spinner absolute top-1/2 left-1/2 w-[64px] translate-x-1/2 -translate-y-1/2" />
+        <Loader2
+          className="absolute top-1/2 left-1/2 size-16 -translate-x-1/2 -translate-y-1/2 animate-spin"
+          aria-label="Loading"
+        />
       </div>
     ),
     defaultPendingMinMs: 750,
