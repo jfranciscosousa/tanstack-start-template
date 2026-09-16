@@ -14,6 +14,11 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 - Keep every project skill in `.agents/skills/` as the canonical source.
 - Expose each canonical skill to other agents through symlinks
 
+## Browser self-test
+
+- When asked to self-test the application with `agent-browser`, generate test user data as needed.
+- Create test users through the internal services that users would eventually use. Edit the database directly only as a last resort.
+
 ## Code guidelines
 
 - Variables should have clear simple names. Don't: `e`. Do: `event`
