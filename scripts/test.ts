@@ -5,6 +5,7 @@ import { existsSync } from "fs";
 import { loadEnv } from "./helpers/env.ts";
 
 process.env.NODE_ENV = "test";
+process.env.APP_ENV ??= "test";
 
 $.stdio = "inherit";
 
@@ -15,7 +16,7 @@ if (!process.env.CI && !existsSync(".env.test")) {
   process.exit(1);
 }
 
-loadEnv();
+await loadEnv();
 
 console.log("🧪 Running all tests...");
 

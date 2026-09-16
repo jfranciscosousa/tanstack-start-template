@@ -11,7 +11,7 @@ async function updateEnvFile(filePath: string, values: Record<string, string>) {
   for (const [key, value] of Object.entries(values)) {
     content = content.replace(
       new RegExp(`^${key}=.*$`, "m"),
-      `${key}=${value}`
+      () => `${key}=${value}`
     );
   }
 

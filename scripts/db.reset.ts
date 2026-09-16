@@ -3,7 +3,7 @@ import { createInterface } from "node:readline/promises";
 
 import { loadEnv } from "./helpers/env.ts";
 
-loadEnv();
+await loadEnv();
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {

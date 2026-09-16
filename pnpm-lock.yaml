@@ -227,9 +227,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: 6.1.1
         version: 6.1.1(oxc-transform-react@0.148.0)(vite@8.2.2(@types/node@26.4.1)(jiti@2.7.0)(yaml@2.9.0))
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
       drizzle-kit:
         specifier: 1.0.0-rc.2-203eab8
         version: 1.0.0-rc.2-203eab8
