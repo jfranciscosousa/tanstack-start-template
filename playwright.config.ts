@@ -48,6 +48,7 @@ const config: PlaywrightTestConfig = {
   },
   webServer: {
     command: "PORT=3001 pnpm dev",
+    gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
     timeout: 30000,
     url: "http://localhost:3001",
   },
