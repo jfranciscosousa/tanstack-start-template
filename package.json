@@ -6,6 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "zx scripts/run.ts scripts/dev.ts",
+    "browser:auth": "zx scripts/run.ts scripts/browser-auth.ts",
     "build": "zx scripts/run.ts scripts/build.ts",
     "build:prod": "pnpm db migrate && pnpm build",
     "start": "zx scripts/run.ts scripts/start.ts",

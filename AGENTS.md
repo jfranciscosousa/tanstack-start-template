@@ -16,8 +16,8 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 ## Browser self-test
 
-- When asked to self-test the application with `agent-browser`, generate test user data as needed.
-- Create test users through the internal services that users would eventually use. Edit the database directly only as a last resort.
+- For authenticated `agent-browser` self-tests, use `pnpm browser:auth` to install a Better Auth session cookie before opening the app. It can create a test user or sign in with existing credentials. Follow `.agents/skills/better-auth-best-practices/SKILL.md` → "Browser self-test sessions". Test the login UI only when the login flow is the subject of the test.
+- Generate test user data as needed. Create users through the internal services that users would eventually use. Edit the database directly only as a last resort.
 
 ## Code guidelines
 
