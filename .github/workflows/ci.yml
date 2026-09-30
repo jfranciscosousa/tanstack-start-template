@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           pnpm i
-          npx playwright install chromium
+          pnpm exec playwright install chromium
 
       - name: Lint
         run: |

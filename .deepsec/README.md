@@ -9,7 +9,7 @@ Currently configured project: `tanstack-start-template` (target: `..`).
 
 ## Setup
 
-`npx deepsec init` created this workspace and normally completes its
+`pnpm dlx deepsec init` scaffolds this workspace and normally completes its
 install, exact Vercel project link, Sandbox/model probes, threat model,
 coverage-guided scans, custom matchers, and first AI processing run.
 

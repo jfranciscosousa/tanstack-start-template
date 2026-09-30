@@ -18,10 +18,12 @@
     "test:vitest": "zx scripts/run.ts scripts/test.vitest.ts",
     "test:e2e": "zx scripts/run.ts scripts/test.e2e.ts",
     "test:e2e:setup": "zx scripts/run.ts scripts/test.e2e.setup.ts",
+    "test:skills": "vitest run scripts/skills-update.test.ts --project happy-dom",
     "db": "zx scripts/run.ts scripts/db.ts",
     "db:reset": "zx scripts/run.ts scripts/db.reset.ts",
     "ci": "zx scripts/run.ts scripts/ci.ts",
     "setup": "zx scripts/run.ts scripts/setup.ts",
+    "skills:update": "zx scripts/run.ts scripts/skills-update.ts",
     "validate-env": "zx scripts/run.ts scripts/validate-env.ts",
     "worktree": "zx scripts/run.ts scripts/worktree.ts"
   },

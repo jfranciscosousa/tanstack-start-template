@@ -4,6 +4,8 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 **Package manager:** pnpm
 
+Use `pnpm dlx` for one-shot tools.
+
 ## CRITICAL:
 
 - All project operations go through `pnpm <script>` or `scripts/` directly — never call underlying tools (vite, drizzle-kit, vitest, playwright) directly
@@ -11,12 +13,13 @@ Production-ready TanStack Start full-stack template with session-based auth, Pos
 
 ## Skills
 
-- Keep every project skill in `.agents/skills/` as the canonical source.
-- Expose each canonical skill to other agents through symlinks
+- Keep project guidance in `AGENTS.md` and every project skill in `.agents/skills/`.
+- Write guidance that works across agent harnesses. Use shared paths instead of harness-specific copies or symlinks.
+- Keep project-specific guidance outside imported skills so `pnpm skills:update` preserves it.
 
 ## Browser self-test
 
-- For authenticated `agent-browser` self-tests, use `pnpm browser:auth` to install a Better Auth session cookie before opening the app. It can create a test user or sign in with existing credentials. Follow `.agents/skills/better-auth-best-practices/SKILL.md` → "Browser self-test sessions". Test the login UI only when the login flow is the subject of the test.
+- For authenticated `agent-browser` self-tests, use `pnpm browser:auth` to install a Better Auth session cookie before opening the app. It can create a test user or sign in with existing credentials. Follow `.agents/browser-self-test.md`. Test the login UI only when the login flow is the subject of the test.
 - Generate test user data as needed. Create users through the internal services that users would eventually use. Edit the database directly only as a last resort.
 
 ## Code guidelines

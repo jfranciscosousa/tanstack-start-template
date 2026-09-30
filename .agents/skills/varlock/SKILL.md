@@ -304,7 +304,7 @@ When a framework integration is active, it handles loading and injecting env var
 1. Run `varlock init --agent` to auto-generate an initial `.env.schema` from existing `.env` / `.env.example` files
 2. Review the generated schema with the user — init heuristics are a draft, not final
 3. Optionally install this skill:
-   - **skills** (recommended): `npx skills add dmno-dev/varlock` — update with `npx skills update varlock`
+   - **skills** (recommended): `pnpm dlx skills add dmno-dev/varlock` — update with `pnpm dlx skills update varlock`
    - **GitHub CLI** (v2.90+): `gh skill install dmno-dev/varlock varlock` — update with `gh skill update varlock`
 
 ## Schema checklist

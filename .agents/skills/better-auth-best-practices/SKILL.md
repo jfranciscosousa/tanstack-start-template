@@ -15,7 +15,7 @@ description: Configure Better Auth server and client, set up database adapters, 
 2. Set env vars: `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`
 3. Create `auth.ts` with database + config
 4. Create route handler for your framework
-5. Run `npx @better-auth/cli@latest migrate`
+5. Run `pnpm dlx @better-auth/cli@latest migrate`
 6. Verify: call `GET /api/auth/ok` — should return `{ status: "ok" }`
 
 ---
@@ -35,9 +35,9 @@ CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--c
 
 ### CLI Commands
 
-- `npx @better-auth/cli@latest migrate` - Apply schema (built-in adapter)
-- `npx @better-auth/cli@latest generate` - Generate schema for Prisma/Drizzle
-- `npx @better-auth/cli mcp --cursor` - Add MCP to AI tools
+- `pnpm dlx @better-auth/cli@latest migrate` - Apply schema (built-in adapter)
+- `pnpm dlx @better-auth/cli@latest generate` - Generate schema for Prisma/Drizzle
+- `pnpm dlx @better-auth/cli mcp --cursor` - Add MCP to AI tools
 
 **Re-run after adding/changing plugins.**
 
@@ -85,34 +85,6 @@ CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--c
 - `jwe` - Encrypted. Maximum security.
 
 **Key options:** `session.expiresIn` (default 7 days), `session.updateAge` (refresh interval), `session.cookieCache.maxAge`, `session.cookieCache.version` (change to invalidate all sessions).
-
----
-
-## Browser self-test sessions
-
-After project setup, start the app with `pnpm dev` in one terminal. In a second terminal, run:
-
-```bash
-export AGENT_BROWSER_SESSION="$(agent-browser session id --scope worktree --prefix selftest)"
-pnpm browser:auth
-agent-browser open http://localhost:3000/profile
-agent-browser snapshot -i
-```
-
-Use the configured `BETTER_AUTH_URL` instead of `http://localhost:3000` if the app runs on another origin. By default, `pnpm browser:auth` creates a new user through Better Auth's sign-up endpoint.
-
-To use an existing account, set its email and enter its password without displaying it (type the password and press Enter after `read`):
-
-```bash
-export BROWSER_AUTH_EMAIL="you@example.com"
-read -rs BROWSER_AUTH_PASSWORD
-export BROWSER_AUTH_PASSWORD
-pnpm browser:auth
-unset BROWSER_AUTH_EMAIL BROWSER_AUTH_PASSWORD
-agent-browser open http://localhost:3000/profile
-```
-
-Both modes expire the app's session cookie in `AGENT_BROWSER_SESSION`, then install the issued cookie without printing it. A failed sign-in leaves that browser session unauthenticated. Use the login form when testing login itself.
 
 ---
 

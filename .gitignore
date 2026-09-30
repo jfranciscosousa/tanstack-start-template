@@ -22,7 +22,6 @@ yarn.lock
 .tanstack/
 dist/
 .nitro/*
-.claude/*.local.*
 .env*
 
 !.env.schema
