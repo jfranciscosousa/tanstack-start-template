@@ -11,7 +11,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
-import { Avatar } from "~/components/ui/avatar";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 
 import type { FormProps, FormGroupConfig, FieldConfig } from "./types";
@@ -88,9 +87,10 @@ export function Form<TValues extends Record<string, string>>({
             {group.title && (
               <h2 className="flex items-center gap-2 text-xl font-semibold">
                 {group.icon && (
-                  <Avatar size="sm" variant={group.iconVariant}>
-                    <group.icon size={18} />
-                  </Avatar>
+                  <group.icon
+                    aria-hidden="true"
+                    className="size-5 shrink-0 text-muted-foreground"
+                  />
                 )}
                 {group.title}
               </h2>

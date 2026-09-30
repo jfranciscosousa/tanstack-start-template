@@ -5,15 +5,6 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactFormExtendedApi } from "@tanstack/react-form";
 
 type FieldType = "text" | "email" | "password";
-type AvatarVariant =
-  | "default"
-  | "secondary"
-  | "destructive"
-  | "accent"
-  | "muted"
-  | "warning"
-  | "info"
-  | "success";
 
 /**
  * Configuration for a single form field.
@@ -79,17 +70,14 @@ export interface FieldConfig<TValues extends Record<string, string>> {
  * const group: FormGroupConfig<MyValues> = {
  *   title: "Security",
  *   icon: Lock,
- *   iconVariant: "warning",
  *   fields: [currentPasswordField, newPasswordField],
  * };
  */
 export interface FormGroupConfig<TValues extends Record<string, string>> {
   /** Section heading rendered above the group's fields. */
   title?: string;
-  /** Lucide icon rendered in the section header avatar. */
+  /** Decorative Lucide icon rendered beside the section heading. */
   icon?: LucideIcon;
-  /** Visual variant for the avatar that wraps the icon. */
-  iconVariant?: AvatarVariant;
   /** Fields belonging to this group. */
   fields: FieldConfig<TValues>[];
 }
@@ -192,7 +180,6 @@ export interface FormProps<TValues extends Record<string, string>> {
  *     {
  *       title: "Change Password",
  *       icon: Lock,
- *       iconVariant: "warning",
  *       fields: [
  *         { name: "currentPassword", label: "Current Password", type: "password" },
  *         { name: "newPassword", label: "New Password", type: "password" },

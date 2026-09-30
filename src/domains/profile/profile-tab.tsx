@@ -53,7 +53,6 @@ export function ProfileTab() {
               {
                 title: "Change Password",
                 icon: Lock,
-                iconVariant: "warning",
                 fields: [
                   {
                     name: "currentPassword",
