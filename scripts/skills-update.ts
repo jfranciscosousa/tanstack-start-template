@@ -4,21 +4,22 @@ import { readFile, readdir, writeFile } from "node:fs/promises";
 const lock = JSON.parse(await readFile("skills-lock.json", "utf8")) as {
   skills: Record<string, { source: string; sourceType: string }>;
 };
-const sources = new Map<string, string[]>();
-
-for (const [name, skill] of Object.entries(lock.skills)) {
-  const source =
-    skill.sourceType === "well-known"
-      ? `https://${skill.source}`
-      : skill.source;
-  sources.set(source, [...(sources.get(source) ?? []), name]);
-}
-
 $.stdio = "inherit";
 try {
-  for (const [source, names] of sources) {
+  for (const [name, skill] of Object.entries(lock.skills)) {
+    const source =
+      skill.sourceType === "well-known"
+        ? `https://${skill.source}`
+        : skill.source;
     // oxlint-disable-next-line eslint/no-await-in-loop -- Each install writes skills-lock.json.
-    await $`pnpm dlx skills add ${source} --skill ${names} --agent universal --yes`;
+    await $`pnpm dlx skills add ${source} --skill ${name} --agent universal --yes`.catch(
+      error => {
+        throw new Error(
+          `Could not update "${name}" from ${source}. Check upstream for a renamed or removed skill.`,
+          { cause: error }
+        );
+      }
+    );
   }
 } finally {
   const files = await readdir(".agents/skills", { recursive: true });

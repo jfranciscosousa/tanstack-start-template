@@ -16,6 +16,7 @@ Use `pnpm dlx` for one-shot tools.
 - Keep project guidance in `AGENTS.md` and every project skill in `.agents/skills/`.
 - Write guidance that works across agent harnesses. Use shared paths instead of harness-specific copies or symlinks.
 - Keep project-specific guidance outside imported skills so `pnpm skills:update` preserves it.
+- If `pnpm skills:update` reports a failure, check the upstream skill names for a rename or removal. Migrate the directory and lock entry when a skill is renamed, then retry.
 
 ## Browser self-test
 

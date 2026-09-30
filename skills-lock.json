@@ -3,48 +3,59 @@
   "skills": {
     "analyze-logs": {
       "source": "evlog.dev",
+      "sourceUrl": "https://evlog.dev",
       "sourceType": "well-known",
-      "computedHash": "b556e4e5cf892e89c57b7f513039b1f4df45d2b6d0cf2912ae03ea07cdf67c42"
+      "computedHash": "4a04a46743f211420f0844d09110ba4f6219e70f59c89377ba0293650ec12ed4",
+      "wellKnownDigest": "sha256:85611ea5ab31c54e745ad5ebaf994c6aff1405c58a218c26a7ecef02244193b6"
     },
     "better-auth-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
-      "computedHash": "a4c830509e85557b59339d8d93a4e243e9e59c686e7678854d39230e12c2a6dc"
+      "skillPath": "better-auth/best-practices/SKILL.md",
+      "computedHash": "0c30be0e118c2b7a0c4c57bd9e63bf110c7e420a79ec6ce7997153f3b1e066ee"
     },
     "better-auth-security-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
-      "computedHash": "5717187bba9c22030c7174c74012f01c359f21e2ce87e0eb80e24244d8b8c915"
+      "skillPath": "security/SKILL.md",
+      "computedHash": "7a230edf3a24ce18162cb4379f59b6a19b8d24ca04db530609d0f15cede556dc"
     },
     "build-audit-logs": {
       "source": "evlog.dev",
+      "sourceUrl": "https://evlog.dev",
       "sourceType": "well-known",
-      "computedHash": "b74766565be941fd68ac91f642704a45a9683482821c51f9b298246aeb38f5cc"
+      "computedHash": "c183564899bb2a5271bc600390c61e0ddd8bd8681cabb01c18c9e58c9c79e87d",
+      "wellKnownDigest": "sha256:5129c44c641eb40f6a6522557998152c52d3c9d76961843b005970b697662567"
     },
-    "create-auth-skill": {
+    "create-auth": {
       "source": "better-auth/skills",
       "sourceType": "github",
-      "computedHash": "31c027d02dbf1faa37f58191f574b9443143042fb2b684fe32df53ab0270487c"
+      "skillPath": "better-auth/create-auth/SKILL.md",
+      "computedHash": "9a9b498bc144367b8e237233f89def63fb2bd69e8cafe173eaa58fe3a863cdc4"
     },
     "email-and-password-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
-      "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d"
+      "skillPath": "better-auth/emailAndPassword/SKILL.md",
+      "computedHash": "863886759f729081e265941f4f72c503835d55a1f34f6d63cebe6571159fff4a"
     },
     "review-logging-patterns": {
       "source": "evlog.dev",
+      "sourceUrl": "https://evlog.dev",
       "sourceType": "well-known",
-      "computedHash": "1639ebcb462bd06ccecf51428cb69f5cd8a5ff306393ccb4ff1ae7a1f21cb699"
+      "computedHash": "75c77d6bdff8cd68403f95abdc7091e2cf830730baeecf66ec7ffabe0b1f1267",
+      "wellKnownDigest": "sha256:a2438cf1347035a28771abbeb960988eb75029fefb3af3db7f8a9329e5595e5d"
     },
     "varlock": {
       "source": "dmno-dev/varlock",
       "sourceType": "github",
       "skillPath": "skills/varlock/SKILL.md",
-      "computedHash": "604928d00a1369739dd4a65511cf70ac546b094b4ede5996b01fc2a2782e6438"
+      "computedHash": "aad1f0cba6eebc70db9cf6772c23a555bc9727784070126b6d70bf18545adeac"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
       "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
     }
   }

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   readFile: vi.fn<(path: string, encoding: string) => Promise<string>>(),
@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
     (
       command: TemplateStringsArray,
       source: string,
-      names: string[]
+      name: string
     ) => Promise<void>
   >(),
 }));
@@ -19,9 +19,8 @@ const mocks = vi.hoisted(() => ({
 vi.mock("node:fs/promises", () => ({ ...mocks, default: mocks }));
 
 describe("skills:update", () => {
-  afterEach(() => vi.unstubAllGlobals());
-
-  it("refreshes only tracked skills in the shared directory and normalizes commands", async () => {
+  beforeEach(() => {
+    vi.resetModules();
     const lock = {
       skills: {
         auth: { source: "better-auth/skills", sourceType: "github" },
@@ -45,12 +44,17 @@ describe("skills:update", () => {
     mocks.run.mockResolvedValue(undefined);
     mocks.writeFile.mockResolvedValue(undefined);
     vi.stubGlobal("$", mocks.run);
+  });
 
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("refreshes only tracked skills in the shared directory and normalizes commands", async () => {
     await import("./skills-update.ts");
 
     expect(mocks.run.mock.calls.map(call => call.slice(1))).toStrictEqual([
-      ["better-auth/skills", ["auth", "password"]],
-      ["https://evlog.dev", ["logs"]],
+      ["better-auth/skills", "auth"],
+      ["better-auth/skills", "password"],
+      ["https://evlog.dev", "logs"],
     ]);
     for (const [command] of mocks.run.mock.calls) {
       expect(command.join("")).toBe(
@@ -65,5 +69,16 @@ describe("skills:update", () => {
       ".agents/skills/auth/logo.png",
       "utf8"
     );
+  });
+
+  it("signals potential renames and normalizes files after a failed update", async () => {
+    mocks.run.mockRejectedValueOnce(new Error("Skill not found"));
+    await expect(import("./skills-update.ts")).rejects.toThrow(
+      'Could not update "auth" from better-auth/skills. Check upstream for a renamed or removed skill.'
+    );
+    expect(mocks.run.mock.calls.map(call => call.slice(1))).toStrictEqual([
+      ["better-auth/skills", "auth"],
+    ]);
+    expect(mocks.writeFile).toHaveBeenCalledTimes(2);
   });
 });

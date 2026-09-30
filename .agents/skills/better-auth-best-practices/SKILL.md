@@ -5,7 +5,17 @@ description: Configure Better Auth server and client, set up database adapters, 
 
 # Better Auth Integration Guide
 
-**Always consult [better-auth.com/docs](https://better-auth.com/docs) for code examples and latest API.**
+## Documentation Version
+
+Use documentation that matches the Better Auth version installed in the project. APIs and plugin names can differ across maintained release lines.
+
+1. Prefer a version explicitly named by the user.
+2. Otherwise, inspect the resolved `better-auth` version in the lockfile, falling back to the package manifest when no lockfile is available.
+3. When the Better Auth MCP is available, call `get_doc` with `/llms.txt` to resolve that package version to a documentation identifier. Pass the identifier to every `search_docs` call and pass result paths to `get_doc` unchanged.
+4. Without MCP, start at [better-auth.com/llms.txt](https://better-auth.com/llms.txt) and follow the matching version index.
+5. Use the latest documentation only when the project version cannot be determined or the user explicitly asks about the latest release or an upgrade.
+
+When planning an upgrade, separate guidance for the currently installed version from guidance for the target version.
 
 ---
 
@@ -15,7 +25,10 @@ description: Configure Better Auth server and client, set up database adapters, 
 2. Set env vars: `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`
 3. Create `auth.ts` with database + config
 4. Create route handler for your framework
-5. Run `pnpm dlx @better-auth/cli@latest migrate`
+5. Run migrations:
+   - **Built-in adapter:** `pnpm dlx auth@latest migrate`
+   - **Drizzle:** `pnpm dlx auth@latest generate --output src/db/auth-schema.ts` then `pnpm dlx drizzle-kit push` (dev) or `pnpm dlx drizzle-kit generate && pnpm dlx drizzle-kit migrate` (prod)
+   - **Prisma:** `pnpm dlx auth@latest generate --output prisma/schema.prisma` then `pnpm dlx prisma migrate dev`
 6. Verify: call `GET /api/auth/ok` — should return `{ status: "ok" }`
 
 ---
@@ -35,9 +48,9 @@ CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--c
 
 ### CLI Commands
 
-- `pnpm dlx @better-auth/cli@latest migrate` - Apply schema (built-in adapter)
-- `pnpm dlx @better-auth/cli@latest generate` - Generate schema for Prisma/Drizzle
-- `pnpm dlx @better-auth/cli mcp --cursor` - Add MCP to AI tools
+- `pnpm dlx auth@latest migrate` - Apply schema (built-in adapter)
+- `pnpm dlx auth@latest generate` - Generate schema for Prisma/Drizzle
+- `pnpm dlx auth@latest mcp --cursor` - Add MCP to AI tools
 
 **Re-run after adding/changing plugins.**
 
@@ -62,9 +75,11 @@ CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--c
 
 ## Database
 
-**Direct connections:** Pass `pg.Pool`, `mysql2` pool, `better-sqlite3`, or `bun:sqlite` instance.
+**Direct connections:** Pass `pg.Pool`, `mysql2` pool, `better-sqlite3`, or `bun:sqlite` instance. For Postgres, also supports `postgres` (postgres.js) and `@neondatabase/serverless`.
 
 **ORM adapters:** Import from `better-auth/adapters/drizzle`, `better-auth/adapters/prisma`, `better-auth/adapters/mongodb`.
+
+**Drizzle provider values:** `"pg"` (PostgreSQL), `"mysql"` (MySQL), `"sqlite"` (SQLite). Must match the driver used.
 
 **Critical:** Better Auth uses adapter model names, NOT underlying table names. If Prisma model is `User` mapping to table `users`, use `modelName: "user"` (Prisma reference), not `"users"`.
 
@@ -171,6 +186,8 @@ For separate client/server projects: `createAuthClient<typeof auth>()`.
 4. **Cookie cache** - Custom session fields NOT cached, always re-fetched
 5. **Stateless mode** - No DB = session in cookie only, logout on cache expiry
 6. **Change email flow** - Sends to current email first, then new email
+7. **Drizzle: db not initialized** - `drizzleAdapter(db, ...)` requires a `db` instance from `drizzle()`. See `create-auth` skill for setup examples (node-postgres, postgres.js, Neon).
+8. **Drizzle: missing drizzle.config.ts** - `drizzle-kit` commands require a `drizzle.config.ts` pointing to the generated schema file and DB credentials.
 
 ---
 
