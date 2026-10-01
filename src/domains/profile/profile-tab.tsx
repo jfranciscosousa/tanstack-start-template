@@ -7,7 +7,15 @@ import { updateUserFn } from "~/server/handlers/user-handlers";
 import { updateUserSchema } from "~/schemas/user-schemas";
 import { useCurrentUser } from "~/routes/__root";
 import { formatDate } from "~/lib/date";
-import { Card, CardContent, CardTitle } from "~/components/ui/card";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "~/components/ui/item";
+import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/form/form";
 
@@ -109,34 +117,39 @@ export function ProfileTab() {
         </CardContent>
       </Card>
 
-      {/* Account Info */}
       <Card className="mt-4 shadow-xl">
         <CardContent>
-          <CardTitle className="mb-4 text-lg">Account Information</CardTitle>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-4">
-              <div className="rounded-md bg-background p-2">
-                <CalendarDays size={18} className="text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Member Since</p>
-                <p className="text-sm font-semibold">
+          <Item size="xs" className="mb-4 p-0">
+            <ItemContent>
+              <ItemTitle>
+                <h2 className="text-lg font-semibold">Account Information</h2>
+              </ItemTitle>
+            </ItemContent>
+          </Item>
+          <ItemGroup className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Item render={<li />} variant="outline">
+              <ItemMedia variant="icon">
+                <CalendarDays aria-hidden="true" />
+              </ItemMedia>
+              <ItemContent>
+                <ItemDescription>Member Since</ItemDescription>
+                <ItemTitle>
                   {formatDate(user?.createdAt, "long-date")}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-4">
-              <div className="rounded-md bg-background p-2">
-                <Clock size={18} className="text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Last Updated</p>
-                <p className="text-sm font-semibold">
+                </ItemTitle>
+              </ItemContent>
+            </Item>
+            <Item render={<li />} variant="outline">
+              <ItemMedia variant="icon">
+                <Clock aria-hidden="true" />
+              </ItemMedia>
+              <ItemContent>
+                <ItemDescription>Last Updated</ItemDescription>
+                <ItemTitle>
                   {formatDate(user?.updatedAt, "long-date")}
-                </p>
-              </div>
-            </div>
-          </div>
+                </ItemTitle>
+              </ItemContent>
+            </Item>
+          </ItemGroup>
         </CardContent>
       </Card>
     </>

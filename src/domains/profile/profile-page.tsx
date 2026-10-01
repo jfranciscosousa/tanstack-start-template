@@ -4,6 +4,12 @@ import { Route } from "~/routes/_authed/profile";
 import { SessionsTab } from "~/domains/profile/sessions-tab";
 import { ProfileTab } from "~/domains/profile/profile-tab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "~/components/ui/item";
 
 export default function ProfilePage() {
   const sessions = Route.useLoaderData();
@@ -13,13 +19,16 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
       <div className="space-y-8">
-        {/* Header */}
-        <div className="">
-          <h1 className="text-3xl font-bold">Profile Settings</h1>
-          <p className="mt-2 text-muted-foreground">
-            Manage your account information, password, and active sessions
-          </p>
-        </div>
+        <Item className="p-0">
+          <ItemContent>
+            <ItemTitle>
+              <h1 className="text-3xl font-bold">Profile Settings</h1>
+            </ItemTitle>
+            <ItemDescription>
+              Manage your account information, password, and active sessions
+            </ItemDescription>
+          </ItemContent>
+        </Item>
 
         <Tabs
           value={tab}

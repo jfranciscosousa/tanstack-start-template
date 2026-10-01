@@ -4,6 +4,7 @@ import { revalidateLogic, useForm } from "@tanstack/react-form";
 
 import { isParamsError, renderError } from "~/errors";
 import { Separator } from "~/components/ui/separator";
+import { Item, ItemContent, ItemMedia, ItemTitle } from "~/components/ui/item";
 import { Input } from "~/components/ui/input";
 import {
   Field,
@@ -85,15 +86,18 @@ export function Form<TValues extends Record<string, string>>({
             {groupIndex > 0 && <Separator />}
 
             {group.title && (
-              <h2 className="flex items-center gap-2 text-xl font-semibold">
+              <Item size="xs" className="p-0">
                 {group.icon && (
-                  <group.icon
-                    aria-hidden="true"
-                    className="size-5 shrink-0 text-muted-foreground"
-                  />
+                  <ItemMedia variant="icon">
+                    <group.icon aria-hidden="true" />
+                  </ItemMedia>
                 )}
-                {group.title}
-              </h2>
+                <ItemContent>
+                  <ItemTitle>
+                    <h2 className="text-lg font-semibold">{group.title}</h2>
+                  </ItemTitle>
+                </ItemContent>
+              </Item>
             )}
 
             {group.fields.map(fieldConfig => (
