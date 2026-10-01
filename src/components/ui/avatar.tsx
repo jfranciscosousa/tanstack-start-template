@@ -8,10 +8,7 @@ type AvatarVariant =
   | "secondary"
   | "destructive"
   | "accent"
-  | "muted"
-  | "warning"
-  | "info"
-  | "success";
+  | "muted";
 
 const avatarVariantClasses: Record<AvatarVariant, string> = {
   default: "bg-primary text-primary-foreground",
@@ -19,9 +16,6 @@ const avatarVariantClasses: Record<AvatarVariant, string> = {
   destructive: "bg-destructive/10 text-destructive",
   accent: "bg-accent text-accent-foreground",
   muted: "bg-muted text-muted-foreground",
-  warning: "bg-warning/10 text-warning",
-  info: "bg-info/10 text-info",
-  success: "bg-success/10 text-success",
 };
 
 function Avatar({
