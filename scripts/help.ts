@@ -1,53 +1,53 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun --preload zx/globals
 
 console.log(`
 📋 Available Scripts
 
 🔨 Build Commands:
-  pnpm build              Build the application for production
-  pnpm build:prod         Migrate + build (production deploy)
-  pnpm clean              Clean build artifacts and cache files
+  bun run build              Build the application for production
+  bun run build:prod         Migrate + build (production deploy)
+  bun run clean              Clean build artifacts and cache files
 
 🚀 Development Commands:
-  pnpm dev                Start development server with hot reloading
-  pnpm start              Start production server (requires build first)
+  bun run dev                Start development server with hot reloading
+  bun run start              Start production server (requires build first)
 
 🔍 Code Quality Commands:
-  pnpm lint               Run oxlint on the codebase
-  pnpm lint --fix         Run oxlint with auto-fix
-  pnpm format             Format code with oxfmt
-  pnpm format --check     Check formatting without writing
-  pnpm ts-check           Run TypeScript type checking
+  bun run lint               Run oxlint on the codebase
+  bun run lint --fix         Run oxlint with auto-fix
+  bun run format             Format code with oxfmt
+  bun run format --check     Check formatting without writing
+  bun run ts-check           Run TypeScript type checking
 
 🧪 Test Commands:
-  pnpm test               Run all tests (unit + e2e)
-  pnpm test:vitest        Run unit tests with Vitest
-  pnpm test:vitest --watch  Run unit tests in watch mode
-  pnpm test:e2e           Run e2e tests with database setup
-  pnpm test:e2e --ui      Run e2e tests with Playwright UI
-  pnpm test:e2e:setup     Install Playwright browsers and migrate test DB
+  bun run test               Run all tests (unit + e2e)
+  bun run test:vitest        Run unit tests with Vitest
+  bun run test:vitest --watch  Run unit tests in watch mode
+  bun run test:e2e           Run e2e tests with database setup
+  bun run test:e2e --ui      Run e2e tests with Playwright UI
+  bun run test:e2e:setup     Install Playwright browsers and migrate test DB
 
 🗄️  Database Commands:
-  pnpm db generate        Generate migration from schema changes
-  pnpm db migrate         Apply pending migrations
-  pnpm db studio          Open Drizzle Studio UI
-  pnpm db:reset --force-reset <database-name>
+  bun run db generate        Generate migration from schema changes
+  bun run db migrate         Apply pending migrations
+  bun run db studio          Open Drizzle Studio UI
+  bun run db:reset --force-reset <database-name>
                           Reset a local, non-production DB. Remote DBs require
                           --allow-remote-reset and interactive verification
 
 🌿 Worktree Commands:
-  pnpm worktree create <name>  Create and provision a new worktree
-  pnpm worktree setup          Provision an already-created worktree
-  pnpm worktree list           List worktrees and configuration issues
-  pnpm worktree delete <name>  Remove a worktree and its database
+  bun run worktree create <name>  Create and provision a new worktree
+  bun run worktree setup          Provision an already-created worktree
+  bun run worktree list           List worktrees and configuration issues
+  bun run worktree delete <name>  Remove a worktree and its database
 
 🤖 CI/CD Commands:
-  pnpm ci                 Run full CI pipeline (lint, type-check, test)
-  pnpm validate-env       Validate environment configuration
+  bun run ci                 Run full CI pipeline (lint, type-check, test)
+  bun run validate-env       Validate environment configuration
 
 💡 Usage Examples:
-  pnpm dev                          # Start development
-  pnpm build && pnpm start          # Build and start production
-  pnpm test:vitest --watch          # Develop with tests running
-  pnpm ci                           # Run before committing
+  bun run dev                          # Start development
+  bun run build && bun run start          # Build and start production
+  bun run test:vitest --watch          # Develop with tests running
+  bun run ci                           # Run before committing
 `);

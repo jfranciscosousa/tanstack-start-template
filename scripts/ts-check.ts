@@ -2,21 +2,10 @@ import { codegenEnvTypes } from "./helpers/varlock-codegen.ts";
 
 await codegenEnvTypes();
 
-const args = process.argv.slice(3);
-const useWatch = args.includes("--watch");
-const filteredArgs = args.filter(arg => arg !== "--watch");
-
-const tscArgs = [
-  "--project",
-  "tsconfig.json",
-  "--noEmit",
-  "--skipLibCheck",
-  useWatch ? "--watch" : "",
-  ...filteredArgs,
-].filter(Boolean);
-
-console.log(`> tsc ${tscArgs.join(" ")}`);
+const args = process.argv.slice(2);
+console.log(`> bun check --project tsconfig.json ${args.join(" ")}`);
 
 $.stdio = "inherit";
-await $`pnpm exec tsc ${tscArgs}`;
-if (!useWatch) console.log("✅ TypeScript check completed");
+await $`bun check --project tsconfig.json ${args}`;
+await $`bun check --project scripts/tsconfig.json ${args}`;
+console.log("✅ TypeScript check completed");

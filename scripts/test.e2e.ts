@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun --preload zx/globals
 
 import { existsSync } from "fs";
 
@@ -16,7 +16,7 @@ if (!process.env.CI && !existsSync(".env.test")) {
 
 await loadEnv();
 
-const args = process.argv.slice(3);
+const args = process.argv.slice(2);
 const useUI = args.includes("--ui");
 const filteredArgs = args.filter(arg => arg !== "--ui");
 
@@ -24,5 +24,5 @@ const playwrightArgs = [useUI ? "--ui" : "", ...filteredArgs].filter(Boolean);
 console.log(`> playwright test ${playwrightArgs.join(" ")}`);
 
 $.stdio = "inherit";
-await $`pnpm test:e2e:setup`;
-await $`pnpm exec playwright test ${playwrightArgs}`;
+await $`bun run test:e2e:setup`;
+await $`bun run playwright test ${playwrightArgs}`;

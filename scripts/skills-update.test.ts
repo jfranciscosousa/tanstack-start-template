@@ -32,7 +32,7 @@ describe("skills:update", () => {
     mocks.readFile.mockImplementation(async (path: string) => {
       if (path === "skills-lock.json") return JSON.stringify(lock);
       if (path.endsWith("SKILL.md")) return `Use ${legacyRunner} tool`;
-      if (path.endsWith("SKILL.MD")) return `Use ${legacyRunner} security-tool`;
+      if (path.endsWith("SKILL.MD")) return "Use pnpm dlx security-tool";
       return "Keep this guidance";
     });
     mocks.readdir.mockResolvedValue([
@@ -58,12 +58,12 @@ describe("skills:update", () => {
     ]);
     for (const [command] of mocks.run.mock.calls) {
       expect(command.join("")).toBe(
-        "pnpm dlx skills add  --skill  --agent universal --yes"
+        "bunx skills add  --skill  --agent universal --yes"
       );
     }
     expect(mocks.writeFile.mock.calls).toStrictEqual([
-      [".agents/skills/auth/SKILL.md", "Use pnpm dlx tool"],
-      [".agents/skills/security/SKILL.MD", "Use pnpm dlx security-tool"],
+      [".agents/skills/auth/SKILL.md", "Use bunx tool"],
+      [".agents/skills/security/SKILL.MD", "Use bunx security-tool"],
     ]);
     expect(mocks.readFile).not.toHaveBeenCalledWith(
       ".agents/skills/auth/logo.png",

@@ -1,3 +1,5 @@
+import type { ErrorComponentProps } from "@tanstack/react-router";
+
 import { getRequest } from "@tanstack/react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -32,7 +34,7 @@ export const Route = createRootRoute({
     user: await fetchCurrentUser(),
   }),
   component: RootComponent,
-  errorComponent: props => (
+  errorComponent: (props: ErrorComponentProps) => (
     <RootDocument>
       <DefaultCatchBoundary {...props} />
     </RootDocument>

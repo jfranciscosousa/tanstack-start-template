@@ -17,15 +17,25 @@ A modern full-stack React application template built with TanStack Start, featur
 - **Styling**: Tailwind CSS 4 + Base UI + shadcn components
 - **Testing**: Vitest 4 + React Testing Library + Playwright
 - **Build Tool**: Vite 7
-- **Package Manager**: pnpm
+- **Runtime and Package Manager**: Bun canary
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js (18+ recommended)
-- pnpm
+- Bun canary (install with `mise install` or `bun upgrade --canary`)
+- Node.js (for tools that require Node)
 - PostgreSQL (for database)
+
+Dependencies use Bun’s isolated global store. Worktree setup installs from the
+lockfile instead of copying `node_modules`. Nitro stays local because its dev
+worker requires project-local dependency resolution.
+
+Canary updates can contain breaking changes. CI installs the latest canary.
+`bun run ts-check` generates environment types, then runs `bun check`.
+TypeScript stays installed for editor support. Vitest and Playwright stay unchanged.
+Bun preserves the one-day release age and trusted build packages. It does not
+preserve pnpm's `trustPolicy: no-downgrade` setting.
 
 ### Installation
 
@@ -34,11 +44,12 @@ A modern full-stack React application template built with TanStack Start, featur
 git clone <your-repo-url>
 cd tanstack-start-template
 
-# Run setup script (installs dependencies, sets up database)
-pnpm setup
+# Install dependencies, then configure the app and databases
+bun install --frozen-lockfile
+bun run setup
 
 # Start development server
-pnpm dev
+bun run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see your application.
@@ -48,35 +59,35 @@ Visit [http://localhost:3000](http://localhost:3000) to see your application.
 ### Development
 
 ```bash
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm setup        # Initial project setup
+bun run dev          # Start development server
+bun run build        # Build for production
+bun run start        # Start production server
+bun run setup        # Initial project setup
 ```
 
-For a worktree created by an editor or another tool, run `pnpm worktree setup` from
+For a worktree created by an editor or another tool, run `bun run worktree setup` from
 inside that worktree. It provisions a separate database, port, environment, and
 dependencies without creating another Git worktree. To create and provision one
-from the main checkout, use `pnpm worktree create <name>`.
+from the main checkout, use `bun run worktree create <name>`.
 
 ### Testing
 
 ```bash
-pnpm test               # Run all tests (unit + e2e)
-pnpm test:vitest        # Run unit tests with Vitest
-pnpm test:vitest --watch  # Run unit tests in watch mode
-pnpm test:e2e           # Run e2e tests with Playwright
-pnpm test:e2e --ui      # Run e2e tests with Playwright UI
+bun run test               # Run all tests (unit + e2e)
+bun run test:vitest        # Run unit tests with Vitest
+bun run test:vitest --watch  # Run unit tests in watch mode
+bun run test:e2e           # Run e2e tests with Playwright
+bun run test:e2e --ui      # Run e2e tests with Playwright UI
 ```
 
 ### Code Quality
 
 ```bash
-pnpm lint         # Run linter
-pnpm lint --fix   # Run linter with auto-fix
-pnpm format       # Format code
-pnpm format --check  # Check formatting without writing
-pnpm ts-check     # Run TypeScript compiler check
+bun run lint         # Run linter
+bun run lint --fix   # Run linter with auto-fix
+bun run format       # Format code
+bun run format --check  # Check formatting without writing
+bun run ts-check     # Run Bun type checking
 ```
 
 ## Project Structure
@@ -103,7 +114,7 @@ scripts/           # Development, test, and build scripts (.ts files)
 
 ## Environment Variables
 
-The setup script (`pnpm setup`) will help you configure your environment automatically. It sets up two files, `.env` and `.env.test` that are used for development and testing environments.
+The setup script (`bun run setup`) will help you configure your environment automatically. It sets up two files, `.env` and `.env.test` that are used for development and testing environments.
 
 It will also help you rename the app to suit your needs.
 
@@ -112,10 +123,10 @@ It will also help you rename the app to suit your needs.
 The application uses PostgreSQL with Drizzle ORM. The schema is defined in `src/server/db/schema.ts`. Use the `db` script to manage migrations:
 
 ```bash
-pnpm db generate    # Generate migration files from schema changes
-pnpm db migrate     # Apply pending migrations
-pnpm db studio      # Open Drizzle Studio database browser
-pnpm db:reset --force-reset <database-name> # Reset a local, non-production DB
+bun run db generate    # Generate migration files from schema changes
+bun run db migrate     # Apply pending migrations
+bun run db studio      # Open Drizzle Studio database browser
+bun run db:reset --force-reset <database-name> # Reset a local, non-production DB
 # Remote DBs also require --allow-remote-reset and interactive verification
 ```
 

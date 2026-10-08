@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun --preload zx/globals
 
 import { existsSync } from "fs";
 
@@ -11,7 +11,7 @@ const SERVER_FILE = ".output/server/index.mjs";
 if (!existsSync(SERVER_FILE)) {
   console.error(`❌ Server file not found: ${SERVER_FILE}`);
   console.log(
-    "💡 Run 'NITRO_PRESET=node_server scripts/build.ts' first to build the application"
+    "💡 Run 'NITRO_PRESET=node_server bun run build' first to build the application"
   );
   process.exit(1);
 }
@@ -19,4 +19,4 @@ if (!existsSync(SERVER_FILE)) {
 console.log("🚀 Starting production server...");
 
 $.stdio = "inherit";
-await $`node .output/server/index.mjs`;
+await $`bun .output/server/index.mjs`;

@@ -7,6 +7,7 @@ await $`rm -rf
   .cache
   test-results
   .output
+  .vercel/output
   .tanstack
   .nitro
   dist`;

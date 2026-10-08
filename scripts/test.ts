@@ -1,4 +1,4 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun --preload zx/globals
 
 import { existsSync } from "fs";
 
@@ -21,9 +21,9 @@ await loadEnv();
 console.log("🧪 Running all tests...");
 
 console.log("📋 Running unit tests with Vitest...");
-await $`pnpm test:vitest`;
+await $`bun run test:vitest`;
 
 console.log("🎭 Running end-to-end tests...");
-await $`pnpm test:e2e`;
+await $`bun run test:e2e`;
 
 console.log("✅ All tests completed successfully!");

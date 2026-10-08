@@ -18,12 +18,12 @@ if (process.env.NODE_ENV === "production") {
 
 const parsedDatabaseUrl = new URL(databaseUrl);
 const databaseName = parsedDatabaseUrl.pathname.replace(/^\//, "");
-const args = process.argv.slice(3);
+const args = process.argv.slice(2);
 const forceFlagIndex = args.indexOf("--force-reset");
 const confirmedDatabaseName = args.at(forceFlagIndex + 1);
 if (forceFlagIndex === -1 || confirmedDatabaseName !== databaseName) {
   console.error(
-    `❌ Destructive reset requires: pnpm db:reset --force-reset ${databaseName}`
+    `❌ Destructive reset requires: bun run db:reset --force-reset ${databaseName}`
   );
   process.exit(1);
 }
@@ -76,6 +76,6 @@ await sql`CREATE SCHEMA public`;
 await sql.end();
 
 console.log("🗄️  Applying migrations with drizzle-kit...");
-await $`pnpm drizzle-kit migrate`;
+await $`bun run drizzle-kit migrate`;
 
 console.log("✅ Database reset complete!");

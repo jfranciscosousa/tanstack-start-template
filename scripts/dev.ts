@@ -11,4 +11,4 @@ console.log("🚀 Starting TanStack Start development server...");
 // Prevents dev mode crash with git daemon
 process.env.CHOKIDAR_USEPOLLING ??= "true";
 
-await $`CHOKIDAR_USEPOLLING=true pnpm vite dev --port ${port}`;
+await $`CHOKIDAR_USEPOLLING=true bun run vite dev --port ${port}`;
