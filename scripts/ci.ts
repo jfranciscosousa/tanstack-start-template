@@ -1,17 +1,24 @@
+import { $ } from "bun";
+
 process.env.NODE_ENV = "test";
 process.env.APP_ENV ??= "test";
 
-$.stdio = "inherit";
-
 console.log("🤖 Running CI pipeline...");
 
+console.log("🔍 Running lint and formatting checks...");
+await $`bun run lint`;
+await $`bun run format --check`;
+
 console.log("🔍 Running type checks...");
-await $`pnpm ts-check`;
+await $`bun run ts-check`;
+
+console.log("🔨 Building the application...");
+await $`bun run build`;
 
 console.log("🎭 Installing Playwright browsers...");
-await $`pnpm exec playwright install chromium`;
+await $`bun run playwright install chromium`;
 
 console.log("🧪 Running all tests...");
-await $`pnpm test`;
+await $`bun run test`;
 
 console.log("✅ CI pipeline completed successfully!");

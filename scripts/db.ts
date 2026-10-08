@@ -1,10 +1,11 @@
+import { $ } from "bun";
+
 import { loadEnv } from "./helpers/env.ts";
 
 await loadEnv();
 
-const args = process.argv.slice(3);
+const args = process.argv.slice(2);
 
 console.log(`🗄️  Running drizzle-kit ${args.join(" ")}...`);
 
-$.stdio = "inherit";
-await $`pnpm drizzle-kit ${args}`;
+await $`bun run drizzle-kit ${args}`;

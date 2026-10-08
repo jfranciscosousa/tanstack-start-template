@@ -5,27 +5,28 @@
   "sideEffects": false,
   "scripts": {
     "prepare": "husky",
-    "dev": "zx scripts/run.ts scripts/dev.ts",
-    "browser:auth": "zx scripts/run.ts scripts/browser-auth.ts",
-    "build": "zx scripts/run.ts scripts/build.ts",
-    "build:prod": "pnpm db migrate && pnpm build",
-    "start": "zx scripts/run.ts scripts/start.ts",
-    "clean": "zx scripts/run.ts scripts/clean.ts",
-    "lint": "zx scripts/run.ts scripts/lint.ts",
-    "format": "zx scripts/run.ts scripts/format.ts",
-    "ts-check": "zx scripts/run.ts scripts/ts-check.ts",
-    "test": "zx scripts/run.ts scripts/test.ts",
-    "test:vitest": "zx scripts/run.ts scripts/test.vitest.ts",
-    "test:e2e": "zx scripts/run.ts scripts/test.e2e.ts",
-    "test:e2e:setup": "zx scripts/run.ts scripts/test.e2e.setup.ts",
+    "dev": "bun scripts/run.ts scripts/dev.ts",
+    "browser:auth": "bun scripts/run.ts scripts/browser-auth.ts",
+    "build": "bun scripts/run.ts scripts/build.ts",
+    "build:prod": "bun run db migrate && bun run build",
+    "start": "bun scripts/run.ts scripts/start.ts",
+    "clean": "bun scripts/run.ts scripts/clean.ts",
+    "lint": "bun scripts/run.ts scripts/lint.ts",
+    "format": "bun scripts/run.ts scripts/format.ts",
+    "ts-check": "bun scripts/run.ts scripts/ts-check.ts",
+    "test": "bun scripts/run.ts scripts/test.ts",
+    "test:vitest": "bun scripts/run.ts scripts/test.vitest.ts",
+    "test:e2e": "bun scripts/run.ts scripts/test.e2e.ts",
+    "test:e2e:setup": "bun scripts/run.ts scripts/test.e2e.setup.ts",
+    "test:scripts": "vitest run scripts --project happy-dom",
     "test:skills": "vitest run scripts/skills-update.test.ts --project happy-dom",
-    "db": "zx scripts/run.ts scripts/db.ts",
-    "db:reset": "zx scripts/run.ts scripts/db.reset.ts",
-    "ci": "zx scripts/run.ts scripts/ci.ts",
-    "setup": "zx scripts/run.ts scripts/setup.ts",
-    "skills:update": "zx scripts/run.ts scripts/skills-update.ts",
-    "validate-env": "zx scripts/run.ts scripts/validate-env.ts",
-    "worktree": "zx scripts/run.ts scripts/worktree.ts"
+    "db": "bun scripts/run.ts scripts/db.ts",
+    "db:reset": "bun scripts/run.ts scripts/db.reset.ts",
+    "ci": "bun scripts/run.ts scripts/ci.ts",
+    "setup": "bun scripts/run.ts scripts/setup.ts",
+    "skills:update": "bun scripts/run.ts scripts/skills-update.ts",
+    "validate-env": "bun scripts/run.ts scripts/validate-env.ts",
+    "worktree": "bun scripts/run.ts scripts/worktree.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -64,6 +65,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
+    "@types/bun": "1.4.2",
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -83,17 +85,22 @@
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
     "vitest": "^5.0.3",
-    "vitest-mock-extended": "^5.1.1",
-    "zx": "^8.8.5"
+    "vitest-mock-extended": "^5.1.1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "pnpm oxfmt --no-error-on-unmatched-pattern",
-      "pnpm oxlint --fix"
+      "bun run oxfmt --no-error-on-unmatched-pattern",
+      "bun run oxlint --fix"
     ],
     "*.{json,md,css}": [
-      "pnpm oxfmt --no-error-on-unmatched-pattern"
+      "bun run oxfmt --no-error-on-unmatched-pattern"
     ]
   },
-  "packageManager": "pnpm@12.6.0"
+  "trustedDependencies": [
+    "@parcel/watcher",
+    "core-js-pure",
+    "esbuild",
+    "msw",
+    "nitro"
+  ]
 }

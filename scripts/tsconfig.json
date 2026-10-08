@@ -1,11 +1,12 @@
 {
-  "include": ["**/*.ts", "**/*.mts"],
+  "include": ["**/*.ts", "**/*.mts", "../*.config.ts", "../env.d.ts"],
   "compilerOptions": {
     "strict": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES2022",
-    "types": ["node", "zx/globals"],
+    "types": ["node", "bun", "vite/client"],
+    "paths": { "~/*": ["../src/*"] },
     "skipLibCheck": true,
     "esModuleInterop": true,
     "isolatedModules": true,

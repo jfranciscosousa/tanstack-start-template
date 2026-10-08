@@ -1,13 +1,17 @@
 import postgres from "postgres";
 import path from "node:path";
-import os from "node:os";
 import fs from "node:fs";
+import { $ } from "bun";
+
+import { question } from "./helpers/question.ts";
 
 const DEFAULT_PORT = 3000;
 
-const [subcommand, ...args] = process.argv.slice(3);
+const [subcommand, ...args] = process.argv.slice(2);
 
-const repoRoot = (await $`git rev-parse --show-toplevel`).stdout.trim();
+const repoRoot = (await $`git rev-parse --show-toplevel`).stdout
+  .toString()
+  .trim();
 const repoName = path.basename(repoRoot);
 const worktreesRoot = path.resolve(repoRoot, "..", "worktrees", repoName);
 
@@ -22,7 +26,7 @@ interface WorktreeInfo {
 
 async function listWorktrees(): Promise<WorktreeInfo[]> {
   const { stdout } = await $`git worktree list --porcelain`.quiet();
-  const blocks = stdout.split("\n\n").filter(Boolean);
+  const blocks = stdout.toString().split("\n\n").filter(Boolean);
 
   return blocks.map((block, index) => {
     const lines = block.split("\n");
@@ -139,12 +143,12 @@ async function cmdList() {
   }
   if (missingWorktreeCount > 0) {
     console.log(
-      `Run \`pnpm worktree cleanup\` to prune ${missingWorktreeCount} stale Git worktree record(s).`
+      `Run \`bun run worktree cleanup\` to prune ${missingWorktreeCount} stale Git worktree record(s).`
     );
   }
   if (configurationIssueCount > 0) {
     console.log(
-      "Run `pnpm worktree setup` from each affected non-main worktree to provision its .env, database, and port."
+      "Run `bun run worktree setup` from each affected non-main worktree to provision its .env, database, and port."
     );
   }
 }
@@ -168,7 +172,7 @@ async function fetchExistingDbs(
 
 async function cmdCreate(name: string) {
   if (!name) {
-    console.error("❌ Usage: pnpm worktree create <name>");
+    console.error("❌ Usage: bun run worktree create <name>");
     process.exit(1);
   }
   if (!/^[a-z0-9][a-z0-9-]*$/.test(name)) {
@@ -187,7 +191,9 @@ async function cmdCreate(name: string) {
   const mainWorktree = worktrees.find(wt => wt.isMain);
   const mainEnv = readEnv(path.join(mainWorktree?.path ?? repoRoot, ".env"));
   if (!mainEnv.DATABASE_URL) {
-    console.error("❌ Main .env has no DATABASE_URL. Run `pnpm setup` first.");
+    console.error(
+      "❌ Main .env has no DATABASE_URL. Run `bun run setup` first."
+    );
     process.exit(1);
   }
 
@@ -224,7 +230,7 @@ async function cmdCreate(name: string) {
   });
 
   console.log(`\n✅ Worktree '${name}' ready`);
-  console.log(`   cd ${worktreePath} && pnpm dev`);
+  console.log(`   cd ${worktreePath} && bun run dev`);
 }
 
 async function cmdSetup() {
@@ -234,7 +240,9 @@ async function cmdSetup() {
   );
 
   if (!current || current.isMain) {
-    console.error("❌ Run `pnpm worktree setup` from a non-main Git worktree");
+    console.error(
+      "❌ Run `bun run worktree setup` from a non-main Git worktree"
+    );
     process.exit(1);
   }
 
@@ -243,7 +251,7 @@ async function cmdSetup() {
   const mainEnv = readEnv(path.join(mainPath, ".env"));
   if (!mainEnv.DATABASE_URL) {
     console.error(
-      "❌ Main worktree .env has no DATABASE_URL. Run `pnpm setup` first."
+      "❌ Main worktree .env has no DATABASE_URL. Run `bun run setup` first."
     );
     process.exit(1);
   }
@@ -276,7 +284,7 @@ async function cmdSetup() {
   });
 
   console.log(`\n✅ Worktree '${current.name}' ready`);
-  console.log(`   pnpm dev`);
+  console.log(`   bun run dev`);
 }
 
 async function provisionWorktree({
@@ -296,11 +304,11 @@ async function provisionWorktree({
   newPort: number;
   sourceDb: string;
 }) {
+  console.log(`📦 Preparing node_modules...`);
+  await installDependencies(targetPath);
+
   console.log(`🗄️  Cloning database ${sourceDb} → ${newDb}...`);
   await cloneDatabase(mainEnv.DATABASE_URL, sourceDb, newDb);
-
-  console.log(`📦 Preparing node_modules...`);
-  await cloneNodeModules(sourcePath, targetPath);
 
   console.log(`📄 Writing .env...`);
   writeWorktreeEnv({
@@ -314,7 +322,7 @@ async function provisionWorktree({
 
 async function cmdDelete(name: string) {
   if (!name) {
-    console.error("❌ Usage: pnpm worktree delete <name>");
+    console.error("❌ Usage: bun run worktree delete <name>");
     process.exit(1);
   }
 
@@ -387,7 +395,10 @@ async function cmdDelete(name: string) {
 }
 
 async function cmdCleanup() {
-  const mainEnv = readEnv(path.join(repoRoot, ".env"));
+  const worktrees = await listWorktrees();
+  const mainPath = worktrees.find(tree => tree.isMain)?.path;
+  if (!mainPath) throw new Error("Main worktree not found");
+  const mainEnv = readEnv(path.join(mainPath, ".env"));
   if (!mainEnv.DATABASE_URL) {
     console.error("❌ Main .env has no DATABASE_URL.");
     process.exit(1);
@@ -399,7 +410,6 @@ async function cmdCleanup() {
   console.log(`🌿 Pruning stale git worktree records...`);
   await $`git worktree prune -v`.nothrow();
 
-  const worktrees = await listWorktrees();
   const expectedDbs = new Set(
     worktrees
       .filter(tree => !tree.isMain)
@@ -411,7 +421,7 @@ async function cmdCleanup() {
   const sql = postgres(adminUrl);
   const rows = await sql<{ datname: string }[]>`
     SELECT datname FROM pg_database
-    WHERE datname LIKE ${`${sourceDb}_%`}
+    WHERE starts_with(datname, ${`${sourceDb}_`})
   `;
   await sql.end();
 
@@ -484,24 +494,8 @@ async function dropDatabase(url: string, dbName: string) {
   await sql.end();
 }
 
-async function cloneNodeModules(from: string, to: string) {
-  const src = path.join(from, "node_modules");
-  const dst = path.join(to, "node_modules");
-  if (fs.existsSync(dst)) {
-    console.log(`   (node_modules already exists, skipping)`);
-    return;
-  }
-  if (!fs.existsSync(src)) {
-    console.log(`   (no node_modules in main, running pnpm install instead)`);
-    await $`cd ${to} && pnpm install`;
-    return;
-  }
-
-  if (os.platform() === "darwin") {
-    await $`cp -cR ${src} ${dst}`;
-  } else {
-    await $`cp -R ${src} ${dst}`;
-  }
+async function installDependencies(worktreePath: string) {
+  await $`cd ${worktreePath} && bun install --frozen-lockfile`;
 }
 
 function writeWorktreeEnv({
@@ -568,7 +562,7 @@ switch (subcommand) {
   default:
     console.error(`Unknown subcommand: ${subcommand}`);
     console.error(
-      `Usage: pnpm worktree [list|create <name>|setup|delete <name>|cleanup]`
+      `Usage: bun run worktree [list|create <name>|setup|delete <name>|cleanup]`
     );
     process.exit(1);
 }

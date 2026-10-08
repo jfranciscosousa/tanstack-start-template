@@ -1,6 +1,7 @@
 import postgres from "postgres";
-import { createInterface } from "node:readline/promises";
+import { $ } from "bun";
 
+import { question } from "./helpers/question.ts";
 import { loadEnv } from "./helpers/env.ts";
 
 await loadEnv();
@@ -18,12 +19,12 @@ if (process.env.NODE_ENV === "production") {
 
 const parsedDatabaseUrl = new URL(databaseUrl);
 const databaseName = parsedDatabaseUrl.pathname.replace(/^\//, "");
-const args = process.argv.slice(3);
+const args = process.argv.slice(2);
 const forceFlagIndex = args.indexOf("--force-reset");
 const confirmedDatabaseName = args.at(forceFlagIndex + 1);
 if (forceFlagIndex === -1 || confirmedDatabaseName !== databaseName) {
   console.error(
-    `❌ Destructive reset requires: pnpm db:reset --force-reset ${databaseName}`
+    `❌ Destructive reset requires: bun run db:reset --force-reset ${databaseName}`
   );
   process.exit(1);
 }
@@ -45,14 +46,9 @@ if (!localHosts.has(parsedDatabaseUrl.hostname)) {
   }
 
   const verification = `reset ${databaseName} on ${parsedDatabaseUrl.hostname}`;
-  const prompt = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  const answer = await prompt.question(
+  const answer = await question(
     `⚠️  Remote database detected. Type '${verification}' to continue: `
   );
-  prompt.close();
 
   if (answer !== verification) {
     console.error("❌ Manual verification failed. Database was not changed.");
@@ -76,6 +72,6 @@ await sql`CREATE SCHEMA public`;
 await sql.end();
 
 console.log("🗄️  Applying migrations with drizzle-kit...");
-await $`pnpm drizzle-kit migrate`;
+await $`bun run drizzle-kit migrate`;
 
 console.log("✅ Database reset complete!");

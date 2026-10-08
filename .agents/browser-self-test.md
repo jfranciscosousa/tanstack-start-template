@@ -1,15 +1,15 @@
 # Browser self-test sessions
 
-After project setup, start the app with `pnpm dev` in one terminal. In a second terminal, run:
+After project setup, start the app with `bun run dev` in one terminal. In a second terminal, run:
 
 ```bash
 export AGENT_BROWSER_SESSION="$(agent-browser session id --scope worktree --prefix selftest)"
-pnpm browser:auth
+bun run browser:auth
 agent-browser open http://localhost:3000/profile
 agent-browser snapshot -i
 ```
 
-Use the configured `BETTER_AUTH_URL` instead of `http://localhost:3000` if the app runs on another origin. By default, `pnpm browser:auth` creates a new user through Better Auth's sign-up endpoint.
+Use the configured `BETTER_AUTH_URL` instead of `http://localhost:3000` if the app runs on another origin. By default, `bun run browser:auth` creates a new user through Better Auth's sign-up endpoint.
 
 To use an existing account, set its email and enter its password without displaying it (type the password and press Enter after `read`):
 
@@ -17,7 +17,7 @@ To use an existing account, set its email and enter its password without display
 export BROWSER_AUTH_EMAIL="you@example.com"
 read -rs BROWSER_AUTH_PASSWORD
 export BROWSER_AUTH_PASSWORD
-pnpm browser:auth
+bun run browser:auth
 unset BROWSER_AUTH_EMAIL BROWSER_AUTH_PASSWORD
 agent-browser open http://localhost:3000/profile
 ```

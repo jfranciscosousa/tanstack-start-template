@@ -1,6 +1,7 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun
 
 import { existsSync } from "fs";
+import { $ } from "bun";
 
 import { loadEnv } from "./helpers/env.ts";
 
@@ -22,7 +23,6 @@ const testDatabaseUrl = process.env.DATABASE_URL;
 if (!testDatabaseUrl) throw new Error("DATABASE_URL is not set");
 const testDatabaseName = new URL(testDatabaseUrl).pathname.replace(/^\//, "");
 
-$.stdio = "inherit";
-await $`pnpm exec playwright install chromium`;
-await $`pnpm db:reset --force-reset ${testDatabaseName}`;
+await $`bun run playwright install chromium`;
+await $`bun run db:reset --force-reset ${testDatabaseName}`;
 console.log("✅ End-to-end dependencies set up successfully!");

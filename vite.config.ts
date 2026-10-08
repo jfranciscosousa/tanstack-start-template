@@ -1,4 +1,6 @@
-import { defineConfig } from "vite";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
+import { join } from "node:path";
+import { readdirSync, realpathSync } from "node:fs";
 import { nitro } from "nitro/vite";
 import react from "@vitejs/plugin-react";
 import { varlockVitePlugin } from "@varlock/vite-integration";
@@ -18,6 +20,7 @@ export default defineConfig({
 
     nitro({
       preset: process.env.NITRO_PRESET || "vercel",
+      devServer: { runner: "node-worker" },
       compatibilityDate: "2026-03-21",
     }),
 
@@ -26,6 +29,15 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    fs: {
+      // Nitro loads bundled dev modules through package paths in Bun's shared store.
+      allow: [
+        searchForWorkspaceRoot(process.cwd()),
+        ...readdirSync("node_modules/.bun", { withFileTypes: true })
+          .filter(entry => entry.isSymbolicLink())
+          .map(entry => realpathSync(join("node_modules/.bun", entry.name))),
+      ],
+    },
     port: 3000,
   },
 });

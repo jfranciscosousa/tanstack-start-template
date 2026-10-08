@@ -1,0 +1,8 @@
+# Varlock must control environment selection and validation.
+env = false
+
+[install]
+auto = "disable"
+linker = "isolated"
+globalStore = true
+minimumReleaseAge = 86400

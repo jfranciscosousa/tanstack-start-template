@@ -1,6 +1,7 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun
 
 import { existsSync } from "fs";
+import { $ } from "bun";
 
 import { loadEnv } from "./helpers/env.ts";
 
@@ -16,7 +17,7 @@ if (!process.env.CI && !existsSync(".env.test")) {
 
 await loadEnv();
 
-const args = process.argv.slice(3);
+const args = process.argv.slice(2);
 const useWatch = args.includes("--watch");
 const filteredArgs = args.filter(arg => arg !== "--watch");
 
@@ -27,6 +28,5 @@ const testDatabaseUrl = process.env.DATABASE_URL;
 if (!testDatabaseUrl) throw new Error("DATABASE_URL is not set");
 const testDatabaseName = new URL(testDatabaseUrl).pathname.replace(/^\//, "");
 
-$.stdio = "inherit";
-await $`pnpm db:reset --force-reset ${testDatabaseName}`;
-await $`pnpm exec vitest ${vitestArgs}`;
+await $`bun run db:reset --force-reset ${testDatabaseName}`;
+await $`bun run vitest ${vitestArgs}`;

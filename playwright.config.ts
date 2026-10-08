@@ -2,7 +2,9 @@ import type { PlaywrightTestConfig } from "@playwright/test";
 
 import { devices } from "@playwright/test";
 
-const { screen: deviceScreen, ...desktopChrome } = devices["Desktop Chrome"];
+const { screen: deviceScreen, ...desktopChrome } = devices[
+  "Desktop Chrome"
+] as (typeof devices)[string] & { screen?: unknown };
 void deviceScreen;
 
 /**
@@ -47,7 +49,7 @@ const config: PlaywrightTestConfig = {
     trace: "on-first-retry",
   },
   webServer: {
-    command: "PORT=3001 pnpm dev",
+    command: "PORT=3001 bun run dev",
     gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
     timeout: 30000,
     url: "http://localhost:3001",

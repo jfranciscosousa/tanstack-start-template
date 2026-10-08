@@ -10,13 +10,13 @@ function hasExitCode(error: unknown): error is { exitCode: number } {
   );
 }
 
-const [scriptPath, ...args] = process.argv.slice(3);
+const [scriptPath, ...args] = process.argv.slice(2);
 
 if (!scriptPath) {
   console.error("❌ Specify a script to run.");
   process.exitCode = 1;
 } else {
-  process.argv = [...process.argv.slice(0, 2), scriptPath, ...args];
+  process.argv = [process.argv[0], scriptPath, ...args];
 
   try {
     await import(pathToFileURL(resolve(scriptPath)).href);

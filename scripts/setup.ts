@@ -1,7 +1,10 @@
-#!/usr/bin/env pnpm zx
+#!/usr/bin/env -S bun
 
 import { readFile, writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
+import { $ } from "bun";
+
+import { question } from "./helpers/question.ts";
 
 const TEMPLATE_NAME = "tanstack-start-template";
 
@@ -31,8 +34,12 @@ app_name ||= TEMPLATE_NAME;
 // Rename app in all relevant files if a new name was given
 if (app_name !== TEMPLATE_NAME) {
   console.log(`✏️  Renaming app to '${app_name}'...`);
-  await $`sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" README.md`;
-  await $`sed -i '' "s|${TEMPLATE_NAME}|${app_name}|g" src/lib/app-config.ts`;
+  await Promise.all(
+    ["README.md", "src/lib/app-config.ts"].map(async path => {
+      const content = await readFile(path, "utf8");
+      await writeFile(path, content.replaceAll(TEMPLATE_NAME, app_name));
+    })
+  );
   console.log("✅ App renamed");
 }
 
@@ -87,22 +94,22 @@ console.log("✅ Environment files configured");
 
 // Install dependencies
 console.log("\n📦 Installing dependencies...");
-await $`pnpm install`;
-await $`pnpm exec playwright install chromium`;
+await $`bun install --frozen-lockfile`;
+await $`bun run playwright install chromium`;
 
 // Apply database schema
 console.log("\n🗄️  Setting up databases...");
 console.log(`Creating development database: ${dev_db_name}`);
-await $`createdb "${dev_db_name}" 2>/dev/null || echo "   Database ${dev_db_name} already exists (or createdb failed)"`;
+await $`PGPASSWORD=${db_password} createdb --host=${db_host} --port=${db_port} --username=${db_user} ${dev_db_name}`;
 
 console.log(`Creating test database: ${test_db_name}`);
-await $`createdb "${test_db_name}" 2>/dev/null || echo "   Database ${test_db_name} already exists (or createdb failed)"`;
+await $`PGPASSWORD=${db_password} createdb --host=${db_host} --port=${db_port} --username=${db_user} ${test_db_name}`;
 
 console.log("Applying migrations to development database...");
-await $`pnpm drizzle-kit migrate`;
+await $`DATABASE_URL=${dev_db_url} bun run drizzle-kit migrate`;
 
 console.log("Applying migrations to test database...");
-await $`DATABASE_URL="${test_db_url}" pnpm drizzle-kit migrate`;
+await $`DATABASE_URL=${test_db_url} bun run drizzle-kit migrate`;
 
 console.log(`\n🎉 Setup complete! Your project '${app_name}' is ready to go:`);
 console.log("   ✅ Dependencies installed");

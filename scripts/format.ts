@@ -1,11 +1,21 @@
-const DEFAULT_PATHS = ["src", "scripts"];
+import { $ } from "bun";
 
-const args = process.argv.slice(3);
+const DEFAULT_PATHS = [
+  "src",
+  "scripts",
+  "vite.config.ts",
+  "vitest.config.ts",
+  "playwright.config.ts",
+  "drizzle.config.ts",
+  "nitro.config.ts",
+  "oxlint.config.ts",
+];
+
+const args = process.argv.slice(2);
 const hasPath = args.some(arg => !arg.startsWith("-"));
 const paths = hasPath ? [] : DEFAULT_PATHS;
 
 const allArgs = [...paths, ...args].filter(Boolean);
 console.log(`> oxfmt ${allArgs.join(" ")}`);
 
-$.stdio = "inherit";
-await $`pnpm exec oxfmt ${allArgs}`;
+await $`bun run oxfmt ${allArgs}`;
