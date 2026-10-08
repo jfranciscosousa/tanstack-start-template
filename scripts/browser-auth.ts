@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bun --preload zx/globals
+#!/usr/bin/env -S bun
 
 import { spawnSync } from "node:child_process";
 

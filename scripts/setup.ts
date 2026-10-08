@@ -1,7 +1,10 @@
-#!/usr/bin/env -S bun --preload zx/globals
+#!/usr/bin/env -S bun
 
 import { readFile, writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
+import { $ } from "bun";
+
+import { question } from "./helpers/question.ts";
 
 const TEMPLATE_NAME = "tanstack-start-template";
 

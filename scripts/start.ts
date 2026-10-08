@@ -1,6 +1,7 @@
-#!/usr/bin/env -S bun --preload zx/globals
+#!/usr/bin/env -S bun
 
 import { existsSync } from "fs";
+import { $ } from "bun";
 
 import { loadEnv } from "./helpers/env.ts";
 
@@ -18,5 +19,6 @@ if (!existsSync(SERVER_FILE)) {
 
 console.log("🚀 Starting production server...");
 
-$.stdio = "inherit";
+// Resolved-env injection can replace PORT with the build-time value.
+process.env.NITRO_PORT ??= process.env.PORT ?? "3000";
 await $`bun .output/server/index.mjs`;

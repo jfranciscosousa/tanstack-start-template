@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bun --preload zx/globals
+#!/usr/bin/env -S bun
 
 console.log(`
 📋 Available Scripts

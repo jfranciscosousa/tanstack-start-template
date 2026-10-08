@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   readFile: vi.fn<(path: string, encoding: string) => Promise<string>>(),
@@ -15,6 +15,9 @@ const mocks = vi.hoisted(() => ({
     ) => Promise<void>
   >(),
 }));
+
+// oxlint-disable-next-line id-length -- Bun exports the shell under this name.
+vi.mock("bun", () => ({ $: mocks.run }));
 
 vi.mock("node:fs/promises", () => ({ ...mocks, default: mocks }));
 
@@ -43,10 +46,7 @@ describe("skills:update", () => {
     ]);
     mocks.run.mockResolvedValue(undefined);
     mocks.writeFile.mockResolvedValue(undefined);
-    vi.stubGlobal("$", mocks.run);
   });
-
-  afterEach(() => vi.unstubAllGlobals());
 
   it("refreshes only tracked skills in the shared directory and normalizes commands", async () => {
     await import("./skills-update.ts");

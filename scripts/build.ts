@@ -1,10 +1,11 @@
+import { $ } from "bun";
+
 import { envPreflight } from "./helpers/env-preflight.ts";
 
 await envPreflight();
 
 console.log("🔨 Building TanStack Start application...");
 
-$.stdio = "inherit";
 await $`bun run vite build`;
 
 console.log("✅ Build completed successfully!");

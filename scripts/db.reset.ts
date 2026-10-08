@@ -1,6 +1,7 @@
 import postgres from "postgres";
-import { createInterface } from "node:readline/promises";
+import { $ } from "bun";
 
+import { question } from "./helpers/question.ts";
 import { loadEnv } from "./helpers/env.ts";
 
 await loadEnv();
@@ -45,14 +46,9 @@ if (!localHosts.has(parsedDatabaseUrl.hostname)) {
   }
 
   const verification = `reset ${databaseName} on ${parsedDatabaseUrl.hostname}`;
-  const prompt = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  const answer = await prompt.question(
+  const answer = await question(
     `⚠️  Remote database detected. Type '${verification}' to continue: `
   );
-  prompt.close();
 
   if (answer !== verification) {
     console.error("❌ Manual verification failed. Database was not changed.");

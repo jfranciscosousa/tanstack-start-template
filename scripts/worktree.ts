@@ -1,12 +1,17 @@
 import postgres from "postgres";
 import path from "node:path";
 import fs from "node:fs";
+import { $ } from "bun";
+
+import { question } from "./helpers/question.ts";
 
 const DEFAULT_PORT = 3000;
 
 const [subcommand, ...args] = process.argv.slice(2);
 
-const repoRoot = (await $`git rev-parse --show-toplevel`).stdout.trim();
+const repoRoot = (await $`git rev-parse --show-toplevel`).stdout
+  .toString()
+  .trim();
 const repoName = path.basename(repoRoot);
 const worktreesRoot = path.resolve(repoRoot, "..", "worktrees", repoName);
 
@@ -21,7 +26,7 @@ interface WorktreeInfo {
 
 async function listWorktrees(): Promise<WorktreeInfo[]> {
   const { stdout } = await $`git worktree list --porcelain`.quiet();
-  const blocks = stdout.split("\n\n").filter(Boolean);
+  const blocks = stdout.toString().split("\n\n").filter(Boolean);
 
   return blocks.map((block, index) => {
     const lines = block.split("\n");

@@ -1,10 +1,10 @@
 import { join } from "node:path";
 import { readFile, readdir, writeFile } from "node:fs/promises";
+import { $ } from "bun";
 
 const lock = JSON.parse(await readFile("skills-lock.json", "utf8")) as {
   skills: Record<string, { source: string; sourceType: string }>;
 };
-$.stdio = "inherit";
 try {
   for (const [name, skill] of Object.entries(lock.skills)) {
     const source =

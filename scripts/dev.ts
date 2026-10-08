@@ -1,8 +1,8 @@
+import { $ } from "bun";
+
 import { envPreflight } from "./helpers/env-preflight.ts";
 
 await envPreflight();
-
-$.stdio = "inherit";
 
 const port = process.env.PORT ?? "3000";
 

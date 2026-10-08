@@ -1,7 +1,7 @@
+import { $ } from "bun";
+
 process.env.NODE_ENV = "test";
 process.env.APP_ENV ??= "test";
-
-$.stdio = "inherit";
 
 console.log("🤖 Running CI pipeline...");
 

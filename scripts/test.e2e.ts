@@ -1,6 +1,7 @@
-#!/usr/bin/env -S bun --preload zx/globals
+#!/usr/bin/env -S bun
 
 import { existsSync } from "fs";
+import { $ } from "bun";
 
 import { loadEnv } from "./helpers/env.ts";
 
@@ -23,6 +24,5 @@ const filteredArgs = args.filter(arg => arg !== "--ui");
 const playwrightArgs = [useUI ? "--ui" : "", ...filteredArgs].filter(Boolean);
 console.log(`> playwright test ${playwrightArgs.join(" ")}`);
 
-$.stdio = "inherit";
 await $`bun run test:e2e:setup`;
 await $`bun run playwright test ${playwrightArgs}`;

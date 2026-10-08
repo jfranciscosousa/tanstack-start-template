@@ -5,6 +5,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "~": path.resolve(import.meta.dirname, "./src"),
+      bun: path.resolve(
+        import.meta.dirname,
+        "./scripts/helpers/bun-shell-test.ts"
+      ),
     },
   },
 

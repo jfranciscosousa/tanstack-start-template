@@ -1,3 +1,5 @@
+import { $ } from "bun";
+
 const DEFAULT_PATHS = [
   "src",
   "scripts",
@@ -16,5 +18,4 @@ const paths = hasPath ? [] : DEFAULT_PATHS;
 const allArgs = ["--deny-warnings", ...paths, ...args].filter(Boolean);
 console.log(`> oxlint ${allArgs.join(" ")}`);
 
-$.stdio = "inherit";
 await $`bun run oxlint ${allArgs}`;
