@@ -1,55 +1,50 @@
 import type { Page } from "@playwright/test";
-import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 
-import { expect } from "@playwright/test";
-import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
 
-import { createUserAndLogin, test } from "./utils";
+import { createUserAndLogin, expect, test } from "./utils";
 
-async function createNote(screen: Screen) {
+function getNotes(page: Page) {
+  return page.locator(".break-inside-avoid");
+}
+
+async function createNote(page: Page) {
   const note = faker.git.commitSha();
 
-  await screen.getByPlaceholderText("What needs to be done?").fill(note);
-  await screen.getByText("Add task").click();
-  await screen.findByText(note);
+  await page.getByPlaceholder("What needs to be done?").fill(note);
+  await page.getByText("Add task", { exact: true }).click();
+  await expect(page.getByText(note, { exact: true })).toBeVisible();
 
   return note;
 }
 
-function getNotesLength(page: Page) {
-  return page.locator(".break-inside-avoid").count();
-}
+test("creates todos", async ({ page }) => {
+  await createUserAndLogin(page);
 
-test("creates todos", async ({ page, screen }) => {
-  await createUserAndLogin(page, screen);
+  const note = await createNote(page);
 
-  const note = await createNote(screen);
-
-  expect(await screen.getByText(note).count()).toBe(1);
+  await expect(page.getByText(note, { exact: true })).toHaveCount(1);
 });
 
-test("deletes todos", async ({ page, screen }) => {
-  await createUserAndLogin(page, screen);
-  await createNote(screen);
+test("deletes todos", async ({ page }) => {
+  await createUserAndLogin(page);
+  await createNote(page);
 
-  const notesCountBefore = await getNotesLength(page);
+  const notesCountBefore = await getNotes(page).count();
   await page.locator(".break-inside-avoid button").first().click();
   await page.getByRole("button", { name: "Delete", exact: true }).click();
 
-  await waitFor(async () =>
-    expect(await getNotesLength(page)).toBe(notesCountBefore - 1)
-  );
+  await expect(getNotes(page)).toHaveCount(notesCountBefore - 1);
 });
 
-test("deletes all todos", async ({ page, screen }) => {
-  await createUserAndLogin(page, screen);
-  await createNote(screen);
-  await createNote(screen);
-  await createNote(screen);
+test("deletes all todos", async ({ page }) => {
+  await createUserAndLogin(page);
+  await createNote(page);
+  await createNote(page);
+  await createNote(page);
 
   await page.getByRole("button", { name: "Clear all" }).first().click();
   await page.getByRole("button", { name: "Clear all" }).last().click();
 
-  await waitFor(async () => expect(await getNotesLength(page)).toBe(0));
+  await expect(getNotes(page)).toHaveCount(0);
 });

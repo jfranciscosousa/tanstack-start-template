@@ -1,4 +1,3 @@
-import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
 
 import {
@@ -8,44 +7,42 @@ import {
   waitForLoadersToDisappear,
 } from "./utils";
 
-test("signs up and lands on the todos page", async ({ page, screen }) => {
+test("signs up and lands on the todos page", async ({ page }) => {
   await page.goto("/signup");
-  await waitForLoadersToDisappear(screen);
+  await waitForLoadersToDisappear(page);
 
-  await screen.getByLabelText("Email").fill(faker.internet.email());
-  await screen.getByLabelText("Name").fill(faker.person.fullName());
-  await screen.getByLabelText("Password").fill("foobar123");
-  await screen.getByLabelText("Confirm password").fill("foobar123");
-  await screen.getByText("Create account", { selector: "button" }).click();
+  await page.getByLabel("Email", { exact: true }).fill(faker.internet.email());
+  await page.getByLabel("Name", { exact: true }).fill(faker.person.fullName());
+  await page.getByLabel("Password", { exact: true }).fill("foobar123");
+  await page.getByLabel("Confirm password", { exact: true }).fill("foobar123");
+  await page
+    .getByRole("button", { name: "Create account", exact: true })
+    .click();
 
   await page.waitForURL("/");
 });
 
 test("logs in without rendering the authentication error boundary", async ({
   page,
-  screen,
 }) => {
   const errors: string[] = [];
   page.on("console", message => {
     if (message.type() === "error") errors.push(message.text());
   });
 
-  await createUserAndLogin(page, screen);
+  await createUserAndLogin(page);
 
   expect(errors.filter(error => error.includes("AppError"))).toEqual([]);
 });
 
-test("shows login and then redirects to original page", async ({
-  page,
-  screen,
-}) => {
-  await createUserAndLogin(page, screen, "/profile");
+test("shows login and then redirects to original page", async ({ page }) => {
+  await createUserAndLogin(page, "/profile");
 
   await page.waitForURL("/profile?tab=profile");
 });
 
-test("drives profile tabs from URL state", async ({ page, screen }) => {
-  await createUserAndLogin(page, screen, "/profile?tab=sessions");
+test("drives profile tabs from URL state", async ({ page }) => {
+  await createUserAndLogin(page, "/profile?tab=sessions");
 
   await page.waitForURL("/profile?tab=sessions");
   await expect(page.getByRole("tab", { name: /sessions/i })).toHaveAttribute(
@@ -62,14 +59,12 @@ test("drives profile tabs from URL state", async ({ page, screen }) => {
   );
 });
 
-test("logs out and drops user on login page", async ({ page, screen }) => {
-  const user = await createUserAndLogin(page, screen);
+test("logs out and drops user on login page", async ({ page }) => {
+  const user = await createUserAndLogin(page);
 
   await page.getByLabel("Account menu").click();
-  await (await screen.findByText("Sign out")).click();
+  await page.getByText("Sign out", { exact: true }).click();
 
-  await waitFor(async () => {
-    expect(await (await screen.findByText("Sign in")).count()).toBe(1);
-    expect(await screen.queryByText(user.name).count()).toBe(0);
-  });
+  await expect(page.getByText("Sign in", { exact: true })).toHaveCount(1);
+  await expect(page.getByText(user.name, { exact: true })).toHaveCount(0);
 });

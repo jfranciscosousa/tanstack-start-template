@@ -1,24 +1,15 @@
 import type { Page } from "@playwright/test";
-import type { LocatorFixtures as TestingLibraryFixtures } from "@playwright-testing-library/test/fixture.js";
-import type { Screen } from "@playwright-testing-library/test/dist/fixture/types";
 
-import { test as base } from "@playwright/test";
-import { locatorFixtures as fixtures } from "@playwright-testing-library/test/fixture.js";
-import { waitFor } from "@playwright-testing-library/test";
+import { expect } from "@playwright/test";
 import { faker } from "@faker-js/faker";
 
 import { auth } from "~/lib/auth";
 
 export const USER_TEST_PASSWORD = "foobar123";
 
-export const test = base.extend<TestingLibraryFixtures>(fixtures);
-export const { expect } = test;
+export { expect, test } from "@playwright/test";
 
-export async function createUserAndLogin(
-  page: Page,
-  screen: Screen,
-  originalPage?: string
-) {
+export async function createUserAndLogin(page: Page, originalPage?: string) {
   const password = USER_TEST_PASSWORD;
   const email = faker.internet.email({
     firstName: crypto.randomUUID().replaceAll("-", ""),
@@ -30,21 +21,16 @@ export async function createUserAndLogin(
   });
 
   await page.goto(originalPage || "/");
-  await waitForLoadersToDisappear(screen);
+  await waitForLoadersToDisappear(page);
 
-  await screen.getByLabelText("Email").fill(email);
-  await screen.getByLabelText("Password").fill(password);
-  await screen.getByText("Sign in", { selector: "button" }).click();
-  await waitFor(async () => {
-    await expect(screen.getByTestId(`Welcome ${name}`)).toBeVisible();
-  });
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByTestId(`Welcome ${name}`)).toBeVisible();
 
   return user;
 }
 
-export async function waitForLoadersToDisappear(screen: Screen) {
-  await waitFor(async () => {
-    const loaders = await screen.findAllByTestId("loader");
-    await expect(loaders).toHaveCount(0);
-  });
+export async function waitForLoadersToDisappear(page: Page) {
+  await expect(page.getByTestId("loader")).toHaveCount(0);
 }

@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 import { expect } from "@playwright/test";
-import { waitFor } from "@playwright-testing-library/test";
 import { faker } from "@faker-js/faker";
 
 import { users } from "~/server/db/schema";
@@ -17,8 +16,8 @@ function assertUserSame(user1: object, user2: object) {
   });
 }
 
-test("renders profile", async ({ page, screen }) => {
-  const user = await createUserAndLogin(page, screen);
+test("renders profile", async ({ page }) => {
+  const user = await createUserAndLogin(page);
 
   await page.goto("/profile");
 
@@ -26,8 +25,8 @@ test("renders profile", async ({ page, screen }) => {
   expect(page.getByText(user.email)).toBeTruthy();
 });
 
-test("updates profile", async ({ page, screen }) => {
-  const user = await createUserAndLogin(page, screen);
+test("updates profile", async ({ page }) => {
+  const user = await createUserAndLogin(page);
   const newName = faker.person.firstName();
   const newPassword = faker.internet.password();
 
@@ -40,11 +39,7 @@ test("updates profile", async ({ page, screen }) => {
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
-  await waitFor(async () => {
-    await expect(
-      screen.getByText("Profile updated successfully!")
-    ).toBeVisible();
-  });
+  await expect(page.getByText("Profile updated successfully!")).toBeVisible();
 
   const [updatedUser] = await db
     .select()
@@ -65,8 +60,8 @@ test("updates profile", async ({ page, screen }) => {
   ).toBeTruthy();
 });
 
-test("updates email", async ({ page, screen }) => {
-  const user = await createUserAndLogin(page, screen);
+test("updates email", async ({ page }) => {
+  const user = await createUserAndLogin(page);
   const newEmail = faker.internet.email({
     firstName: crypto.randomUUID().replaceAll("-", ""),
   });
@@ -76,11 +71,7 @@ test("updates email", async ({ page, screen }) => {
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
-  await waitFor(async () => {
-    await expect(
-      screen.getByText("Profile updated successfully!")
-    ).toBeVisible();
-  });
+  await expect(page.getByText("Profile updated successfully!")).toBeVisible();
 
   const [updatedUser] = await db
     .select()
@@ -97,9 +88,8 @@ test("updates email", async ({ page, screen }) => {
 
 test("does not update profile if password confirmation does not match", async ({
   page,
-  screen,
 }) => {
-  const user = await createUserAndLogin(page, screen);
+  const user = await createUserAndLogin(page);
   const newPassword = faker.internet.password();
 
   await page.goto("/profile");
@@ -110,7 +100,7 @@ test("does not update profile if password confirmation does not match", async ({
   await page.locator("#currentPassword").fill(USER_TEST_PASSWORD);
   await page.getByRole("button", { name: "Save Changes" }).click();
 
-  await screen.findByText("Passwords must match");
+  await expect(page.getByText("Passwords must match")).toBeVisible();
 
   const [updatedUser] = await db
     .select()
@@ -131,8 +121,8 @@ test("does not update profile if password confirmation does not match", async ({
   ).toBeTruthy();
 });
 
-test("does not update profile if password is bad", async ({ page, screen }) => {
-  const user = await createUserAndLogin(page, screen);
+test("does not update profile if password is bad", async ({ page }) => {
+  const user = await createUserAndLogin(page);
   const newName = faker.person.firstName();
 
   await page.goto("/profile");
@@ -140,7 +130,7 @@ test("does not update profile if password is bad", async ({ page, screen }) => {
   await page.locator("#currentPassword").fill("bad_password");
   await page.getByRole("button", { name: "Save Changes" }).click();
 
-  await screen.findByText("The current password is wrong");
+  await expect(page.getByText("The current password is wrong")).toBeVisible();
 
   const [updatedUser] = await db
     .select()
