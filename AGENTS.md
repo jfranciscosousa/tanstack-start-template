@@ -32,7 +32,12 @@ Use `bunx` for one-shot tools.
 
 ## Runtime and dependency maintenance
 
-- `mise` cannot install Bun canary (HTTP 404). Download the canary binary from the Bun GitHub release.
-- `.deepsec` is a separate pnpm workspace. Audit and update it on its own. Open findings there (last checked 2026-11-08): `zod` 3.24.4 and `minimatch` 10.2.6, both transitive. A major bump fixes `minimatch`. No fixed `zod` 3.x release exists.
+- Bun tracks canary in `.tool-versions`, CI, and `vercel.json`. `mise` still returns HTTP 404 for canary. Use the [Bun canary release](https://github.com/oven-sh/bun/releases/tag/canary) binary until `mise` resolves the correct asset (checked 2026-11-18).
+- Match the CI PostgreSQL image tag to `.tool-versions`. The local Vercel build selects `nodejs26.x`; check the built runtime when changing the Node major version.
+- Keep `drizzle-orm` and `drizzle-kit` at `1.0.0-rc.2-203eab8`. The matched `1.0.0-rc.5` pair rejects the existing migration snapshots. Revisit when the snapshot upgrade can be validated against existing databases (checked 2026-11-18).
+- Nitro tracks the 3.0 release candidate. Move to stable when Nitro 3.0 is available (checked 2026-11-18).
+- `lucide-react` 1.75.0 and Vitest 5.1.1 have not passed the 24-hour Bun release age on 2026-11-18. Recheck after that period.
+- The app audit still reports transitive [`minimatch` 10.2.6](https://github.com/advisories/GHSA-g3hv-75wg-m249) and [`picomatch` 4.0.7](https://github.com/advisories/GHSA-fc5q-39xc-vjpf). These are tooling paths, not part of the Vercel server bundle. Recheck when the Shadcn CLI dependency chain accepts Minimatch 11 or Picomatch publishes a fix (checked 2026-11-18).
+- `.deepsec` is a separate, local-only pnpm workspace. Audit and update it on its own. Keep the Zod 4 override for [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5) until the dependency graph resolves patched Zod 4 on its own. Zod 3.24.4 remains through `@vercel/sandbox` 1.x; there is no patched Zod 3 release. Deepsec also remains on vulnerable [`minimatch` 10.2.6](https://github.com/advisories/GHSA-g3hv-75wg-m249). Recheck when Deepsec adopts a Sandbox release that uses Zod 4 and accepts Minimatch 11 (checked 2026-11-18).
+- For isolated E2E runs, set `E2E_PORT` and point `BETTER_AUTH_URL` to `http://localhost:<E2E_PORT>`. The E2E setup resets the database named in `DATABASE_URL`; use a throwaway local database. Playwright allows 120 seconds for the first Nitro render on a cold start.
 - E2E tests use native Playwright queries. `@playwright-testing-library/test` is archived and breaks Playwright 1.64 and later. Do not add it back.
-- The `@modelcontextprotocol/sdk` override in the root `package.json` matched no installed package on 2026-11-08. Verify, then remove it.
