@@ -2,8 +2,6 @@
 
 Production-ready TanStack Start full-stack template with session-based auth, PostgreSQL, and React 19.
 
-**Runtime and package manager:** Bun canary
-
 Use `bunx` for one-shot tools.
 
 ## CRITICAL:
@@ -30,9 +28,4 @@ Use `bunx` for one-shot tools.
 - Don't apply db changes directly — use `bun run db generate`
 - Run targeted checks after changing code. Linter, formatters, tests where applicable. Focused, avoid running unrelated tests and checks for unrelated files.
 
-## Runtime and dependency maintenance
-
-- `mise` cannot install Bun canary (HTTP 404). Download the canary binary from the Bun GitHub release.
-- `.deepsec` is a separate pnpm workspace. Audit and update it on its own. Open findings there (last checked 2026-11-08): `zod` 3.24.4 and `minimatch` 10.2.6, both transitive. A major bump fixes `minimatch`. No fixed `zod` 3.x release exists.
-- E2E tests use native Playwright queries. `@playwright-testing-library/test` is archived and breaks Playwright 1.64 and later. Do not add it back.
-- The `@modelcontextprotocol/sdk` override in the root `package.json` matched no installed package on 2026-11-08. Verify, then remove it.
+[Runtime and dependency maintenance](docs/maintenance.md)

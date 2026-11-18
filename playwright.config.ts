@@ -7,6 +7,12 @@ const { screen: deviceScreen, ...desktopChrome } = devices[
 ] as (typeof devices)[string] & { screen?: unknown };
 void deviceScreen;
 
+const port = Number(process.env.E2E_PORT ?? 3001);
+if (!Number.isInteger(port) || port < 1 || port > 65535) {
+  throw new Error("E2E_PORT must be a valid TCP port");
+}
+const baseURL = `http://localhost:${port}`;
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -43,16 +49,16 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: "http://localhost:3001",
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
   webServer: {
-    command: "PORT=3001 bun run dev",
+    command: `PORT=${port} bun run dev`,
     gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
-    timeout: 30000,
-    url: "http://localhost:3001",
+    timeout: 120000,
+    url: baseURL,
   },
   workers: 1,
 };
